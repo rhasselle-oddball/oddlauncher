@@ -1,0 +1,76 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Build outputs
+dist/
+dist-ssr/
+build/
+.output/
+.nuxt/
+.next/
+out/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE and Editor files
+.vscode/settings.json
+.vscode/launch.json
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS generated files
+Thumbs.db
+*.log
+.cache/
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# Temporary directories
+.tmp/
+temp/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Vite
+.vite/
+
+# Tauri build artifacts (already covered in src-tauri/.gitignore but adding here for completeness)
+src-tauri/target/
+src-tauri/gen/
+
+# Local user data directory for Oddbox
+.oddbox/
+
+# Testing
+.nyc_output
+
+# Storybook build outputs
+storybook-static/
+
+# Misc
+*.tgz
+*.tar.gz
+*.zip
+*.rar
