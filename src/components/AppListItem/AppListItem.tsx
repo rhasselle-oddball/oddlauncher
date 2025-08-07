@@ -12,7 +12,7 @@ interface AppListItemProps {
 export function AppListItem({ app, isSelected, onClick }: AppListItemProps) {
   // Use process management for this app
   const { isRunning, isStarting, isStopping, hasError } = useAppProcess(app.id)
-  
+
   const handleClick = () => {
     onClick(app)
   }

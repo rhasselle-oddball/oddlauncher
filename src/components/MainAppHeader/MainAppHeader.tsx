@@ -46,7 +46,7 @@ export function MainAppHeader({
 
   const handleStartStopClick = async () => {
     if (!selectedApp) return
-    
+
     try {
       if (isRunning) {
         await stop()

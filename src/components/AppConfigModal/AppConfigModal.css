@@ -113,7 +113,7 @@
 
 .modal-body {
   padding: 1.5rem;
-  max-height: calc(90vh - 140px);
+  max-height: calc(90vh - 160px); /* Increased from 140px to account for header and footer */
   overflow-y: auto;
 }
 
@@ -438,6 +438,6 @@
   }
 
   .modal-body {
-    max-height: calc(100vh - 140px);
+    max-height: calc(100vh - 160px); /* Increased from 140px to account for header and footer */
   }
 }

@@ -4,11 +4,41 @@ A native desktop application that acts like a "Steam Library for dev tools". Lau
 
 ## 🚀 Quick Start
 
+**Current State**: The application is functionally usable! You can add development projects, configure them, and start/stop processes. The only missing piece is real-time terminal output (Task 11).
+
 ### Prerequisites
 
 - **Node.js** v18+ (recommend v22.18.0)
 - **Rust** and **Cargo** (latest stable)
 - **Git**
+
+#### Platform-Specific System Dependencies
+
+**Linux (Ubuntu/Debian):**
+```bash
+sudo apt update
+sudo apt install -y \
+  libgtk-3-dev libwebkit2gtk-4.0-dev \
+  libayatana-appindicator3-dev librsvg2-dev \
+  libjavascriptcoregtk-4.1-dev libsoup-3.0-dev \
+  libwebkit2gtk-4.1-dev
+```
+
+**Linux (RHEL/Fedora):**
+```bash
+sudo dnf install -y \
+  gtk3-devel webkit2gtk4.1-devel \
+  ayatana-appindicator-gtk3-devel librsvg2-devel
+```
+
+**macOS:**
+```bash
+# Xcode Command Line Tools required
+xcode-select --install
+```
+
+**Windows:**
+- No additional dependencies needed (WebView2 is included)
 
 ### Installation
 
@@ -41,22 +71,77 @@ A native desktop application that acts like a "Steam Library for dev tools". Lau
    npm run dev
    ```
 
-2. **Run the Tauri app**
+2. **Run the Tauri app (opens automatically)**
    ```bash
-   cargo tauri dev
+   npm run tauri dev
    ```
+
+The development server will:
+- Start the frontend at http://localhost:5173/
+- Launch the desktop application automatically
+- Enable hot-reloading for both frontend and backend changes
 
 ### Building for Production
 
-1. **Build the frontend**
-   ```bash
-   npm run build
-   ```
+#### Native Platform Build (Recommended)
 
-2. **Build the Tauri app**
-   ```bash
-   cargo tauri build
-   ```
+For the best compatibility, build on the target platform:
+
+**All Platforms:**
+```bash
+npm run tauri build
+```
+
+This creates:
+- **Windows**: `.exe` installer (NSIS) and `.msi` package
+- **macOS**: `.app` bundle and `.dmg` disk image
+- **Linux**: `.deb`, `.rpm`, and `.AppImage` packages
+
+#### Cross-Platform Building
+
+You can cross-compile for other platforms from Linux:
+
+**Windows from Linux:**
+```bash
+# Install cross-compilation tools
+rustup target add x86_64-pc-windows-gnu
+sudo apt install mingw-w64
+
+# Create .cargo/config.toml (already included)
+npm run tauri build -- --target x86_64-pc-windows-gnu
+```
+
+**Output Locations:**
+- Native build: `src-tauri/target/release/bundle/`
+- Cross-compiled: `src-tauri/target/{target}/release/bundle/`
+
+#### Bundle Options
+
+The app supports multiple installer formats per platform:
+
+- **Windows**: NSIS installer (`.exe`), MSI package (`.msi`)
+- **macOS**: Application bundle (`.app`), Disk image (`.dmg`)
+- **Linux**: Debian package (`.deb`), RPM package (`.rpm`), AppImage (`.appimage`)
+
+To build only specific formats, modify `src-tauri/tauri.conf.json`:
+```json
+{
+  "bundle": {
+    "targets": ["nsis", "msi"]  // Windows example
+  }
+}
+```
+
+#### Distribution
+
+**For End Users:**
+- **Windows**: Distribute the `.exe` installer (includes WebView2 setup)
+- **macOS**: Distribute the `.dmg` file
+- **Linux**: Distribute `.deb` for Debian/Ubuntu, `.rpm` for RHEL/Fedora, or `.AppImage` for universal compatibility
+
+**For Developers:**
+- Raw executables are in `src-tauri/target/release/`
+- Require WebView2 runtime on Windows (automatically handled by installers)
 
 ## 📁 Project Structure
 
@@ -91,15 +176,28 @@ oddbox/
 2. **Issues**: Use GitHub issues for tracking work (linked to tasks)
 3. **Commits**: Use conventional commit messages (`feat:`, `fix:`, etc.)
 
-## 🎯 Features (Planned)
+## 🎯 Features
 
-- ✅ Steam-like grid layout for dev tools
-- ✅ Dark theme UI
-- ⏳ One-click server launching
-- ⏳ Real-time terminal output display
-- ⏳ Auto-launch browser tabs
-- ⏳ Custom thumbnails for apps
-- ⏳ Process management (start/stop/restart)
+### ✅ Implemented
+- Steam-like sidebar layout for dev tools
+- Dark theme UI with responsive design
+- One-click server launching and stopping
+- Real-time process status indicators
+- App configuration with form validation
+- File/directory pickers for easy setup
+- Configuration persistence (`~/.oddbox/apps.json`)
+- Process management with cleanup
+- Cross-platform support (Windows, macOS, Linux)
+
+### 🚧 In Development
+- Real-time terminal output display (Task 11)
+- Auto-launch browser functionality
+
+### 🗓️ Planned
+- Custom thumbnails for apps
+- App grouping and organization
+- Global keyboard shortcuts
+- System tray integration
 
 ## 🤝 Contributing
 

@@ -104,7 +104,7 @@ pub async fn start_app_process(
         Err(e) => {
             let error_msg = format!("Failed to start process: {}", e);
             log::error!("{}", error_msg);
-            
+
             // Emit process error event
             let _ = app_handle.emit("process-error", serde_json::json!({
                 "appId": app_id,
@@ -133,17 +133,17 @@ pub async fn start_app_process(
     if let Some(stdout) = child.stdout.take() {
         let app_handle_stdout = app_handle_clone.clone();
         let app_id_stdout = app_id_clone.clone();
-        
+
         tokio::spawn(async move {
             let mut reader = BufReader::new(stdout);
             let mut line = String::new();
-            
+
             loop {
                 match reader.read_line(&mut line).await {
                     Ok(0) => break, // EOF
                     Ok(_) => {
                         let output_line = line.trim_end().to_string();
-                        
+
                         // Emit to frontend
                         let _ = app_handle_stdout.emit("process-output", serde_json::json!({
                             "appId": app_id_stdout,
@@ -151,7 +151,7 @@ pub async fn start_app_process(
                             "content": output_line,
                             "timestamp": chrono::Utc::now().to_rfc3339()
                         }));
-                        
+
                         line.clear();
                     }
                     Err(e) => {
@@ -167,25 +167,25 @@ pub async fn start_app_process(
     if let Some(stderr) = child.stderr.take() {
         let app_handle_stderr = app_handle_clone.clone();
         let app_id_stderr = app_id_clone.clone();
-        
+
         tokio::spawn(async move {
             let mut reader = BufReader::new(stderr);
             let mut line = String::new();
-            
+
             loop {
                 match reader.read_line(&mut line).await {
                     Ok(0) => break, // EOF
                     Ok(_) => {
                         let output_line = line.trim_end().to_string();
-                        
+
                         // Emit to frontend
                         let _ = app_handle_stderr.emit("process-output", serde_json::json!({
                             "appId": app_id_stderr,
-                            "type": "stderr", 
+                            "type": "stderr",
                             "content": output_line,
                             "timestamp": chrono::Utc::now().to_rfc3339()
                         }));
-                        
+
                         line.clear();
                     }
                     Err(e) => {
@@ -201,20 +201,20 @@ pub async fn start_app_process(
     let app_handle_monitor = app_handle_clone.clone();
     let app_id_monitor = app_id_clone.clone();
     let process_manager_arc = Arc::clone(&process_manager.processes);
-    
+
     tokio::spawn(async move {
         let exit_status = child.wait().await;
-        
+
         // Remove from process manager
         {
             let mut processes = process_manager_arc.lock().unwrap();
             processes.remove(&app_id_monitor);
         }
-        
+
         match exit_status {
             Ok(status) => {
                 log::info!("Process {} exited with status: {}", app_id_monitor, status);
-                
+
                 let _ = app_handle_monitor.emit("process-exit", serde_json::json!({
                     "appId": app_id_monitor,
                     "exitCode": status.code(),
@@ -223,7 +223,7 @@ pub async fn start_app_process(
             }
             Err(e) => {
                 log::error!("Process {} failed: {}", app_id_monitor, e);
-                
+
                 let _ = app_handle_monitor.emit("process-error", serde_json::json!({
                     "appId": app_id_monitor,
                     "error": format!("Process failed: {}", e),
@@ -344,7 +344,7 @@ pub async fn get_process_status(
     process_manager: State<'_, ProcessManager>,
 ) -> Result<Option<AppProcess>, String> {
     let processes = process_manager.processes.lock().unwrap();
-    
+
     if let Some(process_info) = processes.get(&app_id) {
         Ok(Some(AppProcess {
             app_id: app_id.clone(),
@@ -369,7 +369,7 @@ pub async fn get_all_process_status(
 ) -> Result<HashMap<String, AppProcess>, String> {
     let processes = process_manager.processes.lock().unwrap();
     let mut result = HashMap::new();
-    
+
     for (app_id, process_info) in processes.iter() {
         result.insert(app_id.clone(), AppProcess {
             app_id: app_id.clone(),
@@ -381,7 +381,7 @@ pub async fn get_all_process_status(
             is_background: Some(false),
         });
     }
-    
+
     Ok(result)
 }
 
@@ -394,17 +394,17 @@ pub async fn kill_all_processes(
     process_manager: State<'_, ProcessManager>,
 ) -> Result<ProcessResult, String> {
     log::info!("Killing all running processes");
-    
+
     // Get all process info first, then clear the map
     let processes_to_kill = {
         let mut processes = process_manager.processes.lock().unwrap();
         let cloned_processes: Vec<(String, ProcessInfo)> = processes.drain().collect();
         cloned_processes
     };
-    
+
     let mut killed_count = 0;
     let mut failed_count = 0;
-    
+
     for (app_id, process_info) in processes_to_kill {
         let kill_result = tokio::process::Command::new("kill")
             .arg("-TERM")
@@ -416,7 +416,7 @@ pub async fn kill_all_processes(
             Ok(output) if output.status.success() => {
                 killed_count += 1;
                 log::info!("Killed process for app: {}", app_id);
-                
+
                 let _ = app_handle.emit("process-stopped", serde_json::json!({
                     "appId": app_id,
                     "pid": process_info.pid,
@@ -433,7 +433,7 @@ pub async fn kill_all_processes(
             }
         }
     }
-    
+
     Ok(ProcessResult {
         success: failed_count == 0,
         message: format!("Killed {} processes, {} failed", killed_count, failed_count),

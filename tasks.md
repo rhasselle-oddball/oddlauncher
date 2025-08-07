@@ -353,7 +353,7 @@ Based on the PRD, here are the development tasks organized by priority and depen
 
 **What was accomplished:**
 - ✅ Created comprehensive Tauri commands for process lifecycle management:
-  - `start_app_process` - starts processes with full configuration support  
+  - `start_app_process` - starts processes with full configuration support
   - `stop_app_process` - stops processes gracefully using system kill
   - `get_process_status` - retrieves individual process information
   - `get_all_process_status` - gets all running processes
@@ -367,7 +367,7 @@ Based on the PRD, here are the development tasks organized by priority and depen
   - `process-output` events for stdout/stderr streaming (ready for terminal integration)
 - ✅ Created comprehensive React hooks for frontend integration:
   - `useProcessManager` for global process management
-  - `useAppProcess` for single app process management  
+  - `useAppProcess` for single app process management
   - Automatic event listener setup and cleanup
 - ✅ Integrated process management throughout the UI:
   - MainAppHeader now shows real process status and working Start/Stop buttons
@@ -384,7 +384,7 @@ Based on the PRD, here are the development tasks organized by priority and depen
 
 **Verified Acceptance Criteria:**
 - ✅ Processes start correctly with specified commands
-- ✅ Process PIDs are tracked and stored  
+- ✅ Process PIDs are tracked and stored
 - ✅ Stop functionality terminates processes cleanly
 - ✅ Orphaned processes are prevented (automatic cleanup)
 - ✅ Error handling for failed process starts
@@ -393,11 +393,50 @@ Based on the PRD, here are the development tasks organized by priority and depen
 
 **Current State for Next Developer:**
 - Backend process spawning is fully operational and tested
-- Process PIDs are tracked and processes can be started/stopped cleanly  
+- Process PIDs are tracked and processes can be started/stopped cleanly
 - Real-time status updates work across all UI components
 - Event system is ready for terminal output integration in next task
 - No orphaned processes (proper cleanup on app exit and manual termination)
 - Development environment tested and working with process management
+
+## 🚨 CRITICAL: Production Build Issues
+
+### Task 11: Fix Production Build Layout and Functionality Issues
+**Priority:** HIGH 🚨 | **Status:** TODO | **Dependencies:** None
+
+**Issue Description:**
+Production build testing revealed several critical issues that need immediate attention:
+
+1. **Excessive padding/margin around whole app** - Large empty space around entire application
+2. **Unwanted header elements showing** - Title, buttons, and "Apps configured" message should not be visible (only sidebar + main section)
+3. **Modal bottom buttons cut off** - When adding an app, the bottom buttons (Cancel/Add App) are not visible
+4. **Terminal shows unexpected content** - Terminal immediately shows content when adding an app before any processes are started
+5. **Start button not functional** - Click on Start button causes flicker but doesn't actually start processes
+
+**Acceptance Criteria:**
+- [ ] Remove all excessive padding/margin from app container (should fill window)
+- [ ] Hide title, buttons, and app configuration message from top section
+- [ ] Ensure only sidebar and main content area are visible in production build
+- [ ] Fix modal sizing so bottom buttons are always visible and accessible
+- [ ] Fix terminal to show empty/default state when no processes are running
+- [ ] Fix Start button functionality to properly initiate processes without flickering
+- [ ] Verify all fixes work in production build (`npm run tauri build`)
+- [ ] Test on actual production executable, not just development server
+
+**Investigation Priority:**
+1. Check CSS differences between dev and prod builds
+2. Identify which components are rendering unwanted header content
+3. Debug modal container sizing and overflow issues
+4. Investigate terminal state management in production
+5. Debug process management event handling in production
+
+**Files to investigate:**
+- `/src/App.tsx` - main app container and layout
+- `/src/components/Layout/AppLayout.tsx` - layout wrapper
+- `/src/components/AppConfigModal/AppConfigModal.tsx` - modal sizing
+- `/src/components/Terminal/Terminal.tsx` - terminal state
+- `/src/hooks/useProcessManager.ts` - process management
+- Global CSS files for container styling
 - Ready for Task 11: Integrate Real-time Terminal with Process Management
 
 - [ ] **Integrate Real-time Terminal with Process Management**

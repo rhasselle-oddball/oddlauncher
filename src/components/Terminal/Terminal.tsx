@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useMemo } from 'react'
 import { Search, Copy, RotateCcw, Settings, Terminal as TerminalIcon } from 'lucide-react'
 import type { AppConfig } from '../../types'
 import './Terminal.css'
@@ -20,99 +20,6 @@ export interface TerminalProps {
   onSearch?: (query: string) => void
 }
 
-const MOCK_TERMINAL_LINES: TerminalLine[] = [
-  {
-    id: '1',
-    timestamp: '14:32:15',
-    content: 'Starting development server...',
-    type: 'info'
-  },
-  {
-    id: '2',
-    timestamp: '14:32:16',
-    content: '✓ Server running at http://localhost:3000',
-    type: 'success'
-  },
-  {
-    id: '3',
-    timestamp: '14:32:16',
-    content: 'Ready for connections',
-    type: 'output'
-  },
-  {
-    id: '4',
-    timestamp: '14:32:18',
-    content: 'Hot reload enabled',
-    type: 'info'
-  },
-  {
-    id: '5',
-    timestamp: '14:32:20',
-    content: 'Watching for file changes...',
-    type: 'output'
-  },
-  {
-    id: '6',
-    timestamp: '14:32:25',
-    content: 'File change detected: src/App.tsx',
-    type: 'info'
-  },
-  {
-    id: '7',
-    timestamp: '14:32:26',
-    content: '⚠ Warning: Component re-render detected',
-    type: 'warning'
-  },
-  {
-    id: '8',
-    timestamp: '14:32:27',
-    content: '✓ Hot reload completed',
-    type: 'success'
-  },
-  {
-    id: '9',
-    timestamp: '14:32:30',
-    content: 'GET /api/health 200 OK',
-    type: 'output'
-  },
-  {
-    id: '10',
-    timestamp: '14:32:35',
-    content: 'POST /api/data 201 Created',
-    type: 'success'
-  },
-  {
-    id: '11',
-    timestamp: '14:32:40',
-    content: 'Connection established with database',
-    type: 'info'
-  },
-  {
-    id: '12',
-    timestamp: '14:32:45',
-    content: '❌ Error: Connection timeout',
-    type: 'error'
-  },
-  {
-    id: '13',
-    timestamp: '14:32:46',
-    content: 'Retrying connection...',
-    type: 'info'
-  },
-  {
-    id: '14',
-    timestamp: '14:32:47',
-    content: '✓ Connection restored',
-    type: 'success'
-  },
-  {
-    id: '15',
-    timestamp: '14:32:50',
-    content: 'Background task completed',
-    type: 'output'
-  }
-]
-
 export function Terminal({
   selectedApp,
   lines = [],
@@ -128,8 +35,8 @@ export function Terminal({
   const terminalContentRef = useRef<HTMLDivElement>(null)
   const terminalEndRef = useRef<HTMLDivElement>(null)
 
-  // Use mock lines if no real lines are provided and an app is selected
-  const displayLines = selectedApp && lines.length === 0 ? MOCK_TERMINAL_LINES : lines
+  // Only show real lines - no mock data
+  const displayLines = useMemo(() => lines || [], [lines])
 
   // Auto-scroll to bottom when new lines are added
   useEffect(() => {
