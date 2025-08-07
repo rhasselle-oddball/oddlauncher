@@ -1,0 +1,334 @@
+/* Terminal Component Styles */
+.terminal {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-primary);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+}
+
+/* Terminal Header */
+.terminal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+}
+
+.terminal-title-section {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-primary);
+}
+
+.terminal-title {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.terminal-line-count {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: normal;
+}
+
+.terminal-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.terminal-control-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem 0.6rem;
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 32px;
+  height: 32px;
+}
+
+.terminal-control-button:hover:not(:disabled) {
+  background-color: var(--hover-color);
+  color: var(--text-primary);
+  transform: translateY(-1px);
+}
+
+.terminal-control-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.terminal-control-button.active {
+  background-color: var(--accent-color);
+  color: white;
+  border-color: var(--accent-color);
+}
+
+.terminal-control-button.auto-scroll {
+  font-size: 0.9rem;
+  padding: 0.4rem;
+}
+
+/* Search Bar */
+.terminal-search-bar {
+  padding: 0.5rem 1rem;
+  background-color: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.terminal-search-bar form {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.terminal-search-input {
+  flex: 1;
+  padding: 0.4rem 0.75rem;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.terminal-search-input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.2);
+}
+
+.terminal-search-button,
+.terminal-search-clear {
+  padding: 0.4rem 0.75rem;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.terminal-search-button:hover,
+.terminal-search-clear:hover:not(:disabled) {
+  background-color: var(--hover-color);
+}
+
+.terminal-search-clear:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Terminal Content */
+.terminal-content {
+  flex: 1;
+  padding: 1rem;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  overflow-y: auto;
+  background-color: #0d1117;
+  color: #f0f6fc;
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+/* Terminal Lines */
+.terminal-line {
+  margin-bottom: 0.25rem;
+  display: flex;
+  gap: 0.75rem;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+.terminal-timestamp {
+  color: #7d8590;
+  flex-shrink: 0;
+  font-weight: 500;
+  user-select: none;
+}
+
+.terminal-output {
+  flex: 1;
+  white-space: pre-wrap;
+}
+
+/* Terminal Line Types */
+.terminal-line.success .terminal-output {
+  color: #3fb950;
+}
+
+.terminal-line.error .terminal-output {
+  color: #f85149;
+}
+
+.terminal-line.warning .terminal-output {
+  color: #d29922;
+}
+
+.terminal-line.info .terminal-output {
+  color: #58a6ff;
+}
+
+/* Terminal Cursor */
+.terminal-cursor {
+  display: inline-block;
+  background-color: #f0f6fc;
+  width: 8px;
+  height: 1.2em;
+  animation: terminalBlink 1s infinite;
+  margin-top: 0.5rem;
+}
+
+@keyframes terminalBlink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* Empty State */
+.terminal-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-secondary);
+  text-align: center;
+  gap: 0.5rem;
+}
+
+.terminal-empty-state p {
+  margin: 0;
+}
+
+.terminal-empty-state p:first-child {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+/* No App Selected State */
+.terminal-content.no-app-selected {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.no-app-terminal-message {
+  text-align: center;
+  color: var(--text-secondary);
+  max-width: 400px;
+}
+
+.no-app-terminal-message svg {
+  margin-bottom: 1rem;
+  opacity: 0.6;
+}
+
+.no-app-terminal-message h3 {
+  margin: 0 0 1rem 0;
+  color: var(--text-primary);
+  font-size: 1.25rem;
+}
+
+.no-app-terminal-message p {
+  margin: 0.5rem 0;
+  line-height: 1.5;
+}
+
+.no-app-terminal-message p:first-of-type {
+  font-weight: 500;
+}
+
+/* Terminal Scrollbar Styling */
+.terminal-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.terminal-content::-webkit-scrollbar-track {
+  background: #0d1117;
+}
+
+.terminal-content::-webkit-scrollbar-thumb {
+  background: #21262d;
+  border-radius: 4px;
+}
+
+.terminal-content::-webkit-scrollbar-thumb:hover {
+  background: #30363d;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .terminal-header {
+    padding: 0.5rem;
+  }
+  
+  .terminal-title {
+    font-size: 0.9rem;
+  }
+  
+  .terminal-line-count {
+    display: none;
+  }
+  
+  .terminal-controls {
+    gap: 0.25rem;
+  }
+  
+  .terminal-control-button {
+    padding: 0.3rem;
+    min-width: 28px;
+    height: 28px;
+  }
+  
+  .terminal-content {
+    padding: 0.75rem;
+    font-size: 0.8rem;
+  }
+  
+  .terminal-search-bar {
+    padding: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .terminal-title-section {
+    gap: 0.25rem;
+  }
+  
+  .terminal-title {
+    font-size: 0.8rem;
+  }
+  
+  .terminal-control-button {
+    padding: 0.25rem;
+    min-width: 24px;
+    height: 24px;
+  }
+  
+  .terminal-content {
+    padding: 0.5rem;
+    font-size: 0.75rem;
+  }
+  
+  .terminal-line {
+    gap: 0.5rem;
+  }
+}

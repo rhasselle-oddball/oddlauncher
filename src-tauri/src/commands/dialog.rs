@@ -24,7 +24,7 @@ pub async fn pick_image_file(app: AppHandle) -> Result<Option<String>, String> {
         .file()
         .add_filter("Images", &["png", "jpg", "jpeg", "gif", "bmp", "svg", "webp"])
         .set_title("Select Thumbnail Image");
-    
+
     match dialog.blocking_pick_file() {
         Some(path) => {
             let path_str = match path {
@@ -41,15 +41,15 @@ pub async fn pick_image_file(app: AppHandle) -> Result<Option<String>, String> {
 #[command]
 pub async fn validate_directory(path: String) -> Result<bool, String> {
     let path = std::path::Path::new(&path);
-    
+
     if !path.exists() {
         return Ok(false);
     }
-    
+
     if !path.is_dir() {
         return Ok(false);
     }
-    
+
     // Try to read the directory to check permissions
     match std::fs::read_dir(path) {
         Ok(_) => Ok(true),
@@ -61,15 +61,15 @@ pub async fn validate_directory(path: String) -> Result<bool, String> {
 #[command]
 pub async fn validate_file(path: String) -> Result<bool, String> {
     let path = std::path::Path::new(&path);
-    
+
     if !path.exists() {
         return Ok(false);
     }
-    
+
     if !path.is_file() {
         return Ok(false);
     }
-    
+
     // Try to read file metadata to check permissions
     match std::fs::metadata(path) {
         Ok(_) => Ok(true),

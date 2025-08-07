@@ -15,7 +15,13 @@ Oddbox is a native desktop application built with Tauri + React that acts like a
 1. **Task Creation**: Create tasks in `tasks.md` with checkboxes based on the PRD
 2. **Issue Creation**: When starting a task, create a GitHub issue using `gh issue create`
 3. **Development**: Work on the task following the verification steps
-4. **Completion**: When task is complete, commit & push code, then close the issue with `gh issue close`
+4. **Completion**: When task is complete:
+   - Commit all changes with conventional commit message including "Closes #<issue-number>"
+   - Push code to repository with `git push`
+   - Verify issue is automatically closed (or close manually if needed)
+   - Update `tasks.md` to mark task as completed with commit hash and status
+
+**CRITICAL**: Every completed task must be committed, pushed, and have its GitHub issue closed before moving to the next task.
 
 ### Task File Management
 
@@ -23,6 +29,7 @@ Oddbox is a native desktop application built with Tauri + React that acts like a
 - Use checkboxes `- [ ]` for incomplete tasks, `- [x]` for completed tasks
 - Each task should represent a single GitHub issue
 - Include verification steps for each task to ensure completion
+- Mark completed tasks with commit hash and "COMPLETED" status
 
 ### GitHub Integration Commands
 
@@ -30,7 +37,13 @@ Oddbox is a native desktop application built with Tauri + React that acts like a
 # Create issue when starting a task
 gh issue create --title "Task Title" --body "Task description with acceptance criteria"
 
-# Close issue when task is complete
+# Commit and push with issue closure (preferred method)
+git commit -m "feat: implement feature
+
+Closes #<issue-number>"
+git push
+
+# Close issue manually if auto-close didn't work
 gh issue close <issue-number> --comment "Task completed and code deployed"
 
 # Check current issues (ALWAYS use GH_PAGER=cat to prevent user intervention)

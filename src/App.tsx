@@ -2,7 +2,7 @@ import { Settings } from 'lucide-react'
 import { useState } from 'react'
 import { useConfigManager } from './hooks/useConfig'
 import { generateAppId } from './utils/app-data'
-import { AppLayout, LibrarySidebar, MainAppHeader, AppConfigModal } from './components'
+import { AppLayout, LibrarySidebar, MainContent, AppConfigModal } from './components'
 import type { AppConfig } from './types'
 import type { AppConfigModalMode } from './components/AppConfigModal'
 import './styles/App.css'
@@ -70,7 +70,7 @@ function App() {
   const handleModalSubmit = async (appConfig: AppConfig) => {
     try {
       let success = false
-      
+
       if (modalState.mode === 'add') {
         success = await configManager.addApp(appConfig)
         if (success) {
@@ -86,7 +86,7 @@ function App() {
           }
         }
       }
-      
+
       return success
     } catch (error) {
       console.error('Failed to save app config:', error)
@@ -170,7 +170,7 @@ function App() {
             />
           }
           mainContent={
-            <MainAppHeader
+            <MainContent
               selectedApp={selectedApp}
               status="stopped" // TODO: Get real status from process in Phase 3
               onStartStop={handleStartStop}

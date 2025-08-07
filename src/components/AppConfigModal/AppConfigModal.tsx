@@ -44,7 +44,7 @@ export function AppConfigModal({
   // Handle form field changes
   const handleInputChange = useCallback((field: keyof AppConfigFormData, value: string | number | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }))
-    
+
     // Clear error for this field when user starts typing
     if (errors[field]) {
       setErrors(prev => {
@@ -102,7 +102,7 @@ export function AppConfigModal({
   // Handle modal close with animation
   const handleClose = useCallback(() => {
     if (isSubmitting) return
-    
+
     setIsClosing(true)
     setTimeout(() => {
       onClose()
@@ -113,33 +113,33 @@ export function AppConfigModal({
   // Handle form submission
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     // Validate form
     const validation = validateFormData(
       formData,
       configManager.isAppNameTaken,
       mode === 'edit' ? appToEdit?.id : undefined
     )
-    
+
     if (!validation.isValid) {
       setErrors(validation.errors)
       return
     }
-    
+
     setIsSubmitting(true)
-    
+
     try {
       // Convert form data to app config
       let appConfig = formDataToAppConfig(formData, appToEdit)
-      
+
       // Generate ID for new apps
       if (mode === 'add') {
         appConfig = { ...appConfig, id: generateAppId() }
       }
-      
+
       // Submit to parent component
       const success = await onSubmit(appConfig)
-      
+
       if (success) {
         handleClose()
       } else {
@@ -168,7 +168,7 @@ export function AppConfigModal({
         handleClose()
       }
     }
-    
+
     if (isOpen) {
       document.addEventListener('keydown', handleEscape)
       return () => document.removeEventListener('keydown', handleEscape)
@@ -178,7 +178,7 @@ export function AppConfigModal({
   if (!isOpen) return null
 
   return (
-    <div 
+    <div
       className={`modal-overlay ${isClosing ? 'closing' : ''}`}
       onClick={handleBackdropClick}
     >
@@ -197,9 +197,9 @@ export function AppConfigModal({
               </>
             )}
           </h2>
-          <button 
-            type="button" 
-            className="close-button" 
+          <button
+            type="button"
+            className="close-button"
             onClick={handleClose}
             disabled={isSubmitting}
           >
