@@ -5,8 +5,6 @@
   flex-direction: column;
   background-color: var(--bg-primary);
   overflow: hidden;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
 }
 
 /* Terminal Header */
@@ -17,8 +15,6 @@
   padding: 0.75rem 1rem;
   background-color: var(--bg-secondary);
   border-bottom: 1px solid var(--border-color);
-  border-top-left-radius: 6px;
-  border-top-right-radius: 6px;
 }
 
 .terminal-title-section {
@@ -145,8 +141,6 @@
   overflow-y: auto;
   background-color: #0d1117;
   color: #f0f6fc;
-  border-bottom-left-radius: 6px;
-  border-bottom-right-radius: 6px;
 }
 
 /* Terminal Lines */
@@ -279,30 +273,30 @@
   .terminal-header {
     padding: 0.5rem;
   }
-  
+
   .terminal-title {
     font-size: 0.9rem;
   }
-  
+
   .terminal-line-count {
     display: none;
   }
-  
+
   .terminal-controls {
     gap: 0.25rem;
   }
-  
+
   .terminal-control-button {
     padding: 0.3rem;
     min-width: 28px;
     height: 28px;
   }
-  
+
   .terminal-content {
     padding: 0.75rem;
     font-size: 0.8rem;
   }
-  
+
   .terminal-search-bar {
     padding: 0.5rem;
   }
@@ -312,22 +306,22 @@
   .terminal-title-section {
     gap: 0.25rem;
   }
-  
+
   .terminal-title {
     font-size: 0.8rem;
   }
-  
+
   .terminal-control-button {
     padding: 0.25rem;
     min-width: 24px;
     height: 24px;
   }
-  
+
   .terminal-content {
     padding: 0.5rem;
     font-size: 0.75rem;
   }
-  
+
   .terminal-line {
     gap: 0.5rem;
   }

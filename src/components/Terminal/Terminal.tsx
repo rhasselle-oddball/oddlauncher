@@ -28,14 +28,14 @@ const MOCK_TERMINAL_LINES: TerminalLine[] = [
     type: 'info'
   },
   {
-    id: '2', 
+    id: '2',
     timestamp: '14:32:16',
     content: '✓ Server running at http://localhost:3000',
     type: 'success'
   },
   {
     id: '3',
-    timestamp: '14:32:16', 
+    timestamp: '14:32:16',
     content: 'Ready for connections',
     type: 'output'
   },
@@ -143,7 +143,7 @@ export function Terminal({
 
   // Filter lines based on search query
   const filteredLines = searchQuery
-    ? limitedLines.filter(line => 
+    ? limitedLines.filter(line =>
         line.content.toLowerCase().includes(searchQuery.toLowerCase())
       )
     : limitedLines
@@ -330,7 +330,7 @@ export function Terminal({
             ))}
             {/* Auto-scroll anchor */}
             <div ref={terminalEndRef} />
-            
+
             {/* Cursor (only show if auto-scroll is enabled and this is the latest content) */}
             {isAutoScrollEnabled && searchQuery === '' && (
               <div className="terminal-cursor">_</div>
