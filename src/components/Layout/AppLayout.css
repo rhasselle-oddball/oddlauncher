@@ -42,14 +42,13 @@
 }
 
 .collapse-button {
-  background: none;
+  background: var(--bg-tertiary);
   border: none;
   color: var(--text-secondary);
-  font-size: 1rem;
   cursor: pointer;
-  padding: 0.25rem;
   border-radius: 4px;
-  min-width: 24px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -57,8 +56,9 @@
 }
 
 .collapse-button:hover {
-  background-color: var(--hover-color);
+  background: var(--hover-color);
   color: var(--text-primary);
+  transform: translateY(-1px);
 }
 
 .collapse-button:focus {
@@ -148,8 +148,8 @@
   }
 
   .collapse-button {
-    min-width: 20px;
-    font-size: 0.9rem;
+    width: 32px;
+    height: 32px;
   }
 }
 

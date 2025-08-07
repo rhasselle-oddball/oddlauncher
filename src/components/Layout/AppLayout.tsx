@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, ReactNode, MouseEvent as ReactMouseEvent } from 'react'
+import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import './AppLayout.css'
 
 interface AppLayoutProps {
@@ -97,7 +98,7 @@ export function AppLayout({ sidebar, mainContent }: AppLayoutProps) {
             onClick={toggleCollapse}
             title={layoutState.isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
-            {layoutState.isCollapsed ? '→' : '←'}
+            {layoutState.isCollapsed ? <PanelLeftOpen size={20} /> : <PanelLeftClose size={20} />}
           </button>
           {!layoutState.isCollapsed && (
             <h2 className="sidebar-title">Library</h2>
