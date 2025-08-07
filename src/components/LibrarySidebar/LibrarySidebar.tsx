@@ -167,7 +167,6 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp }: Library
             <AppListItem
               key={app.id}
               app={app}
-              status="stopped" // TODO: Get real status from process in Phase 3
               isSelected={selectedAppId === app.id}
               onClick={handleAppClick}
             />

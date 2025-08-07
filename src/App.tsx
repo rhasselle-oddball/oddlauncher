@@ -30,11 +30,6 @@ function App() {
     })
   }
 
-  const handleStartStop = (app: AppConfig) => {
-    // TODO: Implement process start/stop in Phase 3
-    console.log('Start/Stop clicked for app:', app.name)
-  }
-
   const handleEdit = (app: AppConfig) => {
     setModalState({
       isOpen: true,
@@ -172,8 +167,6 @@ function App() {
           mainContent={
             <MainContent
               selectedApp={selectedApp}
-              status="stopped" // TODO: Get real status from process in Phase 3
-              onStartStop={handleStartStop}
               onEdit={handleEdit}
               onDelete={handleDelete}
               onOpenUrl={handleOpenUrl}

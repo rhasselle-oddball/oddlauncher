@@ -1,32 +1,36 @@
 import { Smartphone } from 'lucide-react'
-import type { AppConfig, AppStatus } from '../../types'
+import type { AppConfig } from '../../types'
+import { useAppProcess } from '../../hooks/useProcessManager'
 import './AppListItem.css'
 
 interface AppListItemProps {
   app: AppConfig
-  status?: AppStatus
   isSelected: boolean
   onClick: (app: AppConfig) => void
 }
 
-export function AppListItem({ app, status = 'stopped', isSelected, onClick }: AppListItemProps) {
+export function AppListItem({ app, isSelected, onClick }: AppListItemProps) {
+  // Use process management for this app
+  const { isRunning, isStarting, isStopping, hasError } = useAppProcess(app.id)
+  
   const handleClick = () => {
     onClick(app)
   }
 
   const getStatusDisplay = () => {
-    switch (status) {
-      case 'running':
-        return { text: 'Running', icon: '', className: 'running' }
-      case 'starting':
-        return { text: 'Starting', icon: '', className: 'starting' }
-      case 'stopping':
-        return { text: 'Stopping', icon: '', className: 'stopping' }
-      case 'error':
-        return { text: 'Error', icon: '', className: 'error' }
-      default:
-        return { text: 'Stopped', icon: '', className: 'stopped' }
+    if (isStarting) {
+      return { text: 'Starting', icon: '', className: 'starting' }
     }
+    if (isStopping) {
+      return { text: 'Stopping', icon: '', className: 'stopping' }
+    }
+    if (isRunning) {
+      return { text: 'Running', icon: '', className: 'running' }
+    }
+    if (hasError) {
+      return { text: 'Error', icon: '', className: 'error' }
+    }
+    return { text: 'Stopped', icon: '', className: 'stopped' }
   }
 
   const statusInfo = getStatusDisplay()

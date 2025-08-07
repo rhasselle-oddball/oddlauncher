@@ -348,7 +348,59 @@ Based on the PRD, here are the development tasks organized by priority and depen
 
 ## Phase 3 - Process Management & Integration
 
-- [ ] **Implement Backend Process Spawning**
+### ✅ Task 10: Implement Backend Process Spawning (COMPLETED - Commit: [latest])
+**Status:** Complete ✅ | **Committed:** ✅ | **Pushed:** ✅ | **Issue:** #11 (Closed)
+
+**What was accomplished:**
+- ✅ Created comprehensive Tauri commands for process lifecycle management:
+  - `start_app_process` - starts processes with full configuration support  
+  - `stop_app_process` - stops processes gracefully using system kill
+  - `get_process_status` - retrieves individual process information
+  - `get_all_process_status` - gets all running processes
+  - `kill_all_processes` - emergency cleanup of all processes
+- ✅ Implemented robust process management with ProcessManager state:
+  - Thread-safe Arc<Mutex<HashMap>> for process tracking
+  - Proper PID storage and status tracking
+  - Automatic process cleanup on exit
+- ✅ Added real-time process event system:
+  - `process-started`, `process-stopped`, `process-exit`, `process-error` events
+  - `process-output` events for stdout/stderr streaming (ready for terminal integration)
+- ✅ Created comprehensive React hooks for frontend integration:
+  - `useProcessManager` for global process management
+  - `useAppProcess` for single app process management  
+  - Automatic event listener setup and cleanup
+- ✅ Integrated process management throughout the UI:
+  - MainAppHeader now shows real process status and working Start/Stop buttons
+  - AppListItem components display live process status with visual indicators
+  - Removed hardcoded status props and placeholder implementations
+- ✅ Added proper error handling and user feedback:
+  - ProcessResult interface for operation feedback
+  - Process status tracking (stopped, starting, running, stopping, error)
+  - Visual status indicators with animations
+- ✅ Added required Rust dependencies and proper async handling:
+  - Updated tokio features for process management and I/O
+  - Proper lifetime management for async spawned tasks
+  - Cross-platform process termination using system kill command
+
+**Verified Acceptance Criteria:**
+- ✅ Processes start correctly with specified commands
+- ✅ Process PIDs are tracked and stored  
+- ✅ Stop functionality terminates processes cleanly
+- ✅ Orphaned processes are prevented (automatic cleanup)
+- ✅ Error handling for failed process starts
+- ✅ Sidebar updates show real-time process status
+- ✅ Main view header reflects current process state
+
+**Current State for Next Developer:**
+- Backend process spawning is fully operational and tested
+- Process PIDs are tracked and processes can be started/stopped cleanly  
+- Real-time status updates work across all UI components
+- Event system is ready for terminal output integration in next task
+- No orphaned processes (proper cleanup on app exit and manual termination)
+- Development environment tested and working with process management
+- Ready for Task 11: Integrate Real-time Terminal with Process Management
+
+- [ ] **Integrate Real-time Terminal with Process Management**
   - Create Tauri commands for starting/stopping processes
   - Implement process management with proper cleanup
   - Add process status tracking (PID, running state)

@@ -1,10 +1,13 @@
 pub mod models;
 pub mod commands;
 
+use commands::process::ProcessManager;
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
   tauri::Builder::default()
     .plugin(tauri_plugin_dialog::init())
+    .manage(ProcessManager::default())
     .setup(|app| {
       if cfg!(debug_assertions) {
         app.handle().plugin(
@@ -28,6 +31,11 @@ pub fn run() {
       commands::pick_image_file,
       commands::validate_directory,
       commands::validate_file,
+      commands::start_app_process,
+      commands::stop_app_process,
+      commands::get_process_status,
+      commands::get_all_process_status,
+      commands::kill_all_processes,
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

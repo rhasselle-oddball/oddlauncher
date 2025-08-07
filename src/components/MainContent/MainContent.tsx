@@ -1,12 +1,10 @@
 import { MainAppHeader } from '../MainAppHeader'
 import { Terminal } from '../Terminal'
-import type { AppConfig, AppStatus } from '../../types'
+import type { AppConfig } from '../../types'
 import './MainContent.css'
 
 interface MainContentProps {
   selectedApp: AppConfig | null
-  status?: AppStatus
-  onStartStop?: (app: AppConfig) => void
   onEdit?: (app: AppConfig) => void
   onDelete?: (app: AppConfig) => void
   onOpenUrl?: (app: AppConfig) => void
@@ -25,8 +23,6 @@ interface MainContentProps {
 
 export function MainContent({
   selectedApp,
-  status = 'stopped',
-  onStartStop,
   onEdit,
   onDelete,
   onOpenUrl,
@@ -55,8 +51,6 @@ export function MainContent({
       <div className="main-content-header">
         <MainAppHeader
           selectedApp={selectedApp}
-          status={status}
-          onStartStop={onStartStop}
           onEdit={onEdit}
           onDelete={onDelete}
           onOpenUrl={onOpenUrl}

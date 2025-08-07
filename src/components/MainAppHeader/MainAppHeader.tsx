@@ -1,11 +1,10 @@
 import { Play, Square, Loader, Edit, Trash2, ExternalLink, FolderOpen, Smartphone } from 'lucide-react'
-import type { AppConfig, AppStatus } from '../../types'
+import type { AppConfig } from '../../types'
+import { useAppProcess } from '../../hooks/useProcessManager'
 import './MainAppHeader.css'
 
 interface MainAppHeaderProps {
   selectedApp: AppConfig | null
-  status?: AppStatus
-  onStartStop?: (app: AppConfig) => void
   onEdit?: (app: AppConfig) => void
   onDelete?: (app: AppConfig) => void
   onOpenUrl?: (app: AppConfig) => void
@@ -14,32 +13,52 @@ interface MainAppHeaderProps {
 
 export function MainAppHeader({
   selectedApp,
-  status = 'stopped',
-  onStartStop,
   onEdit,
   onDelete,
   onOpenUrl,
   onOpenDirectory
 }: MainAppHeaderProps) {
+  // Use process management for the selected app
+  const {
+    isRunning,
+    isStarting,
+    isStopping,
+    hasError,
+    start,
+    stop
+  } = useAppProcess(selectedApp?.id || '')
 
   const getStatusDisplay = () => {
-    switch (status) {
-      case 'running':
-        return { text: 'Stop', icon: <Square size={16} />, className: 'running', buttonText: 'Stop' }
-      case 'starting':
-        return { text: 'Starting...', icon: <Loader size={16} className="spin" />, className: 'starting', buttonText: 'Starting...' }
-      case 'stopping':
-        return { text: 'Stopping...', icon: <Loader size={16} className="spin" />, className: 'stopping', buttonText: 'Stopping...' }
-      case 'error':
-        return { text: 'Error', icon: <Square size={16} />, className: 'error', buttonText: 'Start' }
-      default:
-        return { text: 'Start', icon: <Play size={16} />, className: 'stopped', buttonText: 'Start' }
+    if (isStarting) {
+      return { text: 'Starting...', icon: <Loader size={16} className="spin" />, className: 'starting', buttonText: 'Starting...' }
     }
+    if (isStopping) {
+      return { text: 'Stopping...', icon: <Loader size={16} className="spin" />, className: 'stopping', buttonText: 'Stopping...' }
+    }
+    if (isRunning) {
+      return { text: 'Stop', icon: <Square size={16} />, className: 'running', buttonText: 'Stop' }
+    }
+    if (hasError) {
+      return { text: 'Error', icon: <Square size={16} />, className: 'error', buttonText: 'Start' }
+    }
+    return { text: 'Start', icon: <Play size={16} />, className: 'stopped', buttonText: 'Start' }
   }
 
-  const handleStartStopClick = () => {
-    if (selectedApp && onStartStop) {
-      onStartStop(selectedApp)
+  const handleStartStopClick = async () => {
+    if (!selectedApp) return
+    
+    try {
+      if (isRunning) {
+        await stop()
+      } else {
+        await start(
+          selectedApp.command,
+          selectedApp.workingDirectory,
+          selectedApp.environmentVariables
+        )
+      }
+    } catch (error) {
+      console.error('Failed to start/stop process:', error)
     }
   }
 
@@ -141,7 +160,7 @@ export function MainAppHeader({
           <button
             className={`start-stop-button ${statusInfo.className}`}
             onClick={handleStartStopClick}
-            disabled={status === 'starting' || status === 'stopping'}
+            disabled={isStarting || isStopping}
           >
             <span className="button-icon">{statusInfo.icon}</span>
             <span className="button-text">{statusInfo.buttonText}</span>
