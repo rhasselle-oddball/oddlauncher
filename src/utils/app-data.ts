@@ -1,7 +1,7 @@
 /**
  * Utility functions for working with app data models
  */
-import type { AppConfig, GlobalConfig } from '../types';
+import type { AppConfig, GlobalConfig } from '../types'
 
 /**
  * Creates a new app configuration with default values
@@ -21,7 +21,7 @@ export function createDefaultAppConfig(): Omit<AppConfig, 'id'> {
     tags: undefined,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-  };
+  }
 }
 
 /**
@@ -39,27 +39,29 @@ export function createDefaultGlobalConfig(): GlobalConfig {
       autoSave: true,
     },
     lastModified: new Date().toISOString(),
-  };
+  }
 }
 
 /**
  * Validates that an app configuration has all required fields
  */
-export function validateAppConfig(config: Partial<AppConfig>): config is AppConfig {
+export function validateAppConfig(
+  config: Partial<AppConfig>
+): config is AppConfig {
   return Boolean(
     config.id &&
-    config.name &&
-    config.command &&
-    config.createdAt &&
-    config.updatedAt
-  );
+      config.name &&
+      config.command &&
+      config.createdAt &&
+      config.updatedAt
+  )
 }
 
 /**
  * Generates a new unique ID for an app
  */
 export function generateAppId(): string {
-  return crypto.randomUUID();
+  return crypto.randomUUID()
 }
 
 /**
@@ -69,5 +71,5 @@ export function updateAppTimestamps(config: AppConfig): AppConfig {
   return {
     ...config,
     updatedAt: new Date().toISOString(),
-  };
+  }
 }

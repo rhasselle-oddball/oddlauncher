@@ -5,40 +5,45 @@
 /**
  * Status of an application process
  */
-export type AppStatus = 'stopped' | 'starting' | 'running' | 'stopping' | 'error';
+export type AppStatus =
+  | 'stopped'
+  | 'starting'
+  | 'running'
+  | 'stopping'
+  | 'error'
 
 /**
  * Configuration for an individual app
  */
 export interface AppConfig {
   /** Unique identifier for the app */
-  id: string;
+  id: string
   /** Display name of the app */
-  name: string;
+  name: string
   /** Shell command to execute */
-  command: string;
+  command: string
   /** Working directory for the command (optional) */
-  workingDirectory?: string;
+  workingDirectory?: string
   /** URL to open in browser when app starts (optional) */
-  url?: string;
+  url?: string
   /** Custom thumbnail/icon path (optional) */
-  thumbnailPath?: string;
+  thumbnailPath?: string
   /** Environment variables to set (optional) */
-  environmentVariables?: Record<string, string>;
+  environmentVariables?: Record<string, string>
   /** Auto-launch browser when app starts (default: true if url provided) */
-  autoLaunchBrowser?: boolean;
+  autoLaunchBrowser?: boolean
   /** Delay in seconds before opening browser (default: 0) */
-  browserDelay?: number;
+  browserDelay?: number
   /** Port to poll for readiness before opening browser (optional) */
-  portToCheck?: number;
+  portToCheck?: number
   /** Maximum time to wait for port to be ready in seconds (default: 30) */
-  portCheckTimeout?: number;
+  portCheckTimeout?: number
   /** Tags for organization and filtering (optional) */
-  tags?: string[];
+  tags?: string[]
   /** Creation timestamp */
-  createdAt: string;
+  createdAt: string
   /** Last modified timestamp */
-  updatedAt: string;
+  updatedAt: string
 }
 
 /**
@@ -46,19 +51,19 @@ export interface AppConfig {
  */
 export interface AppProcess {
   /** App configuration ID */
-  appId: string;
+  appId: string
   /** Process ID (if running) */
-  pid?: number;
+  pid?: number
   /** Current status */
-  status: AppStatus;
+  status: AppStatus
   /** Start time (if running) */
-  startedAt?: string;
+  startedAt?: string
   /** Last error message (if status is error) */
-  errorMessage?: string;
+  errorMessage?: string
   /** Terminal output buffer */
-  output: string[];
+  output: string[]
   /** Whether the process is detached/background */
-  isBackground?: boolean;
+  isBackground?: boolean
 }
 
 /**
@@ -66,9 +71,9 @@ export interface AppProcess {
  */
 export interface AppState {
   /** App configuration */
-  config: AppConfig;
+  config: AppConfig
   /** Runtime process information */
-  process?: AppProcess;
+  process?: AppProcess
 }
 
 /**
@@ -76,24 +81,24 @@ export interface AppState {
  */
 export interface GlobalConfig {
   /** Version of the config format */
-  version: string;
+  version: string
   /** Applications configuration */
-  apps: AppConfig[];
+  apps: AppConfig[]
   /** Global settings */
   settings: {
     /** Theme preference (currently only 'dark' supported) */
-    theme: 'dark';
+    theme: 'dark'
     /** Default working directory for new apps */
-    defaultWorkingDirectory?: string;
+    defaultWorkingDirectory?: string
     /** Maximum lines to keep in terminal output buffer */
-    maxTerminalLines: number;
+    maxTerminalLines: number
     /** Default browser command (optional - uses system default) */
-    defaultBrowser?: string;
+    defaultBrowser?: string
     /** Auto-save configuration changes */
-    autoSave: boolean;
-  };
+    autoSave: boolean
+  }
   /** Last modified timestamp */
-  lastModified: string;
+  lastModified: string
 }
 
 /**
@@ -101,33 +106,35 @@ export interface GlobalConfig {
  */
 export interface AppError {
   /** Error code */
-  code: string;
+  code: string
   /** Human-readable error message */
-  message: string;
+  message: string
   /** Additional context/details */
-  details?: Record<string, unknown>;
+  details?: Record<string, unknown>
   /** Timestamp when error occurred */
-  timestamp: string;
+  timestamp: string
 }
 
 /**
  * Result type for app operations
  */
-export type AppResult<T> = {
-  success: true;
-  data: T;
-} | {
-  success: false;
-  error: AppError;
-};
+export type AppResult<T> =
+  | {
+      success: true
+      data: T
+    }
+  | {
+      success: false
+      error: AppError
+    }
 
 /**
  * Events emitted by the app system
  */
-export type AppEvent = 
+export type AppEvent =
   | { type: 'status_changed'; appId: string; status: AppStatus }
   | { type: 'output_received'; appId: string; output: string }
   | { type: 'config_updated'; appId: string; config: AppConfig }
   | { type: 'app_added'; appId: string; config: AppConfig }
   | { type: 'app_removed'; appId: string }
-  | { type: 'error_occurred'; appId: string; error: AppError };
+  | { type: 'error_occurred'; appId: string; error: AppError }
