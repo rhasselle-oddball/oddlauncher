@@ -16,15 +16,15 @@ export function AppListItem({ app, status = 'stopped', isSelected, onClick }: Ap
   const getStatusDisplay = () => {
     switch (status) {
       case 'running':
-        return { text: 'Running', icon: '●', className: 'running' }
+        return { text: 'Running', icon: '', className: 'running' }
       case 'starting':
-        return { text: 'Starting', icon: '●', className: 'starting' }
+        return { text: 'Starting', icon: '', className: 'starting' }
       case 'stopping':
-        return { text: 'Stopping', icon: '●', className: 'stopping' }
+        return { text: 'Stopping', icon: '', className: 'stopping' }
       case 'error':
-        return { text: 'Error', icon: '●', className: 'error' }
+        return { text: 'Error', icon: '', className: 'error' }
       default:
-        return { text: 'Stopped', icon: '●', className: 'stopped' }
+        return { text: 'Stopped', icon: '', className: 'stopped' }
     }
   }
 
@@ -49,18 +49,15 @@ export function AppListItem({ app, status = 'stopped', isSelected, onClick }: Ap
         <div className="app-list-item__header">
           <h3 className="app-list-item__name">{app.name}</h3>
           <div className={`app-list-item__status status-${statusInfo.className}`}>
-            <span className="status-icon">{statusInfo.icon}</span>
+            <div className="status-icon"></div>
             <span className="status-text">{statusInfo.text}</span>
           </div>
         </div>
         
         <div className="app-list-item__details">
-          <div className="app-list-item__command" title={app.command}>
-            {app.command}
-          </div>
           {app.workingDirectory && (
             <div className="app-list-item__directory" title={app.workingDirectory}>
-              📁 {app.workingDirectory.replace(/^.*\//, '')}
+              {app.workingDirectory.replace(/^.*\//, '')}
             </div>
           )}
         </div>

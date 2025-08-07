@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useConfigManager } from './hooks/useConfig'
 import { generateAppId } from './utils/app-data'
-import { AppLayout, LibrarySidebar, PlaceholderMainContent } from './components'
+import { AppLayout, LibrarySidebar, MainAppHeader } from './components'
 import type { AppConfig } from './types'
 import './styles/App.css'
 
@@ -16,6 +16,35 @@ function App() {
   const handleAddApp = () => {
     // TODO: Open configuration modal in Task 8
     console.log('Add app clicked - TODO: Implement configuration modal')
+  }
+
+  const handleStartStop = (app: AppConfig) => {
+    // TODO: Implement process start/stop in Phase 3
+    console.log('Start/Stop clicked for app:', app.name)
+  }
+
+  const handleEdit = (app: AppConfig) => {
+    // TODO: Open edit modal in Task 8
+    console.log('Edit clicked for app:', app.name)
+  }
+
+  const handleDelete = (app: AppConfig) => {
+    // TODO: Implement delete with confirmation in Phase 4
+    console.log('Delete clicked for app:', app.name)
+  }
+
+  const handleOpenUrl = (app: AppConfig) => {
+    if (app.url) {
+      // TODO: Implement URL opening in Phase 3
+      console.log('Open URL clicked for app:', app.name, app.url)
+    }
+  }
+
+  const handleOpenDirectory = (app: AppConfig) => {
+    if (app.workingDirectory) {
+      // TODO: Implement directory opening in Phase 3
+      console.log('Open directory clicked for app:', app.name, app.workingDirectory)
+    }
   }
 
   const testAddApp = async () => {
@@ -90,7 +119,17 @@ function App() {
               onAddApp={handleAddApp}
             />
           }
-          mainContent={<PlaceholderMainContent />}
+          mainContent={
+            <MainAppHeader
+              selectedApp={selectedApp}
+              status="stopped" // TODO: Get real status from process in Phase 3
+              onStartStop={handleStartStop}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              onOpenUrl={handleOpenUrl}
+              onOpenDirectory={handleOpenDirectory}
+            />
+          }
         />
       </main>
     </div>

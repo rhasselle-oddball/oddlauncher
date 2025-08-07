@@ -14,30 +14,21 @@
   overflow: hidden;
 }
 
-.app-list-item:hover {
+.app-list-item:hover:not(.selected) {
   background: var(--bg-tertiary);
   border-color: var(--hover-color);
-  transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .app-list-item.selected {
   border-color: var(--accent-blue);
-  background: linear-gradient(135deg, 
-    rgba(0, 122, 204, 0.15), 
-    rgba(77, 195, 247, 0.1)
-  );
-  box-shadow: 0 2px 12px rgba(0, 122, 204, 0.3);
+  background-color: rgba(0, 122, 204, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 122, 204, 0.25);
 }
 
-.app-list-item.selected::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 4px;
-  background: var(--accent-blue);
+.app-list-item.selected:hover {
+  background-color: rgba(0, 122, 204, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 122, 204, 0.35);
 }
 
 /* Thumbnail */
@@ -138,8 +129,31 @@
 }
 
 .status-icon {
-  font-size: 0.5rem;
-  line-height: 1;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  background: var(--text-secondary);
+}
+
+/* Status-specific icon colors */
+.status-running .status-icon {
+  background: var(--accent-green);
+  animation: pulse 2s infinite;
+}
+
+.status-starting .status-icon,
+.status-stopping .status-icon {
+  background: #ff9800;
+  animation: blink 1.5s infinite;
+}
+
+.status-error .status-icon {
+  background: var(--accent-red);
+}
+
+.status-stopped .status-icon {
+  background: var(--text-secondary);
 }
 
 .status-text {
@@ -184,16 +198,6 @@
 
 .app-list-item:hover .app-list-item__command {
   border-color: var(--hover-color);
-}
-
-/* Status Animations */
-.status-running .status-icon {
-  animation: pulse 2s infinite;
-}
-
-.status-starting .status-icon,
-.status-stopping .status-icon {
-  animation: blink 1.5s infinite;
 }
 
 @keyframes pulse {
