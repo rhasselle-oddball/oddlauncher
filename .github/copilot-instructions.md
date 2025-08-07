@@ -33,9 +33,13 @@ gh issue create --title "Task Title" --body "Task description with acceptance cr
 # Close issue when task is complete
 gh issue close <issue-number> --comment "Task completed and code deployed"
 
-# Check current issues
-gh issue list
+# Check current issues (ALWAYS use GH_PAGER=cat to prevent user intervention)
+GH_PAGER=cat gh issue list
+GH_PAGER=cat gh issue list --state=open
+GH_PAGER=cat gh issue list --state=closed
 ```
+
+**IMPORTANT**: Always use `GH_PAGER=cat` with GitHub CLI commands to prevent pager/vim from opening and requiring user intervention. This ensures commands run without blocking.
 
 ## Code Style & Architecture Guidelines
 
