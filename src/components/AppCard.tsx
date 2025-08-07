@@ -43,7 +43,6 @@ export const AppCard: React.FC<AppCardProps> = ({
   }
 
   const statusInfo = getStatusDisplay()
-  const thumbnailSrc = config.thumbnailPath || '/placeholder-thumbnail.svg'
 
   const handleStartStop = () => {
     if (isRunning) {
@@ -65,30 +64,18 @@ export const AppCard: React.FC<AppCardProps> = ({
 
   return (
     <div className={`app-card ${hasError ? 'app-card--error' : ''}`}>
-      {/* Thumbnail */}
-      <div className="app-card__thumbnail">
-        <img
-          src={thumbnailSrc}
-          alt={`${config.name} thumbnail`}
-          onError={(e) => {
-            const target = e.target as HTMLImageElement
-            target.src = '/placeholder-thumbnail.svg'
-          }}
-        />
-        <div className="app-card__overlay">
-          <div className={`app-card__status ${statusInfo.className}`}>
-            <span className="app-card__status-icon">{statusInfo.icon}</span>
-            <span className="app-card__status-text">{statusInfo.text}</span>
-          </div>
-        </div>
-      </div>
-
       {/* Content */}
       <div className="app-card__content">
         <div className="app-card__header">
-          <h3 className="app-card__name" title={config.name}>
-            {config.name}
-          </h3>
+          <div className="app-card__title-section">
+            <h3 className="app-card__name" title={config.name}>
+              {config.name}
+            </h3>
+            <div className={`app-card__status ${statusInfo.className}`}>
+              <span className="app-card__status-icon">{statusInfo.icon}</span>
+              <span className="app-card__status-text">{statusInfo.text}</span>
+            </div>
+          </div>
           <div className="app-card__actions">
             <button
               className="app-card__action-btn app-card__edit-btn"

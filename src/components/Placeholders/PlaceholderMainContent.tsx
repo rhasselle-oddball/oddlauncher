@@ -5,7 +5,6 @@ export function PlaceholderMainContent() {
     <div className="placeholder-main-content">
       <div className="placeholder-header">
         <div className="placeholder-app-info">
-          <div className="placeholder-app-thumbnail-large"></div>
           <div className="placeholder-app-details">
             <h2 className="placeholder-app-title">React Dev Server</h2>
             <p className="placeholder-app-command">npm run dev</p>

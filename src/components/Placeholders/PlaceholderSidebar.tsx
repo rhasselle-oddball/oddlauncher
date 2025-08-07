@@ -14,7 +14,6 @@ export function PlaceholderSidebar() {
 
       <div className="placeholder-app-list">
         <div className="placeholder-app-item">
-          <div className="placeholder-thumbnail"></div>
           <div className="placeholder-details">
             <div className="placeholder-name">React Dev Server</div>
             <div className="placeholder-status running">● Running</div>
@@ -22,7 +21,6 @@ export function PlaceholderSidebar() {
         </div>
 
         <div className="placeholder-app-item">
-          <div className="placeholder-thumbnail"></div>
           <div className="placeholder-details">
             <div className="placeholder-name">API Server</div>
             <div className="placeholder-status stopped">● Stopped</div>
@@ -30,7 +28,6 @@ export function PlaceholderSidebar() {
         </div>
 
         <div className="placeholder-app-item">
-          <div className="placeholder-thumbnail"></div>
           <div className="placeholder-details">
             <div className="placeholder-name">Database</div>
             <div className="placeholder-status starting">● Starting</div>

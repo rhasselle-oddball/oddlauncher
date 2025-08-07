@@ -1,4 +1,3 @@
-import { Smartphone } from 'lucide-react'
 import type { AppConfig } from '../../types'
 import { useAppProcess } from '../../hooks/useProcessManager'
 import './AppListItem.css'
@@ -40,12 +39,6 @@ export function AppListItem({ app, isSelected, onClick }: AppListItemProps) {
       className={`app-list-item ${isSelected ? 'selected' : ''} ${statusInfo.className}`}
       onClick={handleClick}
     >
-      <div className="app-list-item__thumbnail">
-        <div className="app-list-item__placeholder-thumbnail">
-          <Smartphone size={20} />
-        </div>
-      </div>
-
       <div className="app-list-item__content">
         <div className="app-list-item__header">
           <h3 className="app-list-item__name">{app.name}</h3>

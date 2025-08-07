@@ -1,4 +1,4 @@
-import { Play, Square, Loader, Edit, Trash2, ExternalLink, FolderOpen, Smartphone, Copy, Download, Upload } from 'lucide-react'
+import { Play, Square, Loader, Edit, Trash2, ExternalLink, FolderOpen, Copy, Download, Upload } from 'lucide-react'
 import type { AppConfig } from '../../types'
 import { useAppProcess } from '../../hooks/useProcessManager'
 import { useBrowser } from '../../hooks/useBrowser'
@@ -141,9 +141,6 @@ export function MainAppHeader({
     return (
       <div className="main-app-header">
         <div className="no-app-selected">
-          <div className="no-app-icon">
-            <Smartphone size={48} />
-          </div>
           <h2>No App Selected</h2>
           <p>Select an app from the sidebar to view its details and controls.</p>
         </div>
@@ -157,12 +154,6 @@ export function MainAppHeader({
     <div className="main-app-header">
       <div className="app-header-content">
         <div className="app-info-section">
-          <div className="app-thumbnail-large">
-            <div className="placeholder-thumbnail-large">
-              <Smartphone size={32} />
-            </div>
-          </div>
-
           <div className="app-details">
             <h2 className="app-title">{selectedApp.name}</h2>
 
