@@ -2,12 +2,21 @@ import { Settings } from 'lucide-react'
 import { useState } from 'react'
 import { useConfigManager } from './hooks/useConfig'
 import { generateAppId } from './utils/app-data'
-import { AppLayout, LibrarySidebar, MainAppHeader } from './components'
+import { AppLayout, LibrarySidebar, MainAppHeader, AppConfigModal } from './components'
 import type { AppConfig } from './types'
+import type { AppConfigModalMode } from './components/AppConfigModal'
 import './styles/App.css'
 
 function App() {
   const [selectedApp, setSelectedApp] = useState<AppConfig | null>(null)
+  const [modalState, setModalState] = useState<{
+    isOpen: boolean
+    mode: AppConfigModalMode
+    appToEdit?: AppConfig
+  }>({
+    isOpen: false,
+    mode: 'add',
+  })
   const configManager = useConfigManager()
 
   const handleAppSelect = (app: AppConfig | null) => {
@@ -15,8 +24,10 @@ function App() {
   }
 
   const handleAddApp = () => {
-    // TODO: Open configuration modal in Task 8
-    console.log('Add app clicked - TODO: Implement configuration modal')
+    setModalState({
+      isOpen: true,
+      mode: 'add',
+    })
   }
 
   const handleStartStop = (app: AppConfig) => {
@@ -25,8 +36,11 @@ function App() {
   }
 
   const handleEdit = (app: AppConfig) => {
-    // TODO: Open edit modal in Task 8
-    console.log('Edit clicked for app:', app.name)
+    setModalState({
+      isOpen: true,
+      mode: 'edit',
+      appToEdit: app,
+    })
   }
 
   const handleDelete = (app: AppConfig) => {
@@ -45,6 +59,38 @@ function App() {
     if (app.workingDirectory) {
       // TODO: Implement directory opening in Phase 3
       console.log('Open directory clicked for app:', app.name, app.workingDirectory)
+    }
+  }
+
+  // Modal handlers
+  const handleCloseModal = () => {
+    setModalState(prev => ({ ...prev, isOpen: false }))
+  }
+
+  const handleModalSubmit = async (appConfig: AppConfig) => {
+    try {
+      let success = false
+      
+      if (modalState.mode === 'add') {
+        success = await configManager.addApp(appConfig)
+        if (success) {
+          // Auto-select the newly added app
+          setSelectedApp(appConfig)
+        }
+      } else if (modalState.mode === 'edit') {
+        success = await configManager.updateApp(appConfig)
+        if (success) {
+          // Update selected app if it's the one being edited
+          if (selectedApp?.id === appConfig.id) {
+            setSelectedApp(appConfig)
+          }
+        }
+      }
+      
+      return success
+    } catch (error) {
+      console.error('Failed to save app config:', error)
+      return false
     }
   }
 
@@ -136,6 +182,15 @@ function App() {
           }
         />
       </main>
+
+      {/* App Configuration Modal */}
+      <AppConfigModal
+        isOpen={modalState.isOpen}
+        mode={modalState.mode}
+        appToEdit={modalState.appToEdit}
+        onClose={handleCloseModal}
+        onSubmit={handleModalSubmit}
+      />
     </div>
   )
 }
