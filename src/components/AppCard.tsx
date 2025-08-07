@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { AppState, AppStatus } from '../types'
+import DebugModal from './DebugModal'
 import './AppCard.css'
 
 interface AppCardProps {
@@ -26,6 +27,9 @@ export const AppCard: React.FC<AppCardProps> = ({
   const isStarting = status === 'starting'
   const isStopping = status === 'stopping'
   const hasError = status === 'error'
+  
+  // Debug modal state
+  const [showDebugModal, setShowDebugModal] = useState(false)
 
   const getStatusDisplay = () => {
     switch (status) {
@@ -126,6 +130,16 @@ export const AppCard: React.FC<AppCardProps> = ({
             <p title={process.errorMessage}>
               ⚠️ {process.errorMessage}
             </p>
+            <button
+              className="app-card__debug-btn"
+              onClick={(e) => {
+                e.stopPropagation()
+                setShowDebugModal(true)
+              }}
+              title="Show debug information"
+            >
+              🔍 Debug
+            </button>
           </div>
         )}
 
@@ -143,6 +157,16 @@ export const AppCard: React.FC<AppCardProps> = ({
           {!isStarting && !isStopping && (isRunning ? '⏹️ Stop' : '▶️ Start')}
         </button>
       </div>
+
+      {/* Debug Modal */}
+      <DebugModal
+        isOpen={showDebugModal}
+        onClose={() => setShowDebugModal(false)}
+        appName={config.name}
+        command={config.command}
+        workingDirectory={config.workingDirectory}
+        errorMessage={process?.errorMessage}
+      />
     </div>
   )
 }

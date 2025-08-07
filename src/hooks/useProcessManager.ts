@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
 import type { AppProcess, AppStatus, AppError } from '../types'
+import { debugLogger } from '../utils/debug-logger'
 
 /**
  * Result type for process operations from backend
@@ -99,6 +100,17 @@ export function useProcessManager() {
       portCheckTimeout?: number
     ): Promise<ProcessResult> => {
       try {
+        debugLogger.info('ProcessManager', `Starting process for app: ${appId}`, {
+          command,
+          workingDirectory,
+          environmentVariables,
+          url,
+          autoLaunchBrowser,
+          browserDelay,
+          portToCheck,
+          portCheckTimeout
+        })
+
         setIsLoading(true)
         setError(null)
 
@@ -128,6 +140,8 @@ export function useProcessManager() {
           portCheckTimeout,
         })
 
+        debugLogger.info('ProcessManager', `Process start result for ${appId}:`, result)
+
         if (result.success && result.pid) {
           setProcesses((prev) => ({
             ...prev,
@@ -142,6 +156,7 @@ export function useProcessManager() {
             },
           }))
         } else {
+          debugLogger.error('ProcessManager', `Failed to start process for ${appId}`, result)
           // Remove from processes on failure
           setProcesses((prev) => {
             const updated = { ...prev }
@@ -152,6 +167,7 @@ export function useProcessManager() {
 
         return result
       } catch (err) {
+        debugLogger.error('ProcessManager', `Exception starting process for ${appId}`, err)
         console.error(`Failed to start process for ${appId}:`, err)
         setError(err as AppError)
 
@@ -360,6 +376,7 @@ export function useProcessManager() {
           'process-error',
           (event) => {
             const { appId, error } = event.payload
+            debugLogger.error('ProcessManager', `Process error for ${appId}:`, error)
             console.log(`Process error: ${appId} - ${error}`)
 
             setProcesses((prev) => ({

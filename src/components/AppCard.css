@@ -184,20 +184,41 @@
 }
 
 .app-card__error {
-  background: rgba(244, 67, 54, 0.1);
-  border: 1px solid rgba(244, 67, 54, 0.3);
+  background: #2d1b1b;
+  border: 1px solid #5b2c2c;
   border-radius: 6px;
-  padding: 8px;
-  margin-top: 4px;
+  padding: 12px;
+  margin-top: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
 }
 
 .app-card__error p {
-  font-size: 0.8rem;
-  color: var(--accent-red);
   margin: 0;
+  color: #ff6b6b;
+  font-size: 13px;
+  flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.app-card__debug-btn {
+  background: #4a5568;
+  border: 1px solid #718096;
+  color: #e2e8f0;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  white-space: nowrap;
+  transition: background-color 0.2s;
+}
+
+.app-card__debug-btn:hover {
+  background: #2d3748;
 }
 
 /* Main Action Button */

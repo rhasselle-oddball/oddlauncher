@@ -9,13 +9,18 @@ pub fn run() {
     .plugin(tauri_plugin_dialog::init())
     .manage(ProcessManager::default())
     .setup(|app| {
-      if cfg!(debug_assertions) {
-        app.handle().plugin(
-          tauri_plugin_log::Builder::default()
-            .level(log::LevelFilter::Info)
-            .build(),
-        )?;
-      }
+      // Always enable logging, with different levels for debug vs release
+      let log_level = if cfg!(debug_assertions) {
+        log::LevelFilter::Debug
+      } else {
+        log::LevelFilter::Info
+      };
+      
+      app.handle().plugin(
+        tauri_plugin_log::Builder::default()
+          .level(log_level)
+          .build(),
+      )?;
       Ok(())
     })
     .invoke_handler(tauri::generate_handler![
@@ -38,6 +43,7 @@ pub fn run() {
       commands::open_url_in_browser,
       commands::check_port_ready,
       commands::wait_for_port_ready,
+      commands::get_debug_info,
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

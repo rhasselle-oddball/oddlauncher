@@ -616,12 +616,101 @@ Task 15 removed the thumbnail upload functionality but left some thumbnail displ
 
 **Current State for Next Developer:**
 - Application completely free of thumbnail functionality and all related code references
-- Clean, streamlined UI focused on essential app information and controls without visual clutter  
+- Clean, streamlined UI focused on essential app information and controls without visual clutter
 - All TypeScript compilation and build errors resolved permanently
 - Components properly laid out without any thumbnail dependencies or placeholder elements
 - Thumbnail removal is now 100% complete - ready for next development tasks
 
 ## Phase 5 - Polish & Testing
+
+### 🔧 Task 16: Add Multi-Command Dev Server Launch Support
+**Priority:** Medium | **Status:** TODO 📝
+
+**Problem Statement:**
+Currently Oddbox only supports single-line commands in the "Command" field. Many dev servers require multiple commands to be executed in sequence (e.g., setting Node version, then running the dev server). Users need the ability to specify multi-line command sequences that Oddbox will execute automatically.
+
+**Scope:**
+Replace the single "Command" field with a multi-line "Launch Commands" field that allows users to specify multiple commands that will be executed sequentially when starting the dev server.
+
+**IMPORTANT CLARIFICATION:**
+- **This is NOT about setup instructions or documentation**
+- **This IS about the actual commands Oddbox will execute to run the dev server**
+- **Users should NEVER touch a terminal after initial configuration**
+- **Oddbox executes ALL commands automatically when user clicks "Start"**
+
+**Example Use Cases:**
+```
+Launch Commands for vets-website:
+nvm use 14.15
+yarn watch
+
+Launch Commands for Python Django:
+source venv/bin/activate
+python manage.py runserver
+
+Launch Commands for Rails with specific Ruby:
+rbenv use 3.0.0
+bundle exec rails server
+
+Launch Commands for Next.js with environment:
+export NODE_ENV=development
+npm run dev
+```
+
+**Implementation Plan:**
+1. **Backend (Rust)**:
+   - Replace `command: String` with `launchCommands: String` in AppConfig struct
+   - Modify `start_app_process` to handle multi-line commands
+   - Execute commands sequentially using shell script approach
+   - Update JSON schema and ensure backwards compatibility
+   - Convert single command configs to multi-line format automatically
+
+2. **Frontend (TypeScript)**:
+   - Replace command field with launchCommands in AppConfig interface
+   - Replace single-line input with multi-line textarea in AppConfigModal
+   - Update validation to ensure at least one non-empty command
+   - Show command count and preview in app cards/headers
+
+3. **Command Execution Logic**:
+   - Create temporary shell script from multi-line commands
+   - Execute shell script in working directory with proper environment
+   - Stream all command output to terminal in real-time
+   - Handle command failures gracefully (stop execution, show error)
+
+4. **UI/UX**:
+   - Large multi-line textarea labeled "Launch Commands"
+   - Helpful placeholder: "Enter the commands to start your dev server (one per line)"
+   - Show command preview/summary in main app header
+   - Clear indication of multi-command vs single-command apps
+
+**Acceptance Criteria:**
+- [ ] AppConfigModal has multi-line textarea for launch commands instead of single command input
+- [ ] Multiple commands execute sequentially when starting app
+- [ ] Each command's output streams to terminal in real-time
+- [ ] Command execution stops on first failure with clear error message
+- [ ] Single-line commands still work (backwards compatibility)
+- [ ] Existing app configurations migrate automatically
+- [ ] Multi-line commands save/load correctly
+- [ ] Terminal shows output from all executed commands
+
+**Verification Steps:**
+- [ ] Can enter multiple commands in app configuration
+- [ ] Commands execute in correct sequence when starting app
+- [ ] Each command's output appears in terminal
+- [ ] Command failure stops execution and shows error
+- [ ] Single command apps continue working normally
+- [ ] Existing configs load without issues
+- [ ] Commands work across platforms (Windows/Linux/macOS)
+- [ ] Configuration import/export preserves multi-line commands
+
+**Out of Scope:**
+- Interactive command prompts or user input during execution
+- Conditional command execution based on environment
+- Command templates or wizards
+- Parallel command execution
+- Command timeout or cancellation (beyond normal process termination)
+
+---
 
 - [ ] **Add Comprehensive Error Handling & User Feedback**
   - Implement user-friendly error messages throughout the application
