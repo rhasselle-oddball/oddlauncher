@@ -1,0 +1,178 @@
+/* AppLayout Component Styles */
+.app-layout {
+  display: flex;
+  height: 100vh;
+  background-color: var(--bg-primary);
+  overflow: hidden;
+}
+
+.app-layout.resizing {
+  user-select: none;
+  cursor: col-resize;
+}
+
+.app-layout.resizing * {
+  pointer-events: none;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  background-color: var(--bg-secondary);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  min-width: 48px;
+  max-width: 600px;
+  transition: width 0.2s ease-in-out;
+  position: relative;
+  z-index: 10;
+}
+
+.sidebar.collapsed {
+  width: 48px !important;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-tertiary);
+  min-height: 56px;
+}
+
+.collapse-button {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  min-width: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.collapse-button:hover {
+  background-color: var(--hover-color);
+  color: var(--text-primary);
+}
+
+.collapse-button:focus {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+}
+
+.sidebar-title {
+  margin-left: 0.75rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.sidebar-content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Resize Handle */
+.resize-handle {
+  width: 4px;
+  background-color: var(--border-color);
+  cursor: col-resize;
+  transition: background-color 0.2s ease;
+  position: relative;
+  z-index: 20;
+}
+
+.resize-handle:hover {
+  background-color: var(--accent-blue);
+}
+
+.resize-handle:active {
+  background-color: var(--accent-blue);
+}
+
+/* Main View */
+.main-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background-color: var(--bg-primary);
+  overflow: hidden;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .app-layout {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    width: 100% !important;
+    max-height: 200px;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .sidebar.collapsed {
+    max-height: 56px;
+    overflow: hidden;
+  }
+  
+  .resize-handle {
+    display: none;
+  }
+  
+  .main-view {
+    flex: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar-header {
+    padding: 0.5rem;
+  }
+  
+  .sidebar-title {
+    font-size: 1rem;
+    margin-left: 0.5rem;
+  }
+  
+  .collapse-button {
+    min-width: 20px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .sidebar,
+  .collapse-button,
+  .resize-handle {
+    transition: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .resize-handle {
+    background-color: var(--text-primary);
+  }
+  
+  .sidebar {
+    border-right-color: var(--text-primary);
+  }
+  
+  .sidebar-header {
+    border-bottom-color: var(--text-primary);
+  }
+}

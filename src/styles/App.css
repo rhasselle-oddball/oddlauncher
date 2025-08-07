@@ -37,6 +37,7 @@ code {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background-color: var(--bg-primary);
 }
 
 .app-header {
@@ -44,6 +45,12 @@ code {
   padding: 1rem 2rem;
   border-bottom: 1px solid var(--border-color);
   text-align: center;
+  flex-shrink: 0;
+}
+
+.main-layout {
+  flex: 1;
+  overflow: hidden;
 }
 
 .app-header h1 {
@@ -198,7 +205,7 @@ code {
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 1rem;
   }
-  
+
   .app-cards-demo h3 {
     font-size: 1.3rem;
   }

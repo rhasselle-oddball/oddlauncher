@@ -1,0 +1,342 @@
+/* Placeholder Main Content Styles */
+.placeholder-main-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--bg-primary);
+}
+
+/* Header Section */
+.placeholder-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  gap: 2rem;
+}
+
+.placeholder-app-info {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.placeholder-app-thumbnail-large {
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--hover-color) 100%);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.placeholder-app-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.placeholder-app-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.placeholder-app-command {
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  color: var(--accent-blue);
+  background-color: var(--bg-primary);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+  display: inline-block;
+}
+
+.placeholder-app-directory,
+.placeholder-app-url {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.placeholder-app-url {
+  color: var(--accent-green);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Controls Section */
+.placeholder-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+.placeholder-start-button {
+  padding: 0.75rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.placeholder-start-button.running {
+  background-color: #4caf50;
+  color: white;
+}
+
+.placeholder-start-button.stopped {
+  background-color: var(--accent-red);
+  color: white;
+}
+
+.placeholder-start-button.starting {
+  background-color: #ff9800;
+  color: white;
+}
+
+.placeholder-start-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.placeholder-action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.placeholder-action-button {
+  width: 40px;
+  height: 40px;
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.placeholder-action-button:hover:not(:disabled) {
+  background-color: var(--hover-color);
+  color: var(--text-primary);
+  transform: translateY(-1px);
+}
+
+.placeholder-action-button.delete:hover:not(:disabled) {
+  background-color: var(--accent-red);
+  color: white;
+}
+
+.placeholder-action-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Terminal Section */
+.placeholder-terminal {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-primary);
+  overflow: hidden;
+}
+
+.placeholder-terminal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.terminal-title {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.terminal-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.terminal-control-button {
+  padding: 0.25rem 0.75rem;
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.terminal-control-button:hover:not(:disabled) {
+  background-color: var(--hover-color);
+  color: var(--text-primary);
+}
+
+.terminal-control-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.placeholder-terminal-content {
+  flex: 1;
+  padding: 1rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  overflow-y: auto;
+  background-color: #0d1117;
+  color: #f0f6fc;
+}
+
+.terminal-line {
+  margin-bottom: 0.25rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.timestamp {
+  color: #7d8590;
+  flex-shrink: 0;
+}
+
+.output {
+  flex: 1;
+  word-break: break-word;
+}
+
+.output.success {
+  color: #3fb950;
+}
+
+.output.error {
+  color: #f85149;
+}
+
+.output.info {
+  color: #58a6ff;
+}
+
+.terminal-cursor {
+  display: inline-block;
+  background-color: #f0f6fc;
+  width: 8px;
+  height: 1.2em;
+  animation: blink 1s infinite;
+  margin-top: 0.5rem;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* Terminal Scrollbar */
+.placeholder-terminal-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.placeholder-terminal-content::-webkit-scrollbar-track {
+  background: #0d1117;
+}
+
+.placeholder-terminal-content::-webkit-scrollbar-thumb {
+  background: #21262d;
+  border-radius: 4px;
+}
+
+.placeholder-terminal-content::-webkit-scrollbar-thumb:hover {
+  background: #30363d;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .placeholder-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem;
+  }
+  
+  .placeholder-controls {
+    align-self: stretch;
+    justify-content: space-between;
+  }
+  
+  .placeholder-action-buttons {
+    gap: 0.25rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .placeholder-app-info {
+    gap: 1rem;
+  }
+  
+  .placeholder-app-thumbnail-large {
+    width: 48px;
+    height: 48px;
+    font-size: 1.5rem;
+  }
+  
+  .placeholder-app-title {
+    font-size: 1.4rem;
+  }
+  
+  .placeholder-start-button {
+    padding: 0.6rem 1.5rem;
+    font-size: 1rem;
+    min-width: 100px;
+  }
+  
+  .placeholder-action-button {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .placeholder-terminal-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .terminal-controls {
+    align-self: stretch;
+    justify-content: space-between;
+  }
+}
