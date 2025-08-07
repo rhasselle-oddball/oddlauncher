@@ -468,49 +468,37 @@ Production build testing revealed several critical issues that needed immediate 
 - Modal sizing properly handles all form content with accessible buttons
 - Terminal component shows proper empty state and left-aligned content
 - Application fills entire window without excessive padding
-- Ready for next major task: Real-time Terminal Integration with Process Output
-- Ready for Task 11: Integrate Real-time Terminal with Process Management
+### ✅ Task 13: Add Auto-Launch Browser Functionality (COMPLETED - Commit: 59dfa33)
+**Status:** Complete ✅ | **Committed:** 59dfa33 | **Pushed:** ✅ | **Issue:** #15 (Closed)
 
-- [ ] **Integrate Real-time Terminal with Process Management**
-  - Create Tauri commands for starting/stopping processes
-  - Implement process management with proper cleanup
-  - Add process status tracking (PID, running state)
-  - Handle process termination gracefully
-  - Integrate with sidebar status indicators and main view updates
-  - **Verification Steps:**
-    - [ ] Processes start correctly with specified commands
-    - [ ] Process PIDs are tracked and stored
-    - [ ] Stop functionality terminates processes cleanly
-    - [ ] Orphaned processes are prevented
-    - [ ] Error handling for failed process starts
-    - [ ] Sidebar updates show real-time process status
-    - [ ] Main view header reflects current process state
+**What was accomplished:**
+- ✅ Implemented URL opening when apps start successfully with configurable options
+- ✅ Added Tauri commands for opening URLs in default browser (`open_url_in_browser`)
+- ✅ Implemented port polling utilities (`check_port_ready`, `wait_for_port_ready`)
+- ✅ Added browser launch configuration options to process start command
+- ✅ Enhanced MainAppHeader with manual URL opening functionality using useBrowser hook
+- ✅ Updated useProcessManager hook with browser launch event handling
+- ✅ Added browser launch success/failure notifications in terminal output
+- ✅ Included configurable delay for slow-starting apps (browserDelay property)
+- ✅ Handled cases where URL is not accessible with graceful error messages
+- ✅ Integrated with main view header (open URL button works correctly)
+- ✅ Added comprehensive browser configuration options to AppConfigModal
 
-- [ ] **Integrate Real-time Terminal with Process Management**
-  - Connect terminal component to live process output streams
-  - Implement process output buffering and streaming
-  - Add terminal state management (clear on restart, persist logs)
-  - Handle process lifecycle events (start, stop, error, exit)
-  - **Verification Steps:**
-    - [ ] Terminal shows output immediately when process starts
-    - [ ] Terminal clears appropriately when starting new process
-    - [ ] Process exit codes and errors display in terminal
-    - [ ] Terminal handles rapid output without performance issues
-    - [ ] Terminal state persists correctly during app selection changes
+**Verified Acceptance Criteria:**
+- ✅ Browser opens automatically when app starts (if configured with autoLaunchBrowser)
+- ✅ Port polling detects when server is ready (portToCheck and portCheckTimeout)
+- ✅ Configurable delay works as expected (browserDelay setting)
+- ✅ Graceful handling of inaccessible URLs with error events and terminal notifications
+- ✅ No browser launches for failed app starts (proper error state handling)
+- ✅ Open URL button in header works correctly with manual browser launching
 
-- [ ] **Add Auto-Launch Browser Functionality**
-  - Implement URL opening when apps start successfully
-  - Add optional port polling for development servers
-  - Include configurable delay for slow-starting apps
-  - Handle cases where URL is not accessible
-  - Integrate with main view header (open URL button state)
-  - **Verification Steps:**
-    - [ ] Browser opens automatically when app starts (if configured)
-    - [ ] Port polling detects when server is ready
-    - [ ] Configurable delay works as expected
-    - [ ] Graceful handling of inaccessible URLs
-    - [ ] No browser launches for failed app starts
-    - [ ] Open URL button in header works correctly
+**Current State for Next Developer:**
+- Browser auto-launch functionality is fully operational and integrated
+- All browser configuration options available in app configuration modal
+- Real-time browser launch notifications display in terminal output
+- Manual URL opening works from main app header
+- Comprehensive error handling for all browser launch scenarios
+- Ready for next task: Enhanced App Management Features
 
 ## Phase 4 - Advanced Features & Polish
 
