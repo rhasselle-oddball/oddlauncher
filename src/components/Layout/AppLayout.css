@@ -115,23 +115,23 @@
   .app-layout {
     flex-direction: column;
   }
-  
+
   .sidebar {
     width: 100% !important;
     max-height: 200px;
     border-right: none;
     border-bottom: 1px solid var(--border-color);
   }
-  
+
   .sidebar.collapsed {
     max-height: 56px;
     overflow: hidden;
   }
-  
+
   .resize-handle {
     display: none;
   }
-  
+
   .main-view {
     flex: 1;
   }
@@ -141,12 +141,12 @@
   .sidebar-header {
     padding: 0.5rem;
   }
-  
+
   .sidebar-title {
     font-size: 1rem;
     margin-left: 0.5rem;
   }
-  
+
   .collapse-button {
     min-width: 20px;
     font-size: 0.9rem;
@@ -167,11 +167,11 @@
   .resize-handle {
     background-color: var(--text-primary);
   }
-  
+
   .sidebar {
     border-right-color: var(--text-primary);
   }
-  
+
   .sidebar-header {
     border-bottom-color: var(--text-primary);
   }

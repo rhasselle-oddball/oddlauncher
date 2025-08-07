@@ -113,6 +113,8 @@ Based on the PRD, here are the development tasks organized by priority and depen
 
 ## 🚧 TODO: REMAINING TASKS
 
+**UI Architecture Decision:** The application will use a **sidebar + main view layout** as the primary and only interface. This provides the best user experience with a compact app list in the sidebar and detailed information/terminal output in the main content area. No grid view or alternative layouts will be implemented.
+
 ## Phase 2 - Core UI Components
 
 ### ✅ Task 4: Create App Card Component (COMPLETED - Commit: c972f10)
@@ -137,82 +139,115 @@ Based on the PRD, here are the development tasks organized by priority and depen
   - Hover/focus states work properly with accessibility features
 
 **Current State for Next Developer:**
-- AppCard component is fully functional and can be adapted for both list and grid views
+- AppCard component is fully functional for use in the sidebar layout
 - Component available at `/src/components/AppCard.tsx` with comprehensive CSS styling
 - Test component available for development and debugging purposes
 - SVG placeholder thumbnail system working correctly
 - All TypeScript interfaces properly typed and exported
-- Ready for next task: Implement Main Application Layout
+- Ready for next task: Create Library Sidebar Component
 
-- [ ] **Implement Main Application Layout (Sidebar + Main View)**
-  - Create two-pane layout with resizable sidebar and main content area
-  - Implement responsive behavior for different window sizes
-  - Add proper CSS grid/flexbox structure for layout management
-  - Handle layout state persistence (sidebar width, collapsed state)
-  - **Verification Steps:**
-    - [ ] Sidebar and main view render correctly side by side
-    - [ ] Layout is responsive to window resizing
-    - [ ] Sidebar can be resized by dragging divider
-    - [ ] Layout state persists between app sessions
-    - [ ] No layout shifts or visual glitches
+### ✅ Task 5: Implement Main Application Layout (Sidebar + Main View) (COMPLETED - Commit: 16cee02)
+**Status:** Complete ✅ | **Committed:** 16cee02 | **Pushed:** ✅ | **Issue:** #6 (Closed)
 
-- [ ] **Create Library Sidebar Component**
-  - Build app library list in sidebar showing all configured apps
-  - Implement compact list view of apps (small thumbnail, name, status indicator)
-  - Add app selection functionality with active/selected state styling
-  - Include "Add New App" button and search/filter functionality
-  - Handle empty state (no apps configured)
+**What was accomplished:**
+- ✅ Created comprehensive AppLayout component with resizable sidebar and main content area
+- ✅ Implemented sidebar collapse/expand functionality with visual toggle button and smooth animations
+- ✅ Added drag-to-resize functionality for sidebar width (200px - 600px range) with mouse event handlers
+- ✅ Implemented layout state persistence using localStorage (sidebar width, collapsed state)
+- ✅ Created responsive design with proper mobile breakpoints (768px, 480px) and mobile-first approach
+- ✅ Built PlaceholderSidebar component demonstrating compact app list with search and status indicators
+- ✅ Built PlaceholderMainContent component showing header with app info and terminal output sections
+- ✅ Updated main App.tsx to use new layout structure with proper component integration
+- ✅ Added comprehensive CSS styling with dark theme, accessibility features, and smooth transitions
+- ✅ Verified all acceptance criteria:
+  - Sidebar and main view render correctly side by side with proper proportions
+  - Layout is responsive to window resizing across all screen sizes
+  - Sidebar can be resized by dragging divider with visual feedback
+  - Layout state persists between app sessions using localStorage
+  - No layout shifts or visual glitches during interactions or resizing
+
+**Current State for Next Developer:**
+- Main application layout is fully operational and ready for component integration
+- AppLayout component available at `/src/components/Layout/AppLayout.tsx` with comprehensive functionality
+- Placeholder components demonstrate the intended UI structure and styling patterns
+- Responsive design works seamlessly across different screen sizes and orientations
+- Layout state management handles all edge cases and user preferences
+- Development environment tested and working with new layout structure
+- Ready for next task: Create Functional Library Sidebar Component
+
+### Task 6: Create Functional Library Sidebar Component
+- [ ] **Replace PlaceholderSidebar with Functional Library Sidebar Component**
+  - Connect to existing configuration system using `useConfigManager` hook
+  - Display real apps from configuration with proper app data
+  - Implement app selection functionality that updates shared state
+  - Add functional search/filter capability for app names and commands
+  - Include working "Add New App" button (opens configuration modal when ready)
+  - Handle empty state properly (no apps configured yet)
+  - Reuse existing AppCard component for consistent styling in compact list format
   - **Verification Steps:**
-    - [ ] All apps display in sidebar list with proper information
-    - [ ] App selection updates main view content
-    - [ ] Active app is visually highlighted in sidebar
-    - [ ] Search/filter functionality works correctly
-    - [ ] Empty state shows helpful message and add button
+    - [ ] Real apps from configuration display in sidebar list with correct information
+    - [ ] App selection updates global app state and triggers main view updates
+    - [ ] Selected app is visually highlighted in sidebar with active state
+    - [ ] Search/filter functionality filters visible apps correctly
+    - [ ] Empty state shows helpful message and functional add button
     - [ ] List scrolls properly when many apps are configured
+    - [ ] Component integrates seamlessly with existing AppLayout structure
+    - [ ] Loading and error states are handled properly
 
-- [ ] **Create Main App Info Header Component**
-  - Display selected app details (name, description, command, working directory, URL)
-  - Show large thumbnail/icon for selected app
-  - Implement prominent Start/Stop button with status indicators
-  - Add quick action buttons (Edit, Delete, Open URL, Open Directory)
-  - Handle no app selected state
+### Task 7: Create Functional Main App Info Header Component
+- [ ] **Replace PlaceholderMainContent with Functional Main App Info Header Component**
+  - Connect to shared app selection state to display selected app details
+  - Show real app information (name, description, command, working directory, URL)
+  - Display app thumbnail with fallback to existing placeholder system
+  - Implement functional Start/Stop button (placeholder for now, real functionality in Phase 3)
+  - Add quick action buttons (Edit, Delete, Open URL, Open Directory) as placeholders
+  - Handle no app selected state with helpful message
+  - Maintain existing terminal output section as placeholder for now
   - **Verification Steps:**
-    - [ ] Selected app information displays correctly
-    - [ ] Start/Stop button shows correct state and functions properly
-    - [ ] Quick action buttons work as expected
-    - [ ] Thumbnail displays with fallback to placeholder
+    - [ ] Selected app information displays correctly from real configuration data
+    - [ ] App details update immediately when selection changes in sidebar
+    - [ ] Thumbnail displays properly with fallback to placeholder
+    - [ ] Start/Stop button shows correct visual state (functional implementation comes later)
+    - [ ] Quick action buttons are present and styled (functionality comes later)
+    - [ ] No app selected state shows appropriate message and guidance
+    - [ ] Component updates reactively when app configurations change
+    - [ ] All app details render correctly (name, command, directory, URL, etc.)
+
+### Task 8: Create App Configuration Form/Modal Component
+- [ ] **Create Modal Form for Adding and Editing Apps**
+  - Build modal component for app configuration (name, command, workingDirectory, URL, description)
+  - Add comprehensive form validation and user-friendly error messages
+  - Implement file/folder picker for working directory selection
+  - Support both "Add New App" and "Edit Existing App" modes
+  - Include thumbnail upload functionality (basic file picker for now)
+  - Integrate with existing configuration system using available hooks
+  - **Verification Steps:**
+    - [ ] Modal opens and closes properly with smooth animations
+    - [ ] All form fields validate input properly with helpful error messages
+    - [ ] File picker works for selecting working directories
+    - [ ] Form can create new apps and edit existing app configurations
+    - [ ] Form state resets properly after successful submit or cancel
+    - [ ] Apps are saved to configuration and appear immediately in sidebar
+    - [ ] Edit mode pre-populates form with existing app data
+    - [ ] Thumbnail upload allows basic image file selection
+
+### Task 9: Create Functional Terminal Output Component
+- [ ] **Build Real Terminal Interface Component (Static Version)**
+  - Replace terminal section in main view with functional terminal component
+  - Implement terminal-like interface with proper styling (monospace, dark theme)
+  - Add scrollback buffer and auto-scroll functionality
+  - Style with terminal colors and formatting for readability
+  - Include terminal controls (clear, copy, search) as placeholders
+  - Handle no app selected state appropriately
+  - **Note:** Real-time process output integration comes in Phase 3
+  - **Verification Steps:**
+    - [ ] Terminal component renders with proper terminal styling and appearance
+    - [ ] Terminal can display static text content with proper formatting
+    - [ ] Scrollback buffer works with reasonable limits
+    - [ ] Auto-scroll functionality can be toggled on/off
+    - [ ] Terminal controls are present and styled (functionality added later)
     - [ ] No app selected state shows appropriate message
-    - [ ] All app details update when selection changes
-
-- [ ] **Create Terminal Output Component**
-  - Build terminal-like interface for real-time process output
-  - Implement live streaming of stdout/stderr with proper formatting
-  - Add scrollback buffer, auto-scroll, and scroll-to-bottom functionality
-  - Style with monospace font and terminal colors (dark theme)
-  - Include terminal controls (clear, copy, search)
-  - **Verification Steps:**
-    - [ ] Terminal output appears in real-time when app is running
-    - [ ] Both stdout and stderr are captured and displayed
-    - [ ] Terminal styling matches real terminal appearance
-    - [ ] Scrollback works with reasonable buffer limits
-    - [ ] Auto-scroll can be toggled and works properly
-    - [ ] Terminal controls function correctly
-    - [ ] No app running state shows appropriate message
-
-- [ ] **Create App Configuration Form/Modal**
-  - Build modal form for adding new apps (name, command, cwd, URL, description)
-  - Add form validation and error messages
-  - Implement file/folder picker for working directory
-  - Create edit mode for existing app configurations
-  - Include thumbnail upload functionality
-  - **Verification Steps:**
-    - [ ] Modal opens and closes properly
-    - [ ] All form fields validate properly
-    - [ ] File picker works for selecting directories
-    - [ ] Form can both create new and edit existing apps
-    - [ ] Error messages are clear and helpful
-    - [ ] Form state resets properly after submit/cancel
-    - [ ] Thumbnail upload works with preview
+    - [ ] Component is ready for real-time process output integration
 
 ## Phase 3 - Process Management & Integration
 
@@ -259,18 +294,6 @@ Based on the PRD, here are the development tasks organized by priority and depen
 
 ## Phase 4 - Advanced Features & Polish
 
-- [ ] **Add Grid View Toggle Option**
-  - Create toggle button to switch between list sidebar and grid view
-  - Implement grid layout as alternative view mode
-  - Adapt existing AppCard component for grid display
-  - Persist view mode preference in user settings
-  - **Verification Steps:**
-    - [ ] View toggle button works correctly
-    - [ ] Grid view displays apps in responsive grid layout
-    - [ ] List view (sidebar) works as primary interface
-    - [ ] View mode preference saves and restores correctly
-    - [ ] Both views handle app selection and management properly
-
 - [ ] **Enhance App Management Features**
   - Implement app deletion with confirmation modal
   - Add duplicate app functionality
@@ -283,10 +306,10 @@ Based on the PRD, here are the development tasks organized by priority and depen
     - [ ] Import/export functionality works with JSON files
     - [ ] Drag-and-drop reordering works in sidebar
     - [ ] Keyboard shortcuts are documented and functional
-    - [ ] All management features work in both list and grid views
+    - [ ] All management features work correctly in the sidebar
 
 - [ ] **Implement Enhanced Thumbnail System**
-  - Integrate thumbnail display in both sidebar list and main header
+  - Integrate thumbnail display in sidebar list and main app header
   - Add file picker for custom thumbnails in configuration form
   - Create thumbnail storage and management in local directory
   - Implement thumbnail preview and editing capabilities

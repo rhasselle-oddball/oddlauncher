@@ -13,7 +13,7 @@ export function PlaceholderMainContent() {
             <p className="placeholder-app-url">http://localhost:3000</p>
           </div>
         </div>
-        
+
         <div className="placeholder-controls">
           <button className="placeholder-start-button running" disabled>
             🟢 Running
@@ -34,7 +34,7 @@ export function PlaceholderMainContent() {
           </div>
         </div>
       </div>
-      
+
       <div className="placeholder-terminal">
         <div className="placeholder-terminal-header">
           <span className="terminal-title">Terminal Output</span>
@@ -44,7 +44,7 @@ export function PlaceholderMainContent() {
             <button className="terminal-control-button" disabled title="Search">Search</button>
           </div>
         </div>
-        
+
         <div className="placeholder-terminal-content">
           <div className="terminal-line">
             <span className="timestamp">[14:32:15]</span>

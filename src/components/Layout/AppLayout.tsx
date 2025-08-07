@@ -103,7 +103,7 @@ export function AppLayout({ sidebar, mainContent }: AppLayoutProps) {
             <h2 className="sidebar-title">Library</h2>
           )}
         </div>
-        
+
         <div className="sidebar-content">
           {!layoutState.isCollapsed && sidebar}
         </div>

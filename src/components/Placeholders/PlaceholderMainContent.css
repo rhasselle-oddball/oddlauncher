@@ -289,12 +289,12 @@
     gap: 1rem;
     padding: 1rem;
   }
-  
+
   .placeholder-controls {
     align-self: stretch;
     justify-content: space-between;
   }
-  
+
   .placeholder-action-buttons {
     gap: 0.25rem;
   }
@@ -304,23 +304,23 @@
   .placeholder-app-info {
     gap: 1rem;
   }
-  
+
   .placeholder-app-thumbnail-large {
     width: 48px;
     height: 48px;
     font-size: 1.5rem;
   }
-  
+
   .placeholder-app-title {
     font-size: 1.4rem;
   }
-  
+
   .placeholder-start-button {
     padding: 0.6rem 1.5rem;
     font-size: 1rem;
     min-width: 100px;
   }
-  
+
   .placeholder-action-button {
     width: 36px;
     height: 36px;
@@ -334,7 +334,7 @@
     align-items: flex-start;
     gap: 0.5rem;
   }
-  
+
   .terminal-controls {
     align-self: stretch;
     justify-content: space-between;

@@ -1,22 +1,13 @@
 import { useState } from 'react'
 import { useConfigManager } from './hooks/useConfig'
 import { generateAppId } from './utils/app-data'
-import { AppLayout, LibrarySidebar, PlaceholderMainContent } from './components'
+import { AppLayout, PlaceholderSidebar, PlaceholderMainContent } from './components'
 import type { AppConfig } from './types'
 import './styles/App.css'
 
 function App() {
-  const [selectedApp, setSelectedApp] = useState<AppConfig | null>(null)
+  const [count, setCount] = useState(0)
   const configManager = useConfigManager()
-
-  const handleAppSelect = (app: AppConfig | null) => {
-    setSelectedApp(app)
-  }
-
-  const handleAddApp = () => {
-    // TODO: Open configuration modal in Task 8
-    console.log('Add app clicked - TODO: Implement configuration modal')
-  }
 
   const testAddApp = async () => {
     const newApp: AppConfig = {
@@ -32,8 +23,6 @@ function App() {
     const success = await configManager.addApp(newApp)
     if (success) {
       console.log('App added successfully!')
-      // Auto-select the newly added app
-      setSelectedApp(newApp)
     } else {
       console.error('Failed to add app:', configManager.error)
     }
@@ -52,6 +41,13 @@ function App() {
 
         {/* Temporary test buttons - will be removed in final version */}
         <div className="test-buttons">
+          <button
+            className="test-button"
+            onClick={() => setCount((count) => count + 1)}
+          >
+            Test Button: {count}
+          </button>
+
           <button
             className="test-button"
             onClick={testAddApp}
@@ -75,7 +71,6 @@ function App() {
         {configManager.config && (
           <div className="config-info">
             <p>Apps configured: {configManager.config.apps.length}</p>
-            {selectedApp && <p>Selected: {selectedApp.name}</p>}
             <p>Last modified: {configManager.config.lastModified}</p>
           </div>
         )}
@@ -83,13 +78,7 @@ function App() {
 
       <main className="main-layout">
         <AppLayout
-          sidebar={
-            <LibrarySidebar
-              selectedAppId={selectedApp?.id || null}
-              onAppSelect={handleAppSelect}
-              onAddApp={handleAddApp}
-            />
-          }
+          sidebar={<PlaceholderSidebar />}
           mainContent={<PlaceholderMainContent />}
         />
       </main>
