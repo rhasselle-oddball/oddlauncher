@@ -61,11 +61,6 @@
   transform: translateY(-1px);
 }
 
-.collapse-button:focus {
-  outline: 2px solid var(--accent-blue);
-  outline-offset: 2px;
-}
-
 .sidebar-title {
   margin-left: 0.75rem;
   font-size: 1.1rem;
