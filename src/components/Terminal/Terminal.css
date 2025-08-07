@@ -46,20 +46,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.4rem 0.6rem;
-  background-color: var(--bg-tertiary);
-  border: 1px solid var(--border-color);
+  width: 36px;
+  height: 36px;
+  border: none;
   border-radius: 4px;
+  background: var(--bg-tertiary);
   color: var(--text-secondary);
-  font-size: 0.8rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-width: 32px;
-  height: 32px;
 }
 
 .terminal-control-button:hover:not(:disabled) {
-  background-color: var(--hover-color);
+  background: var(--hover-color);
   color: var(--text-primary);
   transform: translateY(-1px);
 }
@@ -67,17 +65,12 @@
 .terminal-control-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
 }
 
 .terminal-control-button.active {
-  background-color: var(--accent-color);
+  background: var(--accent-blue);
   color: white;
-  border-color: var(--accent-color);
-}
-
-.terminal-control-button.auto-scroll {
-  font-size: 0.9rem;
-  padding: 0.4rem;
 }
 
 /* Search Bar */
@@ -287,9 +280,8 @@
   }
 
   .terminal-control-button {
-    padding: 0.3rem;
-    min-width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
   }
 
   .terminal-content {
@@ -312,9 +304,8 @@
   }
 
   .terminal-control-button {
-    padding: 0.25rem;
-    min-width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
   }
 
   .terminal-content {
