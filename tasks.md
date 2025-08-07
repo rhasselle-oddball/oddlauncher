@@ -113,7 +113,72 @@ Based on the PRD, here are the development tasks organized by priority and depen
 
 ## 🚧 TODO: REMAINING TASKS
 
-**UI Architecture Decision:** The application will use a **sidebar + main view layout** as the primary and only interface. This provides the best user experience with a compact app list in the sidebar and detailed information/terminal output in the main content area. No grid view or alternative layouts will be implemented.
+**Core Development Status:** All major core functionality is now complete! ✅
+- ✅ Project Structure & Data Models
+- ✅ Configuration Storage System  
+- ✅ UI Layout & Components (Sidebar, Main Content, Modal)
+- ✅ Backend Process Management & Real-time Integration
+- ✅ Terminal Output Display with Live Process Streaming
+- ✅ Browser Auto-Launch Integration
+- ✅ Production Build Fixes
+
+**Current Active Task:** Task 14 - Enhanced App Management Features
+
+**UI Architecture Decision:** The application uses a **sidebar + main view layout** as the primary and only interface. This provides the best user experience with a compact app list in the sidebar and detailed information/terminal output in the main content area.
+
+## Phase 4 - Advanced Features & Polish
+
+### 🚧 Task 14: Enhanced App Management Features (IN PROGRESS)
+**Priority:** HIGH | **Status:** In Progress 🚧 | **Issue:** #16 (Open)
+
+**Objective:** Implement enhanced app management functionality including deletion, duplication, import/export, reordering, and keyboard shortcuts.
+
+**Acceptance Criteria:**
+
+#### App Deletion
+- [ ] Implement app deletion with confirmation modal
+- [ ] Delete functionality accessible from main app header and context menus
+- [ ] Confirmation modal prevents accidental deletion
+- [ ] Proper cleanup of app data and configurations
+
+#### App Duplication
+- [ ] Add duplicate app functionality
+- [ ] Duplicate creates exact copy with modified name (e.g., "App Name (Copy)")
+- [ ] Duplicated app has unique ID and updated timestamps
+- [ ] All configuration settings copied correctly
+
+#### Import/Export
+- [ ] Create app import/export for sharing configurations
+- [ ] Export single app or entire configuration to JSON
+- [ ] Import apps from JSON files with validation
+- [ ] Handle import conflicts and duplicate names gracefully
+
+#### Drag-and-Drop Reordering
+- [ ] Add drag-and-drop reordering in sidebar
+- [ ] Visual feedback during drag operations
+- [ ] Persist new order in configuration
+- [ ] Smooth animations for reordering
+
+#### Keyboard Shortcuts
+- [ ] Include keyboard shortcuts for common actions
+- [ ] Document shortcuts in help/settings
+- [ ] Common shortcuts: Delete (Del), Duplicate (Ctrl+D), Start/Stop (Space)
+
+**Verification Steps:**
+- [ ] App deletion requires confirmation and works properly
+- [ ] Duplicate creates exact copy with modified name
+- [ ] Import/export functionality works with JSON files
+- [ ] Drag-and-drop reordering works in sidebar
+- [ ] Keyboard shortcuts are documented and functional
+- [ ] All management features work correctly in the sidebar
+
+**Technical Implementation:**
+- Add confirmation modal component for app deletion
+- Implement duplicate app logic in configuration management
+- Create import/export utilities with JSON validation
+- Add drag-and-drop library (react-dnd or similar)
+- Implement keyboard event handlers and documentation
+- Update sidebar and main header components with new actions
 
 ### ✅ Task 12: Integrate Real-time Terminal with Process Output (COMPLETED - Commit: 24aa9b3)
 **Status:** Complete ✅ | **Committed:** 24aa9b3 | **Pushed:** ✅ | **Issue:** #14 (Closed)
@@ -468,8 +533,8 @@ Production build testing revealed several critical issues that needed immediate 
 - Modal sizing properly handles all form content with accessible buttons
 - Terminal component shows proper empty state and left-aligned content
 - Application fills entire window without excessive padding
-### ✅ Task 13: Add Auto-Launch Browser Functionality (COMPLETED - Commit: 59dfa33)
-**Status:** Complete ✅ | **Committed:** 59dfa33 | **Pushed:** ✅ | **Issue:** #15 (Closed)
+### ✅ Task 13: Add Auto-Launch Browser Functionality (COMPLETED - Commit: 59dfa33 & 505ea80)
+**Status:** Complete ✅ | **Committed:** 59dfa33, 505ea80 | **Pushed:** ✅ | **Issue:** #15 (Closed)
 
 **What was accomplished:**
 - ✅ Implemented URL opening when apps start successfully with configurable options
@@ -483,6 +548,9 @@ Production build testing revealed several critical issues that needed immediate 
 - ✅ Handled cases where URL is not accessible with graceful error messages
 - ✅ Integrated with main view header (open URL button works correctly)
 - ✅ Added comprehensive browser configuration options to AppConfigModal
+- ✅ Enhanced browser.rs with comprehensive cross-platform URL opening support
+- ✅ Added reqwest dependency for HTTP port checking functionality
+- ✅ Implemented proper error handling and user feedback for browser operations
 
 **Verified Acceptance Criteria:**
 - ✅ Browser opens automatically when app starts (if configured with autoLaunchBrowser)
@@ -491,6 +559,8 @@ Production build testing revealed several critical issues that needed immediate 
 - ✅ Graceful handling of inaccessible URLs with error events and terminal notifications
 - ✅ No browser launches for failed app starts (proper error state handling)
 - ✅ Open URL button in header works correctly with manual browser launching
+- ✅ Cross-platform browser launching works on Windows, macOS, and Linux
+- ✅ URL validation prevents invalid URLs from being opened
 
 **Current State for Next Developer:**
 - Browser auto-launch functionality is fully operational and integrated
@@ -498,7 +568,8 @@ Production build testing revealed several critical issues that needed immediate 
 - Real-time browser launch notifications display in terminal output
 - Manual URL opening works from main app header
 - Comprehensive error handling for all browser launch scenarios
-- Ready for next task: Enhanced App Management Features
+- Cross-platform URL opening implemented with proper validation
+- Ready for Task 14: Enhanced App Management Features
 
 ## Phase 4 - Advanced Features & Polish
 
