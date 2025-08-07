@@ -16,7 +16,13 @@ export function useConfig() {
       setIsLoading(true)
       setError(null)
 
+      console.log('Loading configuration...')
+      console.log('Window object:', typeof window)
+      console.log('Tauri available:', typeof window !== 'undefined' && (window as unknown as { __TAURI__?: unknown }).__TAURI__)
+      console.log('invoke function type:', typeof invoke)
+      
       const result = await invoke<GlobalConfig>('load_config')
+      console.log('Configuration loaded:', result)
       setConfig(result)
     } catch (err) {
       console.error('Failed to load config:', err)

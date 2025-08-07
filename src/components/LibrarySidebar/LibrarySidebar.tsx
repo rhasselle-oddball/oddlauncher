@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react'
-import { AppCard } from '../AppCard'
+import { AppListItem } from '../AppListItem'
 import { useConfigManager } from '../../hooks/useConfig'
-import type { AppConfig, AppState } from '../../types'
+import type { AppConfig } from '../../types'
 import './LibrarySidebar.css'
 
 interface LibrarySidebarProps {
@@ -158,27 +158,14 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp }: Library
 
       <div className="app-list">
         {filteredApps.map((app) => {
-          // Convert AppConfig to AppState for AppCard component
-          const appState: AppState = {
-            config: app,
-            // No process info since we're not managing processes yet (Phase 3)
-            process: undefined
-          }
-          
           return (
-            <div
+            <AppListItem
               key={app.id}
-              className={`app-list-item ${selectedAppId === app.id ? 'selected' : ''}`}
-              onClick={() => handleAppClick(app)}
-            >
-              <AppCard
-                appState={appState}
-                onStart={() => {/* TODO: Implement in Phase 3 */}}
-                onStop={() => {/* TODO: Implement in Phase 3 */}}
-                onEdit={() => {/* TODO: Implement in Task 8 */}}
-                onDelete={() => {/* TODO: Implement in Phase 4 */}}
-              />
-            </div>
+              app={app}
+              status="stopped" // TODO: Get real status from process in Phase 3
+              isSelected={selectedAppId === app.id}
+              onClick={handleAppClick}
+            />
           )
         })}
       </div>
