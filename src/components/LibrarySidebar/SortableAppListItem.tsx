@@ -9,10 +9,10 @@ interface SortableAppListItemProps {
   onAppSelect: (app: AppConfig) => void
 }
 
-export function SortableAppListItem({ 
-  app, 
-  selectedAppId, 
-  onAppSelect 
+export function SortableAppListItem({
+  app,
+  selectedAppId,
+  onAppSelect
 }: SortableAppListItemProps) {
   const {
     attributes,

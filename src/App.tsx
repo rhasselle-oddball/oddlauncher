@@ -5,12 +5,12 @@ import { useProcessManager } from './hooks/useProcessManager'
 import { AppLayout, LibrarySidebar, MainContent, AppConfigModal, ConfirmationModal } from './components'
 import type { AppConfig } from './types'
 import type { AppConfigModalMode } from './components/AppConfigModal'
-import { 
-  parseImportData, 
-  validateAppConfig, 
-  generateUniqueName, 
-  createFileInput, 
-  readFileAsText 
+import {
+  parseImportData,
+  validateAppConfig,
+  generateUniqueName,
+  createFileInput,
+  readFileAsText
 } from './utils/import-export'
 import './styles/App.css'
 
@@ -36,7 +36,7 @@ function App() {
   // Keyboard shortcuts handlers
   const handleKeyboardStartStop = async () => {
     if (!selectedApp) return
-    
+
     const process = processes[selectedApp.id]
     if (process?.status === 'running') {
       // Stop the process
@@ -153,17 +153,17 @@ function App() {
         try {
           const fileContent = await readFileAsText(file)
           const parseResult = parseImportData(fileContent)
-          
+
           if (!parseResult.success) {
             alert(`Import failed: ${parseResult.error}`)
             return
           }
 
           const exportData = parseResult.data!
-          
+
           if (exportData.type === 'single-app') {
             const importedApp = exportData.data as AppConfig
-            
+
             if (!validateAppConfig(importedApp)) {
               alert('Import failed: Invalid app configuration format.')
               return

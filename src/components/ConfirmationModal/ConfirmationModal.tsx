@@ -72,7 +72,7 @@ export function ConfirmationModal({
 
         <div className="confirmation-modal__body">
           <p className="confirmation-modal__message">{message}</p>
-          
+
           {app && variant === 'danger' && (
             <div className="confirmation-modal__app-info">
               <div className="confirmation-modal__app-item">

@@ -101,7 +101,7 @@ export function MainAppHeader({
       const exportData = exportApp(selectedApp)
       const filename = `${selectedApp.name.replace(/[^a-zA-Z0-9]/g, '_')}_config.json`
       downloadJsonFile(exportData, filename)
-      
+
       // Also call the optional callback if provided
       if (onExportApp) {
         onExportApp(selectedApp)
