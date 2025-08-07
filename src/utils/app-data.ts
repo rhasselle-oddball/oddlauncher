@@ -9,7 +9,7 @@ import type { AppConfig, GlobalConfig } from '../types'
 export function createDefaultAppConfig(): Omit<AppConfig, 'id'> {
   return {
     name: '',
-    command: '',
+    launchCommands: '',
     workingDirectory: undefined,
     url: undefined,
     environmentVariables: undefined,
@@ -50,7 +50,7 @@ export function validateAppConfig(
   return Boolean(
     config.id &&
       config.name &&
-      config.command &&
+      config.launchCommands &&
       config.createdAt &&
       config.updatedAt
   )

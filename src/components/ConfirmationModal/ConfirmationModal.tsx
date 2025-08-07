@@ -79,7 +79,7 @@ export function ConfirmationModal({
                 <strong>App Name:</strong> {app.name}
               </div>
               <div className="confirmation-modal__app-item">
-                <strong>Command:</strong> {app.command}
+                <strong>Command:</strong> {app.launchCommands}
               </div>
               <div className="confirmation-modal__app-item">
                 <strong>Directory:</strong> {app.workingDirectory}

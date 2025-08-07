@@ -63,7 +63,7 @@ export function MainAppHeader({
         await stop()
       } else {
         await start(
-          selectedApp.command,
+          selectedApp.launchCommands,
           selectedApp.workingDirectory,
           selectedApp.environmentVariables,
           selectedApp.url,
@@ -160,7 +160,7 @@ export function MainAppHeader({
             <div className="app-meta">
               <div className="meta-item">
                 <span className="meta-label">Command:</span>
-                <code className="app-command">{selectedApp.command}</code>
+                <code className="app-command">{selectedApp.launchCommands}</code>
               </div>
 
               {selectedApp.workingDirectory && (

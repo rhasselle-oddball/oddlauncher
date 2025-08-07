@@ -27,7 +27,7 @@ export const AppCard: React.FC<AppCardProps> = ({
   const isStarting = status === 'starting'
   const isStopping = status === 'stopping'
   const hasError = status === 'error'
-  
+
   // Debug modal state
   const [showDebugModal, setShowDebugModal] = useState(false)
 
@@ -101,8 +101,8 @@ export const AppCard: React.FC<AppCardProps> = ({
         </div>
 
         <div className="app-card__details">
-          <p className="app-card__command" title={config.command}>
-            {config.command}
+          <p className="app-card__command" title={config.launchCommands}>
+            {config.launchCommands}
           </p>
           {config.workingDirectory && (
             <p className="app-card__directory" title={config.workingDirectory}>
@@ -163,7 +163,7 @@ export const AppCard: React.FC<AppCardProps> = ({
         isOpen={showDebugModal}
         onClose={() => setShowDebugModal(false)}
         appName={config.name}
-        command={config.command}
+        command={config.launchCommands}
         workingDirectory={config.workingDirectory}
         errorMessage={process?.errorMessage}
       />

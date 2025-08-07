@@ -13,7 +13,7 @@ function App() {
     const newApp: AppConfig = {
       id: generateAppId(),
       name: 'Test App',
-      command: 'echo "Hello World"',
+      launchCommands: 'echo "Hello World"',
       workingDirectory: '/tmp',
       url: 'http://localhost:3000',
       createdAt: new Date().toISOString(),

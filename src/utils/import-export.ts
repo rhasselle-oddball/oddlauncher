@@ -90,7 +90,7 @@ export function validateAppConfig(app: unknown): app is AppConfig {
   return (
     typeof appObj.id === 'string' &&
     typeof appObj.name === 'string' &&
-    typeof appObj.command === 'string' &&
+    typeof appObj.launchCommands === 'string' &&
     typeof appObj.workingDirectory === 'string' &&
     typeof appObj.url === 'string' &&
     Array.isArray(appObj.tags) &&

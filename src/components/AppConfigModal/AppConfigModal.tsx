@@ -6,7 +6,7 @@ import { generateAppId } from '../../utils/app-data'
 import {
   appConfigToFormData,
   formDataToAppConfig,
-  createEmptyFormData,
+  getEmptyFormData,
   validateFormData,
 } from './utils'
 import type { AppConfigModalProps, AppConfigFormData, AppConfigFormErrors } from './types'
@@ -20,7 +20,7 @@ export function AppConfigModal({
   onSubmit,
 }: AppConfigModalProps) {
   const configManager = useConfigManager()
-  const [formData, setFormData] = useState<AppConfigFormData>(createEmptyFormData())
+  const [formData, setFormData] = useState<AppConfigFormData>(getEmptyFormData())
   const [errors, setErrors] = useState<AppConfigFormErrors>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
@@ -32,7 +32,7 @@ export function AppConfigModal({
       if (mode === 'edit' && appToEdit) {
         setFormData(appConfigToFormData(appToEdit))
       } else {
-        setFormData(createEmptyFormData())
+        setFormData(getEmptyFormData())
       }
       setErrors({})
       setIsSubmitting(false)
@@ -220,28 +220,28 @@ export function AppConfigModal({
                 )}
               </div>
 
-              {/* Command */}
+              {/* Launch Commands */}
               <div className="form-group">
-                <label htmlFor="command" className="form-label">
-                  Command <span className="required">*</span>
+                <label htmlFor="launchCommands" className="form-label">
+                  Launch Commands <span className="required">*</span>
                 </label>
-                <input
-                  id="command"
-                  type="text"
-                  className={`form-input ${errors.command ? 'error' : ''}`}
-                  value={formData.command}
-                  onChange={(e) => handleInputChange('command', e.target.value)}
-                  placeholder="npm start"
-                  maxLength={500}
+                <textarea
+                  id="launchCommands"
+                  className={`form-input ${errors.launchCommands ? 'error' : ''}`}
+                  value={formData.launchCommands}
+                  onChange={(e) => handleInputChange('launchCommands', e.target.value)}
+                  placeholder="nvm use 14.15&#10;yarn watch"
+                  maxLength={2000}
+                  rows={4}
                 />
-                {errors.command && (
+                {errors.launchCommands && (
                   <div className="form-error">
                     <AlertCircle size={12} />
-                    {errors.command}
+                    {errors.launchCommands}
                   </div>
                 )}
                 <div className="form-help">
-                  The shell command to execute when starting this app
+                  Shell commands to execute when starting this app (one command per line)
                 </div>
               </div>
 

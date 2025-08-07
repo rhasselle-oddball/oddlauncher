@@ -320,7 +320,7 @@ export function useConfigManager() {
     async (operation: () => Promise<GlobalConfig | null>): Promise<boolean> => {
       const result = await operation()
       if (result) {
-        configHook.saveConfig(result)
+        await configHook.saveConfig(result)
         return true
       }
       return false

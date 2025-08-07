@@ -7,21 +7,23 @@ use tauri::{AppHandle, Emitter, State};
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::Command as TokioCommand;
 
+// Process management module for Oddbox application
+
 /**
  * Cross-platform path and command utilities
  */
 mod platform_utils {
     use std::path::Path;
-    
+
     /// Convert various path formats to the appropriate format for the current platform
     pub fn normalize_path(path: &str) -> Result<String, String> {
         log::info!("Normalizing path: '{}'", path);
-        
+
         // Handle WSL network paths from Windows
         if path.starts_with("\\\\wsl.localhost\\") || path.starts_with("//wsl.localhost/") {
             return convert_wsl_network_path(path);
         }
-        
+
         // Handle different path separators
         let normalized = if cfg!(target_os = "windows") {
             // On Windows, handle both forward and back slashes
@@ -39,29 +41,29 @@ mod platform_utils {
                 path.to_string()
             }
         };
-        
+
         log::info!("Normalized path: '{}' -> '{}'", path, normalized);
         Ok(normalized)
     }
-    
+
     /// Convert WSL network paths to appropriate format
     fn convert_wsl_network_path(path: &str) -> Result<String, String> {
         log::info!("Converting WSL network path: '{}'", path);
-        
+
         // Remove the network prefix
         let cleaned = path
             .replace("\\\\wsl.localhost\\", "")
             .replace("//wsl.localhost/", "");
-            
+
         let parts: Vec<&str> = cleaned.split(&['\\', '/'][..]).collect();
-        
+
         if parts.len() < 2 {
             return Err(format!("Invalid WSL path format: {}", path));
         }
-        
+
         // Skip the distro name (e.g., Ubuntu) and convert to Unix path
         let unix_path = format!("/{}", parts[1..].join("/"));
-        
+
         let result = if cfg!(target_os = "windows") {
             // On Windows, we might need to use wsl.exe to execute commands
             unix_path
@@ -69,49 +71,49 @@ mod platform_utils {
             // On Linux/Unix, use the path directly
             unix_path
         };
-        
+
         log::info!("Converted WSL path: '{}' -> '{}'", path, result);
         Ok(result)
     }
-    
+
     /// Prepare command for cross-platform execution
     pub fn prepare_command(command: &str, working_dir: Option<&str>) -> Result<(String, Vec<String>), String> {
         let parts: Vec<&str> = command.trim().split_whitespace().collect();
         if parts.is_empty() {
             return Err("Command cannot be empty".to_string());
         }
-        
+
         let program = parts[0];
         let args: Vec<String> = parts[1..].iter().map(|s| s.to_string()).collect();
-        
+
         // Check if we need to run through WSL on Windows
         if cfg!(target_os = "windows") && should_use_wsl(program, working_dir) {
             return prepare_wsl_command(program, &args, working_dir);
         }
-        
+
         Ok((program.to_string(), args))
     }
-    
+
     /// Check if command should be executed through WSL
     fn should_use_wsl(program: &str, working_dir: Option<&str>) -> bool {
         // Check if working directory suggests WSL usage
         let wsl_working_dir = working_dir
             .map(|dir| dir.starts_with("/") || dir.contains("wsl.localhost"))
             .unwrap_or(false);
-            
+
         // Check if program is typically a Unix command
         let unix_commands = ["yarn", "npm", "node", "python", "python3", "pip", "git", "bash", "sh"];
         let is_unix_command = unix_commands.contains(&program);
-        
+
         wsl_working_dir || is_unix_command
     }
-    
+
     /// Prepare command for WSL execution on Windows
     fn prepare_wsl_command(program: &str, args: &[String], working_dir: Option<&str>) -> Result<(String, Vec<String>), String> {
         log::info!("Preparing WSL command: {} with args: {:?}", program, args);
-        
+
         let mut wsl_args = vec![];
-        
+
         // Add working directory if specified
         if let Some(dir) = working_dir {
             let normalized_dir = normalize_path(dir)?;
@@ -119,36 +121,193 @@ mod platform_utils {
                 wsl_args.extend_from_slice(&["--cd".to_string(), normalized_dir]);
             }
         }
-        
+
         // Add the command and its arguments
         wsl_args.push(program.to_string());
         wsl_args.extend_from_slice(args);
-        
+
         log::info!("WSL command prepared: wsl.exe {:?}", wsl_args);
         Ok(("wsl.exe".to_string(), wsl_args))
     }
-    
+
     /// Validate that a directory exists and is accessible
     pub fn validate_directory(path: &str) -> Result<String, String> {
         let normalized = normalize_path(path)?;
-        
+
         if cfg!(target_os = "windows") && path.starts_with('/') {
             // On Windows, Unix-style paths might be WSL paths
             // We'll validate them differently
             log::info!("Windows detected with Unix path - assuming WSL path: {}", normalized);
             return Ok(normalized);
         }
-        
+
         if !Path::new(&normalized).exists() {
             return Err(format!("Directory does not exist: {}", normalized));
         }
-        
+
         if !Path::new(&normalized).is_dir() {
             return Err(format!("Path is not a directory: {}", normalized));
         }
-        
+
         Ok(normalized)
     }
+}
+
+/// Prepare multi-command execution using shell script approach
+fn prepare_multi_command_execution(launch_commands: &str, working_dir: Option<&str>) -> Result<(String, Vec<String>), String> {
+    log::info!("Preparing multi-command execution: '{}'", launch_commands);
+
+    // Split commands by lines and filter out empty lines
+    let commands: Vec<&str> = launch_commands
+        .lines()
+        .map(|line| line.trim())
+        .filter(|line| !line.is_empty())
+        .collect();
+
+    if commands.is_empty() {
+        return Err("No valid commands found".to_string());
+    }
+
+    // Log all commands that will be executed
+    log::info!("Commands to execute: {:?}", commands);
+
+    // For single command, use the existing prepare_command logic for backwards compatibility
+    if commands.len() == 1 {
+        log::info!("Single command detected, using legacy approach");
+        return platform_utils::prepare_command(commands[0], working_dir);
+    }
+
+    // For multiple commands, create a shell script
+    let shell_script = if cfg!(target_os = "windows") {
+        prepare_windows_multi_command(&commands, working_dir)?
+    } else {
+        prepare_unix_multi_command(&commands, working_dir)?
+    };
+
+    log::info!("Multi-command shell script prepared");
+    Ok(shell_script)
+}
+
+/// Prepare multi-command execution for Windows
+fn prepare_windows_multi_command(commands: &[&str], working_dir: Option<&str>) -> Result<(String, Vec<String>), String> {
+    // Check if we should use WSL
+    let use_wsl = working_dir
+        .map(|dir| dir.starts_with("/") || dir.contains("wsl.localhost"))
+        .unwrap_or(false) || commands.iter().any(|cmd| {
+            let parts: Vec<&str> = cmd.trim().split_whitespace().collect();
+            if let Some(program) = parts.first() {
+                let unix_commands = ["yarn", "npm", "node", "python", "python3", "pip", "git", "bash", "sh", "nvm", "rbenv"];
+                unix_commands.contains(program)
+            } else {
+                false
+            }
+        });
+
+    if use_wsl {
+        // Create bash script for WSL
+        let mut script_lines = vec!["#!/bin/bash".to_string(), "set -e".to_string()];
+
+        // Add working directory change if specified
+        if let Some(dir) = working_dir {
+            let normalized_dir = platform_utils::normalize_path(dir)?;
+            if normalized_dir.starts_with('/') {
+                script_lines.push(format!("cd '{}'", normalized_dir));
+            }
+        }
+
+        // Add all commands
+        for command in commands {
+            script_lines.push(command.to_string());
+        }
+
+        let script_content = script_lines.join("\n");
+
+        // Use WSL to execute bash with the script
+        let wsl_args = vec![
+            "bash".to_string(),
+            "-c".to_string(),
+            script_content,
+        ];
+
+        Ok(("wsl.exe".to_string(), wsl_args))
+    } else {
+        // Create batch script for Windows
+        let mut script_lines = vec!["@echo off".to_string(), "setlocal enabledelayedexpansion".to_string()];
+
+        // Add working directory change if specified
+        if let Some(dir) = working_dir {
+            let normalized_dir = platform_utils::normalize_path(dir)?;
+            script_lines.push(format!("cd /d \"{}\"", normalized_dir));
+        }
+
+        // Add error handling and commands
+        for command in commands {
+            script_lines.push(command.to_string());
+            script_lines.push("if !errorlevel! neq 0 exit /b !errorlevel!".to_string());
+        }
+
+        let script_content = script_lines.join("\n");
+
+        Ok(("cmd.exe".to_string(), vec!["/c".to_string(), script_content]))
+    }
+}
+
+/// Prepare multi-command execution for Unix systems
+fn prepare_unix_multi_command(commands: &[&str], working_dir: Option<&str>) -> Result<(String, Vec<String>), String> {
+    let mut script_lines = vec!["#!/bin/bash".to_string(), "set -e".to_string()];
+
+    // Add initial logging to show what we're executing
+    script_lines.push("echo \"Oddbox: Starting app process...\"".to_string());
+    
+    // Check if any commands use nvm, rbenv, or other version managers that need shell initialization
+    let needs_nvm = commands.iter().any(|cmd| {
+        let first_word = cmd.trim().split_whitespace().next().unwrap_or("");
+        first_word == "nvm" || cmd.contains("nvm ")
+    });
+    
+    let needs_rbenv = commands.iter().any(|cmd| {
+        let first_word = cmd.trim().split_whitespace().next().unwrap_or("");
+        first_word == "rbenv" || cmd.contains("rbenv ")
+    });
+
+    // Add shell initialization for version managers if needed
+    if needs_nvm {
+        // Source nvm if available - try common locations
+        script_lines.push("# Initialize nvm if available".to_string());
+        script_lines.push("if [ -f ~/.nvm/nvm.sh ]; then".to_string());
+        script_lines.push("  source ~/.nvm/nvm.sh".to_string());
+        script_lines.push("elif [ -f /usr/local/share/nvm/nvm.sh ]; then".to_string());
+        script_lines.push("  source /usr/local/share/nvm/nvm.sh".to_string());
+        script_lines.push("elif [ -f /opt/homebrew/opt/nvm/nvm.sh ]; then".to_string());
+        script_lines.push("  source /opt/homebrew/opt/nvm/nvm.sh".to_string());
+        script_lines.push("fi".to_string());
+    }
+    
+    if needs_rbenv {
+        // Initialize rbenv if available
+        script_lines.push("# Initialize rbenv if available".to_string());
+        script_lines.push("if command -v rbenv >/dev/null 2>&1; then".to_string());
+        script_lines.push("  eval \"$(rbenv init -)\"".to_string());
+        script_lines.push("fi".to_string());
+    }
+
+    // Add working directory change if specified
+    if let Some(dir) = working_dir {
+        let normalized_dir = platform_utils::normalize_path(dir)?;
+        script_lines.push(format!("echo \"Oddbox: Changing to working directory: {}\"", normalized_dir));
+        script_lines.push(format!("cd '{}'", normalized_dir));
+    }
+
+    // Add command execution with logging
+    for (i, command) in commands.iter().enumerate() {
+        script_lines.push(format!("echo \"Oddbox: Executing command {}: {}\"", i + 1, command));
+        script_lines.push(command.to_string());
+    }
+
+    let script_content = script_lines.join("\n");
+    log::info!("Generated Unix shell script:\n{}", script_content);
+
+    Ok(("bash".to_string(), vec!["-c".to_string(), script_content]))
 }
 
 /**
@@ -193,7 +352,7 @@ impl Default for ProcessManager {
 #[tauri::command]
 pub async fn start_app_process(
     app_id: String,
-    command: String,
+    launch_commands: String,
     working_directory: Option<String>,
     environment_variables: Option<HashMap<String, String>>,
     url: Option<String>,
@@ -205,7 +364,7 @@ pub async fn start_app_process(
     process_manager: State<'_, ProcessManager>,
 ) -> Result<ProcessResult, String> {
     log::info!("Starting process for app: {}", app_id);
-    log::info!("Raw command: {}", command);
+    log::info!("Raw launch commands: {}", launch_commands);
     if let Some(ref dir) = working_directory {
         log::info!("Raw working directory: {}", dir);
     }
@@ -244,7 +403,7 @@ pub async fn start_app_process(
                     Err(e) => {
                         let error_msg = format!("Failed to normalize working directory: {}", e);
                         log::error!("{}", error_msg);
-                        
+
                         // Emit process error event
                         let _ = app_handle.emit("process-error", serde_json::json!({
                             "appId": app_id,
@@ -265,16 +424,16 @@ pub async fn start_app_process(
         None
     };
 
-    // Prepare command using cross-platform utilities
-    let (program, args) = match platform_utils::prepare_command(&command, normalized_working_dir.as_deref()) {
+    // Prepare multi-command execution using shell script approach
+    let (program, args) = match prepare_multi_command_execution(&launch_commands, normalized_working_dir.as_deref()) {
         Ok((prog, args)) => {
-            log::info!("Command prepared - Program: '{}', Args: {:?}", prog, args);
+            log::info!("Multi-command execution prepared - Program: '{}', Args: {:?}", prog, args);
             (prog, args)
         },
         Err(e) => {
-            let error_msg = format!("Failed to prepare command: {}", e);
+            let error_msg = format!("Failed to prepare launch commands: {}", e);
             log::error!("{}", error_msg);
-            
+
             // Emit process error event
             let _ = app_handle.emit("process-error", serde_json::json!({
                 "appId": app_id,
@@ -302,7 +461,7 @@ pub async fn start_app_process(
         // Skip directory setting for WSL commands on Windows as wsl.exe handles it
         if !(cfg!(target_os = "windows") && program == "wsl.exe") {
             log::info!("Setting working directory to: {}", dir);
-            
+
             // For WSL paths on Windows, we might not be able to validate existence
             let path_exists = if cfg!(target_os = "windows") && dir.starts_with('/') {
                 log::info!("Skipping directory existence check for WSL path on Windows: {}", dir);
@@ -310,11 +469,11 @@ pub async fn start_app_process(
             } else {
                 std::path::Path::new(dir).exists()
             };
-            
+
             if !path_exists {
                 let error_msg = format!("Working directory does not exist: {}", dir);
                 log::error!("{}", error_msg);
-                
+
                 // Emit process error event
                 let _ = app_handle.emit("process-error", serde_json::json!({
                     "appId": app_id,
@@ -328,7 +487,7 @@ pub async fn start_app_process(
                     error: Some(error_msg),
                 });
             }
-            
+
             cmd.current_dir(dir);
         } else {
             log::info!("Skipping working directory setting for WSL command (handled by wsl.exe --cd)");
@@ -352,10 +511,10 @@ pub async fn start_app_process(
             child
         },
         Err(e) => {
-            let error_msg = format!("Failed to start process: {} (command: '{}', working_dir: '{:?}')", 
-                e, command, working_directory);
+            let error_msg = format!("Failed to start process: {} (launch_commands: '{}', working_dir: '{:?}')",
+                e, launch_commands, working_directory);
             log::error!("{}", error_msg);
-            
+
             // Provide more specific error information
             let detailed_error = match e.kind() {
                 std::io::ErrorKind::NotFound => {
@@ -756,15 +915,15 @@ pub async fn get_debug_info(
     working_directory: Option<String>,
 ) -> Result<serde_json::Value, String> {
     log::info!("Getting debug info for command: {}", command);
-    
+
     let parts: Vec<&str> = command.split_whitespace().collect();
     if parts.is_empty() {
         return Err("Command cannot be empty".to_string());
     }
-    
+
     let program = parts[0];
     let args: Vec<&str> = parts[1..].to_vec();
-    
+
     let mut debug_info = serde_json::json!({
         "command": command,
         "program": program,
@@ -776,7 +935,7 @@ pub async fn get_debug_info(
             "family": std::env::consts::FAMILY
         }
     });
-    
+
     // Check if working directory exists
     if let Some(ref dir) = working_directory {
         let path_exists = std::path::Path::new(dir).exists();
@@ -786,24 +945,24 @@ pub async fn get_debug_info(
             "is_directory": path_is_dir
         });
     }
-    
+
     // Try to find the program in PATH
     let program_in_path = which::which(program).is_ok();
     debug_info["program_status"] = serde_json::json!({
         "found_in_path": program_in_path
     });
-    
+
     if let Ok(program_path) = which::which(program) {
         debug_info["program_status"]["full_path"] = serde_json::json!(program_path.to_string_lossy());
     }
-    
+
     // Get environment variables related to PATH
     if let Ok(path_var) = std::env::var("PATH") {
         debug_info["environment"] = serde_json::json!({
             "PATH": path_var
         });
     }
-    
+
     log::info!("Debug info collected: {}", debug_info);
     Ok(debug_info)
 }

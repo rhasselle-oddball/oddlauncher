@@ -207,10 +207,10 @@ function App() {
   }
 
   const handleOpenUrl = (app: AppConfig) => {
-    if (app.url) {
-      // TODO: Implement URL opening in Phase 3
-      console.log('Open URL clicked for app:', app.name, app.url)
-    }
+    // URL opening is handled directly in MainAppHeader component
+    // This callback is kept for compatibility but the actual opening
+    // happens in MainAppHeader using the useBrowser hook
+    console.log('Open URL requested for app:', app.name, app.url)
   }
 
   const handleOpenDirectory = (app: AppConfig) => {

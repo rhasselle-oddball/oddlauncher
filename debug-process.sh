@@ -20,7 +20,7 @@ echo ""
 # Check if working directory exists
 if [ -d "$WORKING_DIR" ]; then
     echo "✅ Working directory exists: $WORKING_DIR"
-    
+
     # Check if it's accessible
     if [ -r "$WORKING_DIR" ] && [ -x "$WORKING_DIR" ]; then
         echo "✅ Working directory is readable and executable"
@@ -28,14 +28,14 @@ if [ -d "$WORKING_DIR" ]; then
         echo "❌ Working directory exists but has permission issues"
         ls -la "$WORKING_DIR/.."
     fi
-    
+
     # List contents
     echo "📁 Working directory contents:"
     ls -la "$WORKING_DIR" | head -10
-    
+
 else
     echo "❌ Working directory does not exist: $WORKING_DIR"
-    
+
     # Check if the Windows path might be the issue
     WSL_PATH="/mnt/c/Users/"
     if [[ "$WORKING_DIR" == \\\\wsl.localhost* ]]; then
@@ -76,14 +76,14 @@ echo ""
 if [ -d "$WORKING_DIR" ] && command -v yarn >/dev/null 2>&1; then
     echo "=== Testing Command Execution ==="
     echo "Attempting to run command in working directory..."
-    
+
     cd "$WORKING_DIR" || exit 1
     echo "Changed to directory: $(pwd)"
-    
+
     # Check if package.json exists
     if [ -f "package.json" ]; then
         echo "✅ package.json found"
-        
+
         # Check if the script exists
         if grep -q "watch" package.json; then
             echo "✅ 'watch' script found in package.json"
@@ -95,12 +95,12 @@ if [ -d "$WORKING_DIR" ] && command -v yarn >/dev/null 2>&1; then
     else
         echo "❌ package.json not found in working directory"
     fi
-    
+
     # Try to run with timeout to avoid hanging
     echo ""
     echo "Attempting to run command (with 10 second timeout)..."
     timeout 10 $COMMAND && echo "✅ Command executed successfully" || echo "❌ Command failed or timed out"
-    
+
 else
     echo "⏭️  Skipping command execution test (missing dependencies)"
 fi

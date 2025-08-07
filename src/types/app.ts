@@ -20,8 +20,8 @@ export interface AppConfig {
   id: string
   /** Display name of the app */
   name: string
-  /** Shell command to execute */
-  command: string
+  /** Shell commands to execute sequentially (one per line) */
+  launchCommands: string
   /** Working directory for the command (optional) */
   workingDirectory?: string
   /** URL to open in browser when app starts (optional) */

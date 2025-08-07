@@ -12,7 +12,7 @@ const testAppState: AppState = {
   config: {
     id: 'test-app-1',
     name: 'Test Application',
-    command: 'npm start',
+    launchCommands: 'npm start',
     workingDirectory: '/home/user/test-app',
     url: 'http://localhost:3000',
     tags: ['Test', 'Development'],
@@ -32,7 +32,7 @@ const stoppedAppState: AppState = {
   config: {
     id: 'test-app-2',
     name: 'Stopped Application',
-    command: 'python server.py',
+    launchCommands: 'python server.py',
     workingDirectory: '/home/user/python-app',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -48,7 +48,7 @@ const errorAppState: AppState = {
   config: {
     id: 'test-app-3',
     name: 'Error Application',
-    command: 'invalid-command',
+    launchCommands: 'invalid-command',
     workingDirectory: '/home/user/error-app',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),

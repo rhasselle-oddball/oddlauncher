@@ -712,6 +712,75 @@ npm run dev
 
 ---
 
+### 🔧 Task 17: Fix App Configuration and Terminal Output Issues
+**Priority:** HIGH 🚨 | **Status:** TODO | **Dependencies:** None
+
+**Issue Description:**
+Three critical user experience issues need to be addressed:
+
+1. **Sidebar Population Issue**: When adding a new app through the modal, the app information appears in the main header but does not populate in the sidebar list
+2. **Terminal Live Feed Issue**: When clicking "Start" on an app, the terminal does not display real-time output from the running process
+3. **Default Browser Opening Enhancement**: Add option to open URLs in the system's default browser instead of just auto-launch on app start
+
+**Root Cause Analysis:**
+- **Sidebar Issue**: Likely a state synchronization problem between the configuration manager and the LibrarySidebar component
+- **Terminal Issue**: Process output events may not be properly connected to the terminal display or the event listeners are not working correctly  
+- **Browser Issue**: Current implementation focuses on auto-launch; need manual "Open in Browser" functionality using system default browser
+
+**Implementation Plan:**
+
+1. **Fix Sidebar Population**:
+   - Debug the app addition flow in App.tsx → AppConfigModal → useConfigManager → LibrarySidebar
+   - Ensure configuration changes trigger proper re-renders in LibrarySidebar
+   - Verify selectedApp state updates correctly when new apps are added
+   - Test the onAppSelect callback chain
+
+2. **Fix Terminal Live Output**:
+   - Verify process-output events are being emitted correctly from Rust backend
+   - Debug the event listeners in useProcessManager hook
+   - Ensure Terminal component receives and displays rawOutput from process manager
+   - Test the process start → output capture → display pipeline
+
+3. **Add Default Browser Functionality**:
+   - Enhance MainAppHeader with manual "Open URL" button functionality
+   - Improve useBrowser hook to handle various URL formats
+   - Add user preference for default browser behavior
+   - Test cross-platform browser opening (Windows/Linux/macOS)
+
+**Acceptance Criteria:**
+- [ ] Adding new app via modal immediately shows app in sidebar list
+- [ ] Selected app state updates correctly when new apps are added
+- [ ] Clicking "Start" on any app shows live terminal output in real-time
+- [ ] Terminal displays both stdout and stderr from running processes
+- [ ] Manual "Open URL" button in header opens URLs in default system browser
+- [ ] Browser opening works across platforms (Windows, Linux, macOS)
+- [ ] All existing functionality continues to work (no regressions)
+
+**Verification Steps:**
+- [ ] Add new app through modal - verify it appears immediately in sidebar
+- [ ] Select newly added app - verify it shows correctly in main header
+- [ ] Start any app - verify terminal shows live output as process runs
+- [ ] Test both successful and failing processes - verify appropriate output
+- [ ] Click "Open URL" button - verify it opens in default browser
+- [ ] Test on different platforms if possible
+- [ ] Verify no existing features are broken
+
+**Technical Tasks:**
+- [ ] Debug LibrarySidebar state management and re-rendering
+- [ ] Debug process output event flow from backend to frontend
+- [ ] Debug Terminal component rawOutput processing
+- [ ] Enhance browser opening functionality with manual controls
+- [ ] Add proper error handling and user feedback
+- [ ] Test all scenarios thoroughly
+
+**Out of Scope:**
+- Major architectural changes to event system
+- Custom browser selection (use system default)
+- Terminal output formatting improvements
+- Performance optimizations
+
+---
+
 - [ ] **Add Comprehensive Error Handling & User Feedback**
   - Implement user-friendly error messages throughout the application
   - Add error boundaries for React components

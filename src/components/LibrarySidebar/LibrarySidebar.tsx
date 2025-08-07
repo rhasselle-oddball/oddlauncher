@@ -57,7 +57,7 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp }: Library
     const query = searchQuery.toLowerCase().trim()
     return appsToFilter.filter(app =>
       app.name.toLowerCase().includes(query) ||
-      app.command.toLowerCase().includes(query) ||
+      app.launchCommands.toLowerCase().includes(query) ||
       (app.tags && app.tags.some(tag => tag.toLowerCase().includes(query)))
     )
   }, [configManager.config?.apps, localAppOrder, searchQuery])

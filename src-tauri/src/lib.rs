@@ -15,7 +15,7 @@ pub fn run() {
       } else {
         log::LevelFilter::Info
       };
-      
+
       app.handle().plugin(
         tauri_plugin_log::Builder::default()
           .level(log_level)

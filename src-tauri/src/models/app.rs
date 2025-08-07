@@ -30,8 +30,8 @@ pub struct AppConfig {
     pub id: String,
     /// Display name of the app
     pub name: String,
-    /// Shell command to execute
-    pub command: String,
+    /// Shell commands to execute sequentially (one per line)
+    pub launch_commands: String,
     /// Working directory for the command (optional)
     pub working_directory: Option<String>,
     /// URL to open in browser when app starts (optional)

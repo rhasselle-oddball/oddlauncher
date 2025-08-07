@@ -183,7 +183,7 @@ export default function DebugModal({
                 <div className="debug-suggestions">
                   {!debugInfo.program_status.found_in_path && (
                     <div className="suggestion">
-                      ❗ The command <code>{debugInfo.program}</code> was not found in your PATH. 
+                      ❗ The command <code>{debugInfo.program}</code> was not found in your PATH.
                       Make sure it's installed and available in your shell.
                     </div>
                   )}

@@ -9,7 +9,7 @@ import type { AppConfig } from '../../types'
  */
 export interface AppConfigFormData {
   name: string
-  command: string
+  launchCommands: string
   workingDirectory: string
   url: string
   description: string
@@ -26,7 +26,7 @@ export interface AppConfigFormData {
  */
 export interface AppConfigFormErrors {
   name?: string
-  command?: string
+  launchCommands?: string
   workingDirectory?: string
   url?: string
   description?: string

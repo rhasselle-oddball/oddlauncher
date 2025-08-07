@@ -15,17 +15,22 @@ class DebugLogger {
   private logs: DebugLog[] = []
   private maxLogs = 1000
 
-  private addLog(level: DebugLog['level'], source: string, message: string, data?: unknown) {
+  private addLog(
+    level: DebugLog['level'],
+    source: string,
+    message: string,
+    data?: unknown
+  ) {
     const log: DebugLog = {
       timestamp: new Date().toISOString(),
       level,
       source,
       message,
-      data
+      data,
     }
 
     this.logs.push(log)
-    
+
     // Keep only the last maxLogs entries
     if (this.logs.length > this.maxLogs) {
       this.logs = this.logs.slice(-this.maxLogs)
@@ -34,7 +39,7 @@ class DebugLogger {
     // Console output with better formatting
     const timestamp = new Date().toLocaleTimeString()
     const prefix = `[${timestamp}] [${source.toUpperCase()}]`
-    
+
     switch (level) {
       case 'error':
         console.error(`${prefix} ❌`, message, data || '')
@@ -72,7 +77,7 @@ class DebugLogger {
   }
 
   getLogsForSource(source: string): DebugLog[] {
-    return this.logs.filter(log => log.source === source)
+    return this.logs.filter((log) => log.source === source)
   }
 
   clearLogs() {
@@ -90,5 +95,5 @@ export const debugLogger = new DebugLogger()
 
 // For development, make it available globally
 if (typeof window !== 'undefined') {
-  ;((window as unknown) as Record<string, unknown>).debugLogger = debugLogger
+  ;(window as unknown as Record<string, unknown>).debugLogger = debugLogger
 }
