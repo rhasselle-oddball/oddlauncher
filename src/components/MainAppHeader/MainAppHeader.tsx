@@ -1,3 +1,4 @@
+import { Play, Square, Loader, Edit, Trash2, ExternalLink, FolderOpen, Smartphone } from 'lucide-react'
 import type { AppConfig, AppStatus } from '../../types'
 import './MainAppHeader.css'
 
@@ -20,19 +21,19 @@ export function MainAppHeader({
   onOpenUrl,
   onOpenDirectory
 }: MainAppHeaderProps) {
-  
+
   const getStatusDisplay = () => {
     switch (status) {
       case 'running':
-        return { text: 'Stop', icon: '⏹️', className: 'running', buttonText: 'Stop' }
+        return { text: 'Stop', icon: <Square size={16} />, className: 'running', buttonText: 'Stop' }
       case 'starting':
-        return { text: 'Starting...', icon: '🟡', className: 'starting', buttonText: 'Starting...' }
+        return { text: 'Starting...', icon: <Loader size={16} className="spin" />, className: 'starting', buttonText: 'Starting...' }
       case 'stopping':
-        return { text: 'Stopping...', icon: '🟡', className: 'stopping', buttonText: 'Stopping...' }
+        return { text: 'Stopping...', icon: <Loader size={16} className="spin" />, className: 'stopping', buttonText: 'Stopping...' }
       case 'error':
-        return { text: 'Error', icon: '🔴', className: 'error', buttonText: 'Start' }
+        return { text: 'Error', icon: <Square size={16} />, className: 'error', buttonText: 'Start' }
       default:
-        return { text: 'Start', icon: '▶️', className: 'stopped', buttonText: 'Start' }
+        return { text: 'Start', icon: <Play size={16} />, className: 'stopped', buttonText: 'Start' }
     }
   }
 
@@ -71,7 +72,9 @@ export function MainAppHeader({
     return (
       <div className="main-app-header">
         <div className="no-app-selected">
-          <div className="no-app-icon">📱</div>
+          <div className="no-app-icon">
+            <Smartphone size={48} />
+          </div>
           <h2>No App Selected</h2>
           <p>Select an app from the sidebar to view its details and controls.</p>
         </div>
@@ -90,27 +93,27 @@ export function MainAppHeader({
               <img src={selectedApp.thumbnailPath} alt={`${selectedApp.name} thumbnail`} />
             ) : (
               <div className="placeholder-thumbnail-large">
-                <span className="placeholder-icon">📱</span>
+                <Smartphone size={32} />
               </div>
             )}
           </div>
 
           <div className="app-details">
             <h2 className="app-title">{selectedApp.name}</h2>
-            
+
             <div className="app-meta">
               <div className="meta-item">
                 <span className="meta-label">Command:</span>
                 <code className="app-command">{selectedApp.command}</code>
               </div>
-              
+
               {selectedApp.workingDirectory && (
                 <div className="meta-item">
                   <span className="meta-label">Directory:</span>
                   <span className="app-directory">{selectedApp.workingDirectory}</span>
                 </div>
               )}
-              
+
               {selectedApp.url && (
                 <div className="meta-item">
                   <span className="meta-label">URL:</span>
@@ -119,7 +122,7 @@ export function MainAppHeader({
                   </a>
                 </div>
               )}
-              
+
               {selectedApp.tags && selectedApp.tags.length > 0 && (
                 <div className="meta-item">
                   <span className="meta-label">Tags:</span>
@@ -135,7 +138,7 @@ export function MainAppHeader({
         </div>
 
         <div className="app-controls-section">
-          <button 
+          <button
             className={`start-stop-button ${statusInfo.className}`}
             onClick={handleStartStopClick}
             disabled={status === 'starting' || status === 'stopping'}
@@ -145,40 +148,40 @@ export function MainAppHeader({
           </button>
 
           <div className="action-buttons">
-            <button 
+            <button
               className="action-button edit"
               onClick={handleEditClick}
               title="Edit App Configuration"
             >
-              ⚙️
+              <Edit size={16} />
             </button>
-            
+
             {selectedApp.url && (
-              <button 
+              <button
                 className="action-button open-url"
                 onClick={handleOpenUrlClick}
                 title="Open URL in Browser"
               >
-                🌐
+                <ExternalLink size={16} />
               </button>
             )}
-            
+
             {selectedApp.workingDirectory && (
-              <button 
+              <button
                 className="action-button open-directory"
                 onClick={handleOpenDirectoryClick}
                 title="Open Directory in File Manager"
               >
-                📁
+                <FolderOpen size={16} />
               </button>
             )}
-            
-            <button 
+
+            <button
               className="action-button delete"
               onClick={handleDeleteClick}
               title="Delete App"
             >
-              🗑️
+              <Trash2 size={16} />
             </button>
           </div>
         </div>

@@ -1,3 +1,4 @@
+import { Smartphone } from 'lucide-react'
 import type { AppConfig, AppStatus } from '../../types'
 import './AppListItem.css'
 
@@ -40,7 +41,7 @@ export function AppListItem({ app, status = 'stopped', isSelected, onClick }: Ap
           <img src={app.thumbnailPath} alt={`${app.name} thumbnail`} />
         ) : (
           <div className="app-list-item__placeholder-thumbnail">
-            <span className="app-list-item__placeholder-icon">📱</span>
+            <Smartphone size={20} />
           </div>
         )}
       </div>
@@ -53,7 +54,7 @@ export function AppListItem({ app, status = 'stopped', isSelected, onClick }: Ap
             <span className="status-text">{statusInfo.text}</span>
           </div>
         </div>
-        
+
         <div className="app-list-item__details">
           {app.workingDirectory && (
             <div className="app-list-item__directory" title={app.workingDirectory}>

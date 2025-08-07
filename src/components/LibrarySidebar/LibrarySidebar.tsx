@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react'
+import { useState, useMemo, ChangeEvent } from 'react'
+import { Smartphone, Search } from 'lucide-react'
 import { AppListItem } from '../AppListItem'
 import { useConfigManager } from '../../hooks/useConfig'
 import type { AppConfig } from '../../types'
@@ -17,7 +18,7 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp }: Library
   // Filter apps based on search query
   const filteredApps = useMemo(() => {
     if (!configManager.config?.apps) return []
-    
+
     if (!searchQuery.trim()) {
       return configManager.config.apps
     }
@@ -34,7 +35,7 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp }: Library
     onAppSelect(app)
   }
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value)
   }
 
@@ -76,7 +77,7 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp }: Library
         </div>
         <div className="error-state">
           <p>Failed to load apps</p>
-          <button 
+          <button
             className="retry-button"
             onClick={() => configManager.loadConfig()}
           >
@@ -101,10 +102,12 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp }: Library
           />
         </div>
         <div className="empty-state">
-          <div className="empty-icon">📱</div>
+          <div className="empty-icon">
+            <Smartphone size={48} />
+          </div>
           <h3>No Apps Yet</h3>
           <p>Get started by adding your first development app.</p>
-          <button 
+          <button
             className="add-app-button primary"
             onClick={handleAddAppClick}
           >
@@ -129,10 +132,12 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp }: Library
           />
         </div>
         <div className="no-results-state">
-          <div className="no-results-icon">🔍</div>
+          <div className="no-results-icon">
+            <Search size={48} />
+          </div>
           <h3>No Results Found</h3>
           <p>Try adjusting your search terms or add a new app.</p>
-          <button 
+          <button
             className="add-app-button"
             onClick={handleAddAppClick}
           >
@@ -171,7 +176,7 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp }: Library
       </div>
 
       <div className="sidebar-actions">
-        <button 
+        <button
           className="add-app-button"
           onClick={handleAddAppClick}
         >

@@ -182,24 +182,24 @@
   .sidebar-search {
     padding: 0.75rem;
   }
-  
+
   .search-input {
     padding: 0.625rem 0.875rem;
     font-size: 0.8125rem;
   }
-  
+
   .app-list {
     padding: 0.25rem;
   }
-  
+
   .app-list-item {
     margin-bottom: 0.25rem;
   }
-  
+
   .sidebar-actions {
     padding: 0.75rem;
   }
-  
+
   .add-app-button {
     padding: 0.625rem 0.875rem;
     font-size: 0.8125rem;
@@ -212,12 +212,12 @@
     padding: 1.5rem 0.75rem;
     min-height: 150px;
   }
-  
+
   .empty-state h3,
   .no-results-state h3 {
     font-size: 1rem;
   }
-  
+
   .empty-state p,
   .no-results-state p {
     font-size: 0.875rem;

@@ -1,3 +1,4 @@
+import { Settings } from 'lucide-react'
 import { useState } from 'react'
 import { useConfigManager } from './hooks/useConfig'
 import { generateAppId } from './utils/app-data'
@@ -76,7 +77,10 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>🎛️ Oddbox</h1>
+        <h1>
+          <Settings size={24} style={{ marginRight: '0.5rem' }} />
+          Oddbox
+        </h1>
         <p>Your Steam Library for Dev Tools</p>
 
         {/* Temporary test buttons - will be removed in final version */}

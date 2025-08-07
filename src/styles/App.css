@@ -57,6 +57,9 @@ code {
   font-size: 2.5rem;
   margin-bottom: 0.5rem;
   color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .app-header p {

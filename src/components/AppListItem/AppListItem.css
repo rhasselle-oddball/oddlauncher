@@ -58,11 +58,7 @@
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, var(--bg-tertiary), var(--hover-color));
-}
-
-.app-list-item__placeholder-icon {
-  font-size: 1.25rem;
-  opacity: 0.8;
+  color: var(--text-secondary);
 }
 
 /* Content */
@@ -216,20 +212,20 @@
     padding: 0.625rem;
     min-height: 64px;
   }
-  
+
   .app-list-item__thumbnail {
     width: 36px;
     height: 36px;
   }
-  
+
   .app-list-item__content {
     margin-left: 0.625rem;
   }
-  
+
   .app-list-item__name {
     font-size: 0.8125rem;
   }
-  
+
   .status-text {
     display: none; /* Show only icon on small screens */
   }
@@ -240,12 +236,12 @@
     padding: 0.5rem;
     min-height: 56px;
   }
-  
+
   .app-list-item__thumbnail {
     width: 32px;
     height: 32px;
   }
-  
+
   .app-list-item__directory {
     display: none; /* Hide directory on very small screens */
   }
