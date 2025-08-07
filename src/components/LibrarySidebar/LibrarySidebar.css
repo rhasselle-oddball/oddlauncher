@@ -168,12 +168,12 @@
 }
 
 .add-app-button.primary {
-  background: linear-gradient(135deg, var(--accent-blue), var(--accent-green));
+  background: var(--accent-blue);
   font-weight: 600;
 }
 
 .add-app-button.primary:hover {
-  background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+  background: #005999;
 }
 
 /* Responsive Design */

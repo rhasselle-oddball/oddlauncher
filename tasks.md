@@ -732,7 +732,7 @@ Three critical user experience issues that were addressed:
 
 **Root Cause Analysis & Solutions:**
 - **Terminal Issue**: Process output events were properly emitted but duplication occurred due to double processing in Terminal component - fixed by consolidating output handling
-- **NVM Issue**: Shell processes spawned without proper environment initialization - fixed by detecting and initializing NVM when needed  
+- **NVM Issue**: Shell processes spawned without proper environment initialization - fixed by detecting and initializing NVM when needed
 - **State Sync Issue**: saveConfig calls weren't awaited properly - fixed async handling in useConfigManager
 
 **Verified Acceptance Criteria:**
@@ -761,7 +761,7 @@ Three critical user experience issues need to be addressed:
 
 **Root Cause Analysis:**
 - **Sidebar Issue**: Likely a state synchronization problem between the configuration manager and the LibrarySidebar component
-- **Terminal Issue**: Process output events may not be properly connected to the terminal display or the event listeners are not working correctly  
+- **Terminal Issue**: Process output events may not be properly connected to the terminal display or the event listeners are not working correctly
 - **Browser Issue**: Current implementation focuses on auto-launch; need manual "Open in Browser" functionality using system default browser
 
 **Implementation Plan:**
@@ -815,6 +815,51 @@ Three critical user experience issues need to be addressed:
 - Custom browser selection (use system default)
 - Terminal output formatting improvements
 - Performance optimizations
+
+### 🚧 Task 18: Fix UI/UX Issues and Improvements
+**Priority:** HIGH 🚨 | **Status:** TODO 📝
+
+**Issue Description:**
+Multiple UI/UX issues need to be addressed to improve user experience:
+
+1. **Title Changes Not Reflected in Sidebar**: When editing and changing the app title, changes are reflected in the header, but not in the sidebar
+2. **Header Command Display**: The header should put more emphasis on the Command as a large block, not just a short line, and the URL should not be truncated - it should be fully visible if possible
+3. **Default Window Size**: The default launch should be a larger window footprint rather than its default small squareish launch
+4. **Button Layout**: Prefer start button and icons onto a new row, so command/directory/URL can enjoy full width if necessary
+5. **Responsive Header Icons**: When shrunk horizontally, the icons in the header sort of get in the way and it's not responsive
+6. **Button Colors**: The start button is the wrong color, it should be blue like add app in the sidebar. There should be no green color anywhere, not on highlight. States are either blue or red. Icons do not need any fancy colors for highlighting or active, just something simple hover
+7. **Modal Selection Issue**: If you are doing edits in the edit modal, you start selecting a field, drag, and your mouse lands outside of the modal, then you release your mouse, it closes the modal, which we don't want
+
+**Implementation Plan:**
+1. **Fix Sidebar State Sync**: Ensure sidebar re-renders when app titles are updated
+2. **Enhance Header Layout**: Redesign header to emphasize commands and show full URLs
+3. **Update Default Window Size**: Modify Tauri configuration for larger default window
+4. **Improve Button Layout**: Restructure header layout for better responsive design
+5. **Fix Responsive Issues**: Improve icon and button behavior on narrow screens
+6. **Update Color Scheme**: Replace green colors with blue/red state system
+7. **Fix Modal Mouse Behavior**: Prevent modal from closing on drag-outside-release
+
+**Acceptance Criteria:**
+- [ ] Title changes in edit modal immediately update sidebar display
+- [ ] Header shows commands as larger, more prominent blocks
+- [ ] URLs display fully without truncation when possible
+- [ ] App launches with larger default window size
+- [ ] Start button and icons move to new row for better layout
+- [ ] Header icons behave responsively on narrow screens
+- [ ] Start button is blue color, no green colors anywhere in UI
+- [ ] Modal doesn't close when dragging text selection outside modal bounds
+- [ ] All color states follow blue (active/running) and red (stopped/error) scheme
+- [ ] Icons have simple hover states without fancy active colors
+
+**Verification Steps:**
+- [ ] Edit app title → verify sidebar updates immediately
+- [ ] Header displays commands prominently and URLs fully
+- [ ] New app launches show larger window size
+- [ ] Responsive design works across different window widths
+- [ ] All UI colors follow blue/red state system consistently
+- [ ] Modal text selection works without closing modal
+- [ ] Icon hover states are simple and appropriate
+- [ ] Start/stop button colors match design requirements
 
 ---
 

@@ -157,30 +157,32 @@ export function MainAppHeader({
           <div className="app-details">
             <h2 className="app-title">{selectedApp.name}</h2>
 
-            <div className="app-meta">
-              <div className="meta-item">
-                <span className="meta-label">Command:</span>
-                <code className="app-command">{selectedApp.launchCommands}</code>
+            <div className="app-meta-primary">
+              <div className="command-section">
+                <span className="meta-label">Launch Commands:</span>
+                <div className="app-command-block">
+                  <pre>{selectedApp.launchCommands}</pre>
+                </div>
               </div>
 
               {selectedApp.workingDirectory && (
-                <div className="meta-item">
-                  <span className="meta-label">Directory:</span>
-                  <span className="app-directory">{selectedApp.workingDirectory}</span>
+                <div className="meta-item-full">
+                  <span className="meta-label">Working Directory:</span>
+                  <span className="app-directory-full">{selectedApp.workingDirectory}</span>
                 </div>
               )}
 
               {selectedApp.url && (
-                <div className="meta-item">
+                <div className="meta-item-full">
                   <span className="meta-label">URL:</span>
-                  <a href={selectedApp.url} className="app-url" target="_blank" rel="noopener noreferrer">
+                  <a href={selectedApp.url} className="app-url-full" target="_blank" rel="noopener noreferrer">
                     {selectedApp.url}
                   </a>
                 </div>
               )}
 
               {selectedApp.tags && selectedApp.tags.length > 0 && (
-                <div className="meta-item">
+                <div className="meta-item-full">
                   <span className="meta-label">Tags:</span>
                   <div className="app-tags">
                     {selectedApp.tags.map((tag, index) => (
@@ -194,14 +196,16 @@ export function MainAppHeader({
         </div>
 
         <div className="app-controls-section">
-          <button
-            className={`start-stop-button ${statusInfo.className}`}
-            onClick={handleStartStopClick}
-            disabled={isStarting || isStopping}
-          >
-            <span className="button-icon">{statusInfo.icon}</span>
-            <span className="button-text">{statusInfo.buttonText}</span>
-          </button>
+          <div className="main-action-row">
+            <button
+              className={`start-stop-button ${statusInfo.className}`}
+              onClick={handleStartStopClick}
+              disabled={isStarting || isStopping}
+            >
+              <span className="button-icon">{statusInfo.icon}</span>
+              <span className="button-text">{statusInfo.buttonText}</span>
+            </button>
+          </div>
 
           <div className="action-buttons">
             <button

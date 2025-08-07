@@ -142,9 +142,11 @@ export function AppConfigModal({
     }
   }, [formData, mode, appToEdit, onSubmit, configManager.isAppNameTaken, configManager.error, handleClose])
 
-  // Handle backdrop click
+  // Handle backdrop click - prevent modal close during text selection
   const handleBackdropClick = useCallback((e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
+    // Only close modal if the click target is the backdrop itself AND
+    // there's no text selection active (to prevent closing during drag selection)
+    if (e.target === e.currentTarget && window.getSelection()?.toString() === '') {
       handleClose()
     }
   }, [handleClose])

@@ -258,13 +258,13 @@ fn prepare_unix_multi_command(commands: &[&str], working_dir: Option<&str>) -> R
 
     // Add initial logging to show what we're executing
     script_lines.push("echo \"Oddbox: Starting app process...\"".to_string());
-    
+
     // Check if any commands use nvm, rbenv, or other version managers that need shell initialization
     let needs_nvm = commands.iter().any(|cmd| {
         let first_word = cmd.trim().split_whitespace().next().unwrap_or("");
         first_word == "nvm" || cmd.contains("nvm ")
     });
-    
+
     let needs_rbenv = commands.iter().any(|cmd| {
         let first_word = cmd.trim().split_whitespace().next().unwrap_or("");
         first_word == "rbenv" || cmd.contains("rbenv ")
@@ -282,7 +282,7 @@ fn prepare_unix_multi_command(commands: &[&str], working_dir: Option<&str>) -> R
         script_lines.push("  source /opt/homebrew/opt/nvm/nvm.sh".to_string());
         script_lines.push("fi".to_string());
     }
-    
+
     if needs_rbenv {
         // Initialize rbenv if available
         script_lines.push("# Initialize rbenv if available".to_string());

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useConfigManager } from './hooks/useConfig'
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
 import { useProcessManager } from './hooks/useProcessManager'
@@ -32,6 +32,16 @@ function App() {
   })
   const configManager = useConfigManager()
   const { processes } = useProcessManager()
+
+  // Update selectedApp when config changes (for title updates)
+  useEffect(() => {
+    if (selectedApp && configManager.config) {
+      const updatedApp = configManager.config.apps.find(app => app.id === selectedApp.id)
+      if (updatedApp && JSON.stringify(updatedApp) !== JSON.stringify(selectedApp)) {
+        setSelectedApp(updatedApp)
+      }
+    }
+  }, [configManager.config, selectedApp])
 
   // Keyboard shortcuts handlers
   const handleKeyboardStartStop = async () => {
@@ -238,9 +248,12 @@ function App() {
       } else if (modalState.mode === 'edit') {
         success = await configManager.updateApp(appConfig)
         if (success) {
-          // Update selected app if it's the one being edited
+          // Update selected app with the new data from config
+          // This ensures sidebar and main header are both updated
           if (selectedApp?.id === appConfig.id) {
-            setSelectedApp(appConfig)
+            // Get the updated app from the config to ensure consistency
+            const updatedApp = configManager.getAppById(appConfig.id)
+            setSelectedApp(updatedApp || appConfig)
           }
         }
       }

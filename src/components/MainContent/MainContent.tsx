@@ -51,10 +51,10 @@ export function MainContent({
     // Format: "[HH:MM:SS] [ERR] content" or "[HH:MM:SS] content"
     const timestampMatch = line.match(/^\[(\d{1,2}:\d{2}:\d{2})\]/)
     const timestamp = timestampMatch ? timestampMatch[1] : new Date().toLocaleTimeString()
-    
+
     // Extract content after timestamp
     let content = timestampMatch ? line.substring(timestampMatch[0].length).trim() : line
-    
+
     // Detect if it's an error line and extract content
     let type: 'info' | 'success' | 'error' | 'warning' | 'output' = 'output'
     if (content.startsWith('[ERR]')) {
@@ -63,11 +63,11 @@ export function MainContent({
     } else if (content.includes('✓') || content.toLowerCase().includes('success')) {
       type = 'success'
     } else if (content.includes('⚠') || content.toLowerCase().includes('warning')) {
-      type = 'warning'  
+      type = 'warning'
     } else if (content.toLowerCase().includes('error')) {
       type = 'error'
     }
-    
+
     return {
       id: `process-${selectedApp?.id}-${index}`,
       timestamp,
