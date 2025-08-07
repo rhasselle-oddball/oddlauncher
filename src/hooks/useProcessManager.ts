@@ -243,6 +243,22 @@ export function useProcessManager() {
     []
   )
 
+  // Clear terminal output for a specific app
+  const clearProcessOutput = useCallback((appId: string) => {
+    setProcesses((prev) => {
+      const currentProcess = prev[appId]
+      if (!currentProcess) return prev
+
+      return {
+        ...prev,
+        [appId]: {
+          ...currentProcess,
+          output: [],
+        },
+      }
+    })
+  }, [])
+
   // Kill all processes
   const killAllProcesses = useCallback(async (): Promise<ProcessResult> => {
     try {
@@ -349,12 +365,39 @@ export function useProcessManager() {
           }
         )
 
-        // Listen for process output events (for future terminal integration)
+        // Listen for process output events
         const unlistenOutput = await listen<ProcessEvent>(
           'process-output',
-          () => {
-            // This can be used later to update terminal components
-            // For now, just ignore it to avoid unused variable warnings
+          (event) => {
+            const { appId, type, content, timestamp } = event.payload
+
+            if (!appId || !content) return
+
+            // Format terminal line with type indicator for stderr
+            const typePrefix = type === 'stderr' ? '[ERR] ' : ''
+            const formattedLine = `[${new Date(timestamp).toLocaleTimeString()}] ${typePrefix}${content}`
+
+            setProcesses((prev) => {
+              const currentProcess = prev[appId]
+              if (!currentProcess) return prev
+
+              // Add new line to output buffer
+              const newOutput = [...currentProcess.output, formattedLine]
+
+              // Limit buffer size (keep last 1000 lines)
+              const maxLines = 1000
+              const trimmedOutput = newOutput.length > maxLines
+                ? newOutput.slice(-maxLines)
+                : newOutput
+
+              return {
+                ...prev,
+                [appId]: {
+                  ...currentProcess,
+                  output: trimmedOutput,
+                },
+              }
+            })
           }
         )
 
@@ -393,6 +436,7 @@ export function useProcessManager() {
     getProcessStatus,
     getAllProcesses,
     killAllProcesses,
+    clearProcessOutput,
   }
 }
 

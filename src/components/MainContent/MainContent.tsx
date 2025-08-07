@@ -1,5 +1,6 @@
 import { MainAppHeader } from '../MainAppHeader'
 import { Terminal } from '../Terminal'
+import { useProcessManager } from '../../hooks/useProcessManager'
 import type { AppConfig } from '../../types'
 import './MainContent.css'
 
@@ -32,11 +33,21 @@ export function MainContent({
   onTerminalCopy,
   onTerminalSearch
 }: MainContentProps) {
+  const { processes, clearProcessOutput } = useProcessManager()
+
+  // Get process output for the selected app
+  const selectedAppProcess = selectedApp ? processes[selectedApp.id] : null
+  const processOutput = selectedAppProcess?.output || []
+
+  // Clear terminal output for current app
+  const clearTerminalOutput = () => {
+    if (selectedApp) {
+      clearProcessOutput(selectedApp.id)
+    }
+  }
 
   // Default terminal handlers if not provided
-  const handleTerminalClear = onTerminalClear || (() => {
-    console.log('Terminal clear requested (placeholder)')
-  })
+  const handleTerminalClear = onTerminalClear || clearTerminalOutput
 
   const handleTerminalCopy = onTerminalCopy || (() => {
     console.log('Terminal copy requested (placeholder)')
@@ -62,6 +73,7 @@ export function MainContent({
         <Terminal
           selectedApp={selectedApp}
           lines={terminalLines}
+          rawOutput={processOutput}
           onClear={handleTerminalClear}
           onCopy={handleTerminalCopy}
           onSearch={handleTerminalSearch}

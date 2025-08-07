@@ -13,6 +13,7 @@ export interface TerminalLine {
 export interface TerminalProps {
   selectedApp: AppConfig | null
   lines?: TerminalLine[]
+  rawOutput?: string[]  // Add support for raw string output
   maxLines?: number
   autoScroll?: boolean
   onClear?: () => void
@@ -23,6 +24,7 @@ export interface TerminalProps {
 export function Terminal({
   selectedApp,
   lines = [],
+  rawOutput = [],
   maxLines = 1000,
   autoScroll = true,
   onClear,
@@ -35,8 +37,43 @@ export function Terminal({
   const terminalContentRef = useRef<HTMLDivElement>(null)
   const terminalEndRef = useRef<HTMLDivElement>(null)
 
-  // Only show real lines - no mock data
-  const displayLines = useMemo(() => lines || [], [lines])
+  // Convert raw output to TerminalLine objects and combine with structured lines
+  const displayLines = useMemo(() => {
+    const structuredLines = lines || []
+    
+    // Convert raw output strings to TerminalLine objects
+    const convertedRawLines: TerminalLine[] = rawOutput.map((line, index) => {
+      // Parse timestamp if present in format [HH:MM:SS]
+      const timestampMatch = line.match(/^\[(\d{1,2}:\d{2}:\d{2})\]/)
+      const timestamp = timestampMatch ? timestampMatch[1] : new Date().toLocaleTimeString()
+      
+      // Extract content (remove timestamp if present)
+      let content = timestampMatch ? line.substring(timestampMatch[0].length).trim() : line
+      
+      // Detect line type based on content
+      let type: TerminalLine['type'] = 'output'
+      if (content.startsWith('[ERR]')) {
+        type = 'error'
+        content = content.substring(5).trim() // Remove [ERR] prefix
+      } else if (content.includes('✓') || content.toLowerCase().includes('success')) {
+        type = 'success'
+      } else if (content.includes('⚠') || content.toLowerCase().includes('warning')) {
+        type = 'warning'
+      } else if (content.toLowerCase().includes('error')) {
+        type = 'error'
+      }
+
+      return {
+        id: `raw-${index}-${Date.now()}`,
+        timestamp,
+        content,
+        type
+      }
+    })
+
+    // Combine structured lines and converted raw lines
+    return [...structuredLines, ...convertedRawLines]
+  }, [lines, rawOutput])
 
   // Auto-scroll to bottom when new lines are added
   useEffect(() => {
