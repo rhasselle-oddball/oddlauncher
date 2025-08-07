@@ -26,8 +26,6 @@ export interface AppConfig {
   workingDirectory?: string
   /** URL to open in browser when app starts (optional) */
   url?: string
-  /** Custom thumbnail/icon path (optional) */
-  thumbnailPath?: string
   /** Environment variables to set (optional) */
   environmentVariables?: Record<string, string>
   /** Auto-launch browser when app starts (default: true if url provided) */

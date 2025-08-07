@@ -41,13 +41,9 @@ export function AppListItem({ app, isSelected, onClick }: AppListItemProps) {
       onClick={handleClick}
     >
       <div className="app-list-item__thumbnail">
-        {app.thumbnailPath ? (
-          <img src={app.thumbnailPath} alt={`${app.name} thumbnail`} />
-        ) : (
-          <div className="app-list-item__placeholder-thumbnail">
-            <Smartphone size={20} />
-          </div>
-        )}
+        <div className="app-list-item__placeholder-thumbnail">
+          <Smartphone size={20} />
+        </div>
       </div>
 
       <div className="app-list-item__content">

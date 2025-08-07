@@ -55,10 +55,6 @@
           "description": "URL to open in browser when app starts",
           "format": "uri"
         },
-        "thumbnailPath": {
-          "type": "string",
-          "description": "Custom thumbnail/icon path"
-        },
         "environmentVariables": {
           "type": "object",
           "description": "Environment variables to set",

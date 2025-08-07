@@ -13,7 +13,6 @@ export interface AppConfigFormData {
   workingDirectory: string
   url: string
   description: string
-  thumbnailPath: string
   environmentVariables: Record<string, string>
   autoLaunchBrowser: boolean
   browserDelay: number
@@ -31,7 +30,6 @@ export interface AppConfigFormErrors {
   workingDirectory?: string
   url?: string
   description?: string
-  thumbnailPath?: string
   environmentVariables?: string
   autoLaunchBrowser?: string
   browserDelay?: string

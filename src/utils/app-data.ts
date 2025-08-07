@@ -12,7 +12,6 @@ export function createDefaultAppConfig(): Omit<AppConfig, 'id'> {
     command: '',
     workingDirectory: undefined,
     url: undefined,
-    thumbnailPath: undefined,
     environmentVariables: undefined,
     autoLaunchBrowser: undefined,
     browserDelay: undefined,

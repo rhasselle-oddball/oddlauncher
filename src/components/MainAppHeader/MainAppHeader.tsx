@@ -158,13 +158,9 @@ export function MainAppHeader({
       <div className="app-header-content">
         <div className="app-info-section">
           <div className="app-thumbnail-large">
-            {selectedApp.thumbnailPath ? (
-              <img src={selectedApp.thumbnailPath} alt={`${selectedApp.name} thumbnail`} />
-            ) : (
-              <div className="placeholder-thumbnail-large">
-                <Smartphone size={32} />
-              </div>
-            )}
+            <div className="placeholder-thumbnail-large">
+              <Smartphone size={32} />
+            </div>
           </div>
 
           <div className="app-details">

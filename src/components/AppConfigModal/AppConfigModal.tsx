@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { X, Folder, Image, Plus, AlertCircle } from 'lucide-react'
+import { X, Folder, Plus, AlertCircle, Settings } from 'lucide-react'
 import { invoke } from '@tauri-apps/api/core'
 import { useConfigManager } from '../../hooks/useConfig'
 import { generateAppId } from '../../utils/app-data'
@@ -64,18 +64,6 @@ export function AppConfigModal({
       }
     } catch (error) {
       console.error('Failed to pick directory:', error)
-    }
-  }, [handleInputChange])
-
-  // Handle image picker
-  const handlePickImage = useCallback(async () => {
-    try {
-      const result = await invoke<string | null>('pick_image_file')
-      if (result) {
-        handleInputChange('thumbnailPath', result)
-      }
-    } catch (error) {
-      console.error('Failed to pick image:', error)
     }
   }, [handleInputChange])
 
@@ -192,7 +180,7 @@ export function AppConfigModal({
               </>
             ) : (
               <>
-                <Image size={20} />
+                <Settings size={20} />
                 Edit {appToEdit?.name}
               </>
             )}
@@ -311,38 +299,6 @@ export function AppConfigModal({
                 <div className="form-help">
                   URL to open in browser when app starts
                 </div>
-              </div>
-
-              {/* Thumbnail */}
-              <div className="form-group">
-                <label htmlFor="thumbnailPath" className="form-label">
-                  Thumbnail Image
-                </label>
-                <div className="file-picker-group">
-                  <input
-                    id="thumbnailPath"
-                    type="text"
-                    className={`form-input file-picker-input ${errors.thumbnailPath ? 'error' : ''}`}
-                    value={formData.thumbnailPath}
-                    onChange={(e) => handleInputChange('thumbnailPath', e.target.value)}
-                    placeholder="/path/to/thumbnail.png"
-                  />
-                  <button
-                    type="button"
-                    className="file-picker-button"
-                    onClick={handlePickImage}
-                    disabled={isSubmitting}
-                  >
-                    <Image size={16} />
-                    Browse
-                  </button>
-                </div>
-                {errors.thumbnailPath && (
-                  <div className="form-error">
-                    <AlertCircle size={12} />
-                    {errors.thumbnailPath}
-                  </div>
-                )}
               </div>
 
               {/* Browser Settings */}

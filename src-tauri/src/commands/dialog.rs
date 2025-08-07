@@ -16,27 +16,6 @@ pub async fn pick_directory(app: AppHandle) -> Result<Option<String>, String> {
     }
 }
 
-/// Show a file picker dialog for images (thumbnails)
-#[command]
-pub async fn pick_image_file(app: AppHandle) -> Result<Option<String>, String> {
-    let dialog = app
-        .dialog()
-        .file()
-        .add_filter("Images", &["png", "jpg", "jpeg", "gif", "bmp", "svg", "webp"])
-        .set_title("Select Thumbnail Image");
-
-    match dialog.blocking_pick_file() {
-        Some(path) => {
-            let path_str = match path {
-                tauri_plugin_dialog::FilePath::Path(p) => p.to_string_lossy().to_string(),
-                tauri_plugin_dialog::FilePath::Url(u) => u.to_string(),
-            };
-            Ok(Some(path_str))
-        },
-        None => Ok(None), // User cancelled
-    }
-}
-
 /// Validate if a directory exists and is accessible
 #[command]
 pub async fn validate_directory(path: String) -> Result<bool, String> {

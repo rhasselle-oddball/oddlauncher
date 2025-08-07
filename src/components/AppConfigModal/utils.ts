@@ -19,7 +19,6 @@ export function appConfigToFormData(config: AppConfig): AppConfigFormData {
     workingDirectory: config.workingDirectory || '',
     url: config.url || '',
     description: '', // Not in AppConfig yet, placeholder
-    thumbnailPath: config.thumbnailPath || '',
     environmentVariables: config.environmentVariables || {},
     autoLaunchBrowser: config.autoLaunchBrowser ?? true,
     browserDelay: config.browserDelay || 0,
@@ -44,7 +43,6 @@ export function formDataToAppConfig(
     command: formData.command.trim(),
     workingDirectory: formData.workingDirectory.trim() || undefined,
     url: formData.url.trim() || undefined,
-    thumbnailPath: formData.thumbnailPath.trim() || undefined,
     environmentVariables:
       Object.keys(formData.environmentVariables).length > 0
         ? formData.environmentVariables
@@ -71,7 +69,6 @@ export function createEmptyFormData(): AppConfigFormData {
     workingDirectory: '',
     url: '',
     description: '',
-    thumbnailPath: '',
     environmentVariables: {},
     autoLaunchBrowser: true,
     browserDelay: 0,
@@ -121,13 +118,6 @@ export function validateFormData(
 
   if (formData.url.trim() && !isValidUrl(formData.url.trim())) {
     errors.url = 'Please enter a valid URL (e.g., http://localhost:3000)'
-  }
-
-  if (
-    formData.thumbnailPath.trim() &&
-    !isValidImagePath(formData.thumbnailPath.trim())
-  ) {
-    errors.thumbnailPath = 'Please select a valid image file'
   }
 
   if (formData.browserDelay < 0 || formData.browserDelay > 60) {
@@ -188,16 +178,6 @@ function isValidPath(path: string): boolean {
   if (invalidChars.test(path)) return false
 
   return true
-}
-
-/**
- * Validate if a path looks like an image file
- */
-function isValidImagePath(path: string): boolean {
-  if (!path.trim()) return false
-
-  const imageExtensions = /\.(png|jpg|jpeg|gif|bmp|svg|webp)$/i
-  return imageExtensions.test(path)
 }
 
 /**

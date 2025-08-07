@@ -36,8 +36,6 @@ pub struct AppConfig {
     pub working_directory: Option<String>,
     /// URL to open in browser when app starts (optional)
     pub url: Option<String>,
-    /// Custom thumbnail/icon path (optional)
-    pub thumbnail_path: Option<String>,
     /// Environment variables to set (optional)
     pub environment_variables: Option<HashMap<String, String>>,
     /// Auto-launch browser when app starts (default: true if url provided)
