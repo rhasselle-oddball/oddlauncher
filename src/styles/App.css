@@ -61,8 +61,12 @@ code {
   flex: 1;
   padding: 2rem;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  gap: 2rem;
   align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
 }
 
 .welcome-section {
@@ -165,5 +169,44 @@ code {
 
   .welcome-section p {
     font-size: 1rem;
+  }
+}
+
+/* App Cards Demo Section */
+.app-cards-demo {
+  width: 100%;
+  max-width: 1000px;
+}
+
+.app-cards-demo h3 {
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.app-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+  justify-items: center;
+  padding: 1rem 0;
+}
+
+@media (max-width: 768px) {
+  .app-cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+  
+  .app-cards-demo h3 {
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
 }
