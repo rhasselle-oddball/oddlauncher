@@ -876,6 +876,13 @@ Multiple UI/UX issues that were addressed to improve user experience:
 - Color scheme is consistent throughout the application using only blue/red states
 - Modal text selection works properly without unexpected closures
 - Sidebar automatically updates when app configurations change
+- **Additional Refinements (Commit: 1250bdc):**
+  - Header layout significantly refined with Steam-like start button styling
+  - Action buttons reduced to essential Edit and Delete only
+  - URL and directory made clickable to replace separate buttons
+  - Controls consolidated into single row saving vertical space
+  - Auto-scroll icon in terminal fixed (proper ArrowDown icon)
+  - Responsive design updated for new compact layout
 - Ready for additional polish tasks or advanced features
 
 ---

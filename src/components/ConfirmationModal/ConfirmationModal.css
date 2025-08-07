@@ -76,12 +76,14 @@
   border: none;
   color: var(--text-secondary, #888);
   cursor: pointer;
-  padding: 4px;
+  padding: 6px;
   border-radius: 6px;
   transition: all 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 36px;
+  min-height: 36px;
 }
 
 .confirmation-modal__close:hover {
@@ -121,6 +123,22 @@
 .confirmation-modal__app-item strong {
   color: var(--text-primary, #ffffff);
   margin-right: 8px;
+}
+
+.confirmation-modal__command-block {
+  background: var(--bg-tertiary, #0d1117);
+  border: 1px solid var(--border-primary, #21262d);
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin: 8px 0 0 0;
+  font-family: 'SF Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--text-primary, #ffffff);
+  white-space: pre-wrap;
+  overflow-x: auto;
+  max-height: 120px;
+  overflow-y: auto;
 }
 
 .confirmation-modal__footer {

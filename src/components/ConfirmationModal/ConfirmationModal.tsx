@@ -66,7 +66,7 @@ export function ConfirmationModal({
             onClick={handleCancelClick}
             aria-label="Close confirmation"
           >
-            <X size={20} />
+            <X size={24} />
           </button>
         </div>
 
@@ -79,7 +79,8 @@ export function ConfirmationModal({
                 <strong>App Name:</strong> {app.name}
               </div>
               <div className="confirmation-modal__app-item">
-                <strong>Command:</strong> {app.launchCommands}
+                <strong>Command:</strong>
+                <pre className="confirmation-modal__command-block">{app.launchCommands}</pre>
               </div>
               <div className="confirmation-modal__app-item">
                 <strong>Directory:</strong> {app.workingDirectory}
