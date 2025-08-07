@@ -136,8 +136,8 @@ export function MainAppHeader({
               {selectedApp.url && (
                 <div className="meta-item-full">
                   <span className="meta-label">URL:</span>
-                  <button 
-                    className="app-url-full clickable" 
+                  <button
+                    className="app-url-full clickable"
                     onClick={handleOpenUrlClick}
                     title="Click to open in browser"
                   >
@@ -149,8 +149,8 @@ export function MainAppHeader({
               {selectedApp.workingDirectory && (
                 <div className="meta-item-full">
                   <span className="meta-label">Working Directory:</span>
-                  <button 
-                    className="app-directory-full clickable" 
+                  <button
+                    className="app-directory-full clickable"
                     onClick={handleOpenDirectoryClick}
                     title="Click to open in file manager"
                   >

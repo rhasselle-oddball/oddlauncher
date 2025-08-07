@@ -833,27 +833,27 @@ Multiple UI/UX issues that were addressed to improve user experience:
 **What was accomplished:**
 - ✅ **Fixed Default Window Size**: Updated Tauri configuration from 800x600 to 1200x800 for better initial user experience
 - ✅ **Updated Color Scheme**: Removed all green colors throughout the application, implemented consistent blue/red state system
-- ✅ **Redesigned Header Layout**: 
+- ✅ **Redesigned Header Layout**:
   - Commands now display in larger, more prominent blocks with proper formatting
   - URLs and directories show in full without truncation using dedicated containers
   - Better visual hierarchy and information display
-- ✅ **Improved Button Layout**: 
+- ✅ **Improved Button Layout**:
   - Moved start button and action icons to separate row for better responsive design
   - Full width utilization for command/directory/URL information
   - Better vertical layout organization
-- ✅ **Enhanced Responsive Design**: 
+- ✅ **Enhanced Responsive Design**:
   - Improved icon and button behavior on narrow screens
   - Better responsive breakpoints for mobile and tablet views
   - Cleaner layout adaptation across different screen sizes
-- ✅ **Fixed Button Colors**: 
+- ✅ **Fixed Button Colors**:
   - Start button now uses blue color matching design system
   - All action buttons follow blue (active) and red (error/delete) color scheme
   - Removed green highlight colors throughout application
   - Simplified hover states for better UX
-- ✅ **Fixed Modal Text Selection**: 
+- ✅ **Fixed Modal Text Selection**:
   - Modal no longer closes when dragging text selection outside modal bounds
   - Improved text selection UX within form fields
-- ✅ **Added Automatic Sidebar Updates**: 
+- ✅ **Added Automatic Sidebar Updates**:
   - Implemented useEffect to sync selectedApp when configuration changes
   - Sidebar now properly reflects title changes immediately after editing
   - Fixed state synchronization between header and sidebar components
