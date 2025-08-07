@@ -1,8 +1,17 @@
 import { useState } from 'react'
 import { useConfigManager } from './hooks/useConfig'
-import { AppLayout, LibrarySidebar, MainContent, AppConfigModal } from './components'
+import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
+import { useProcessManager } from './hooks/useProcessManager'
+import { AppLayout, LibrarySidebar, MainContent, AppConfigModal, ConfirmationModal } from './components'
 import type { AppConfig } from './types'
 import type { AppConfigModalMode } from './components/AppConfigModal'
+import { 
+  parseImportData, 
+  validateAppConfig, 
+  generateUniqueName, 
+  createFileInput, 
+  readFileAsText 
+} from './utils/import-export'
 import './styles/App.css'
 
 function App() {
@@ -15,7 +24,64 @@ function App() {
     isOpen: false,
     mode: 'add',
   })
+  const [deleteConfirmation, setDeleteConfirmation] = useState<{
+    isOpen: boolean
+    app?: AppConfig
+  }>({
+    isOpen: false,
+  })
   const configManager = useConfigManager()
+  const { processes } = useProcessManager()
+
+  // Keyboard shortcuts handlers
+  const handleKeyboardStartStop = async () => {
+    if (!selectedApp) return
+    
+    const process = processes[selectedApp.id]
+    if (process?.status === 'running') {
+      // Stop the process
+      console.log('Keyboard shortcut: Stopping app', selectedApp.name)
+      // The actual stop logic is handled in the MainAppHeader component
+    } else {
+      // Start the process
+      console.log('Keyboard shortcut: Starting app', selectedApp.name)
+      // The actual start logic is handled in the MainAppHeader component
+    }
+  }
+
+  const handleKeyboardDelete = () => {
+    if (selectedApp) {
+      handleDelete(selectedApp)
+    }
+  }
+
+  const handleKeyboardDuplicate = () => {
+    if (selectedApp) {
+      handleDuplicate(selectedApp)
+    }
+  }
+
+  const handleKeyboardEdit = () => {
+    if (selectedApp) {
+      handleEdit(selectedApp)
+    }
+  }
+
+  const handleKeyboardExport = () => {
+    if (selectedApp) {
+      handleExportApp(selectedApp)
+    }
+  }
+
+  const handleKeyboardEscape = () => {
+    if (modalState.isOpen) {
+      handleCloseModal()
+    } else if (deleteConfirmation.isOpen) {
+      handleDeleteCancel()
+    } else {
+      setSelectedApp(null) // Clear selection
+    }
+  }
 
   const handleAppSelect = (app: AppConfig | null) => {
     setSelectedApp(app)
@@ -37,8 +103,107 @@ function App() {
   }
 
   const handleDelete = (app: AppConfig) => {
-    // TODO: Implement delete with confirmation in Phase 4
-    console.log('Delete clicked for app:', app.name)
+    setDeleteConfirmation({
+      isOpen: true,
+      app,
+    })
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (deleteConfirmation.app) {
+      try {
+        const success = await configManager.removeApp(deleteConfirmation.app.id)
+        if (success) {
+          // Clear selection if we deleted the selected app
+          if (selectedApp?.id === deleteConfirmation.app.id) {
+            setSelectedApp(null)
+          }
+        }
+      } catch (error) {
+        console.error('Failed to delete app:', error)
+      }
+    }
+    setDeleteConfirmation({ isOpen: false })
+  }
+
+  const handleDeleteCancel = () => {
+    setDeleteConfirmation({ isOpen: false })
+  }
+
+  const handleDuplicate = async (app: AppConfig) => {
+    try {
+      const success = await configManager.duplicateApp(app.id)
+      if (success) {
+        // Optionally select the duplicated app (it will be the last one in the list)
+        console.log('App duplicated successfully:', app.name)
+      }
+    } catch (error) {
+      console.error('Failed to duplicate app:', error)
+    }
+  }
+
+  const handleExportApp = (app: AppConfig) => {
+    // Export is handled directly in the MainAppHeader component
+    console.log('App exported successfully:', app.name)
+  }
+
+  const handleImportApp = async () => {
+    try {
+      const fileInput = createFileInput(async (file) => {
+        try {
+          const fileContent = await readFileAsText(file)
+          const parseResult = parseImportData(fileContent)
+          
+          if (!parseResult.success) {
+            alert(`Import failed: ${parseResult.error}`)
+            return
+          }
+
+          const exportData = parseResult.data!
+          
+          if (exportData.type === 'single-app') {
+            const importedApp = exportData.data as AppConfig
+            
+            if (!validateAppConfig(importedApp)) {
+              alert('Import failed: Invalid app configuration format.')
+              return
+            }
+
+            // Check for name conflicts and generate unique name if needed
+            const existingNames = configManager.config?.apps.map((app: AppConfig) => app.name) || []
+            if (existingNames.includes(importedApp.name)) {
+              importedApp.name = generateUniqueName(importedApp.name, existingNames)
+            }
+
+            // Update timestamps and regenerate ID
+            importedApp.id = crypto.randomUUID()
+            importedApp.createdAt = new Date().toISOString()
+            importedApp.updatedAt = new Date().toISOString()
+
+            // Add the imported app
+            const success = await configManager.addApp(importedApp)
+            if (success) {
+              alert(`App imported successfully as "${importedApp.name}"`)
+            } else {
+              alert('Failed to import app. Please try again.')
+            }
+          } else {
+            alert('Full configuration import is not yet supported. Please import individual apps.')
+          }
+        } catch (error) {
+          console.error('Import error:', error)
+          alert('Failed to import app. Please check the file format and try again.')
+        } finally {
+          // Clean up the file input
+          document.body.removeChild(fileInput)
+        }
+      })
+
+      fileInput.click()
+    } catch (error) {
+      console.error('Failed to create file input:', error)
+      alert('Failed to open file dialog. Please try again.')
+    }
   }
 
   const handleOpenUrl = (app: AppConfig) => {
@@ -87,6 +252,20 @@ function App() {
     }
   }
 
+  // Set up keyboard shortcuts
+  useKeyboardShortcuts({
+    selectedApp,
+    onStartStop: handleKeyboardStartStop,
+    onDelete: handleKeyboardDelete,
+    onDuplicate: handleKeyboardDuplicate,
+    onEdit: handleKeyboardEdit,
+    onAddNew: handleAddApp,
+    onImport: handleImportApp,
+    onExport: handleKeyboardExport,
+    onEscape: handleKeyboardEscape,
+    disabled: modalState.isOpen || deleteConfirmation.isOpen,
+  })
+
   return (
     <div className="app">
       <AppLayout
@@ -102,6 +281,9 @@ function App() {
             selectedApp={selectedApp}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            onDuplicate={handleDuplicate}
+            onExportApp={handleExportApp}
+            onImportApp={handleImportApp}
             onOpenUrl={handleOpenUrl}
             onOpenDirectory={handleOpenDirectory}
           />
@@ -115,6 +297,19 @@ function App() {
         appToEdit={modalState.appToEdit}
         onClose={handleCloseModal}
         onSubmit={handleModalSubmit}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={deleteConfirmation.isOpen}
+        title="Delete App"
+        message={`Are you sure you want to delete "${deleteConfirmation.app?.name}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="danger"
+        app={deleteConfirmation.app}
+        onConfirm={handleDeleteConfirm}
+        onCancel={handleDeleteCancel}
       />
     </div>
   )

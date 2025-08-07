@@ -1,8 +1,22 @@
-import { useState, useMemo, ChangeEvent } from 'react'
+import { useState, useMemo, ChangeEvent, useEffect } from 'react'
 import { Smartphone, Search } from 'lucide-react'
 import { AppListItem } from '../AppListItem'
 import { useConfigManager } from '../../hooks/useConfig'
 import type { AppConfig } from '../../types'
+import {
+  DndContext,
+  DragEndEvent,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  closestCenter,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import { SortableAppListItem } from './SortableAppListItem'
 import './LibrarySidebar.css'
 
 interface LibrarySidebarProps {
@@ -13,23 +27,70 @@ interface LibrarySidebarProps {
 
 export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp }: LibrarySidebarProps) {
   const [searchQuery, setSearchQuery] = useState('')
+  const [localAppOrder, setLocalAppOrder] = useState<AppConfig[]>([])
   const configManager = useConfigManager()
 
-  // Filter apps based on search query
+  // Set up drag sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // Require 8px of movement before drag starts
+      },
+    })
+  )
+
+  // Update local app order when config changes
+  useEffect(() => {
+    if (configManager.config?.apps) {
+      setLocalAppOrder([...configManager.config.apps])
+    }
+  }, [configManager.config?.apps])
+
+  // Filter apps based on search query - use localAppOrder when not searching
   const filteredApps = useMemo(() => {
-    if (!configManager.config?.apps) return []
+    const appsToFilter = searchQuery.trim() ? configManager.config?.apps || [] : localAppOrder
 
     if (!searchQuery.trim()) {
-      return configManager.config.apps
+      return appsToFilter
     }
 
     const query = searchQuery.toLowerCase().trim()
-    return configManager.config.apps.filter(app =>
+    return appsToFilter.filter(app =>
       app.name.toLowerCase().includes(query) ||
       app.command.toLowerCase().includes(query) ||
       (app.tags && app.tags.some(tag => tag.toLowerCase().includes(query)))
     )
-  }, [configManager.config?.apps, searchQuery])
+  }, [configManager.config?.apps, localAppOrder, searchQuery])
+
+  // Handle drag end - reorder apps
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event
+
+    if (!over || active.id === over.id) {
+      return
+    }
+
+    const oldIndex = localAppOrder.findIndex(app => app.id === active.id)
+    const newIndex = localAppOrder.findIndex(app => app.id === over.id)
+
+    if (oldIndex !== -1 && newIndex !== -1) {
+      const newOrder = arrayMove(localAppOrder, oldIndex, newIndex)
+      setLocalAppOrder(newOrder)
+
+      // Update the order in the backend
+      try {
+        const newConfig = {
+          ...configManager.config!,
+          apps: newOrder
+        }
+        await configManager.saveConfig(newConfig)
+      } catch (error) {
+        console.error('Failed to save app order:', error)
+        // Revert on error
+        setLocalAppOrder(localAppOrder)
+      }
+    }
+  }
 
   const handleAppClick = (app: AppConfig) => {
     onAppSelect(app)
@@ -162,16 +223,38 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp }: Library
       </div>
 
       <div className="app-list">
-        {filteredApps.map((app) => {
-          return (
+        {searchQuery.trim() ? (
+          // When searching, show regular list items (no drag and drop)
+          filteredApps.map((app) => (
             <AppListItem
               key={app.id}
               app={app}
               isSelected={selectedAppId === app.id}
               onClick={handleAppClick}
             />
-          )
-        })}
+          ))
+        ) : (
+          // When not searching, enable drag and drop reordering
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={filteredApps.map(app => app.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              {filteredApps.map((app) => (
+                <SortableAppListItem
+                  key={app.id}
+                  app={app}
+                  selectedAppId={selectedAppId}
+                  onAppSelect={handleAppClick}
+                />
+              ))}
+            </SortableContext>
+          </DndContext>
+        )}
       </div>
 
       <div className="sidebar-actions">

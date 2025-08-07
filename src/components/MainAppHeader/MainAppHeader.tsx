@@ -1,13 +1,17 @@
-import { Play, Square, Loader, Edit, Trash2, ExternalLink, FolderOpen, Smartphone } from 'lucide-react'
+import { Play, Square, Loader, Edit, Trash2, ExternalLink, FolderOpen, Smartphone, Copy, Download, Upload } from 'lucide-react'
 import type { AppConfig } from '../../types'
 import { useAppProcess } from '../../hooks/useProcessManager'
 import { useBrowser } from '../../hooks/useBrowser'
+import { exportApp, downloadJsonFile } from '../../utils/import-export'
 import './MainAppHeader.css'
 
 interface MainAppHeaderProps {
   selectedApp: AppConfig | null
   onEdit?: (app: AppConfig) => void
   onDelete?: (app: AppConfig) => void
+  onDuplicate?: (app: AppConfig) => void
+  onExportApp?: (app: AppConfig) => void
+  onImportApp?: () => void
   onOpenUrl?: (app: AppConfig) => void
   onOpenDirectory?: (app: AppConfig) => void
 }
@@ -16,8 +20,11 @@ export function MainAppHeader({
   selectedApp,
   onEdit,
   onDelete,
+  onDuplicate,
+  onExportApp,
+  onImportApp,
   onOpenUrl,
-  onOpenDirectory
+  onOpenDirectory,
 }: MainAppHeaderProps) {
   // Use process management for the selected app
   const {
@@ -80,6 +87,31 @@ export function MainAppHeader({
   const handleDeleteClick = () => {
     if (selectedApp && onDelete) {
       onDelete(selectedApp)
+    }
+  }
+
+  const handleDuplicateClick = () => {
+    if (selectedApp && onDuplicate) {
+      onDuplicate(selectedApp)
+    }
+  }
+
+  const handleExportClick = () => {
+    if (selectedApp) {
+      const exportData = exportApp(selectedApp)
+      const filename = `${selectedApp.name.replace(/[^a-zA-Z0-9]/g, '_')}_config.json`
+      downloadJsonFile(exportData, filename)
+      
+      // Also call the optional callback if provided
+      if (onExportApp) {
+        onExportApp(selectedApp)
+      }
+    }
+  }
+
+  const handleImportClick = () => {
+    if (onImportApp) {
+      onImportApp()
     }
   }
 
@@ -191,6 +223,30 @@ export function MainAppHeader({
               title="Edit App Configuration"
             >
               <Edit size={16} />
+            </button>
+
+            <button
+              className="action-button duplicate"
+              onClick={handleDuplicateClick}
+              title="Duplicate App"
+            >
+              <Copy size={16} />
+            </button>
+
+            <button
+              className="action-button export"
+              onClick={handleExportClick}
+              title="Export App Configuration"
+            >
+              <Download size={16} />
+            </button>
+
+            <button
+              className="action-button import"
+              onClick={handleImportClick}
+              title="Import App Configuration"
+            >
+              <Upload size={16} />
             </button>
 
             {selectedApp.url && (

@@ -295,6 +295,27 @@
   box-shadow: 0 2px 8px rgba(0, 122, 204, 0.3);
 }
 
+.action-button.duplicate:hover {
+  background: var(--accent-green);
+  border-color: var(--accent-green);
+  color: white;
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+.action-button.export:hover {
+  background: #059669;
+  border-color: #059669;
+  color: white;
+  box-shadow: 0 2px 8px rgba(5, 150, 105, 0.3);
+}
+
+.action-button.import:hover {
+  background: #dc6803;
+  border-color: #dc6803;
+  color: white;
+  box-shadow: 0 2px 8px rgba(220, 104, 3, 0.3);
+}
+
 .action-button.open-url:hover {
   background: var(--accent-blue);
   border-color: var(--accent-blue);
