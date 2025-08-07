@@ -8,9 +8,6 @@ interface MainContentProps {
   selectedApp: AppConfig | null
   onEdit?: (app: AppConfig) => void
   onDelete?: (app: AppConfig) => void
-  onDuplicate?: (app: AppConfig) => void
-  onExportApp?: (app: AppConfig) => void
-  onImportApp?: () => void
   onOpenUrl?: (app: AppConfig) => void
   onOpenDirectory?: (app: AppConfig) => void
   // Terminal props
@@ -29,9 +26,6 @@ export function MainContent({
   selectedApp,
   onEdit,
   onDelete,
-  onDuplicate,
-  onExportApp,
-  onImportApp,
   onOpenUrl,
   onOpenDirectory,
   terminalLines = [],
@@ -104,9 +98,6 @@ export function MainContent({
           selectedApp={selectedApp}
           onEdit={onEdit}
           onDelete={onDelete}
-          onDuplicate={onDuplicate}
-          onExportApp={onExportApp}
-          onImportApp={onImportApp}
           onOpenUrl={onOpenUrl}
           onOpenDirectory={onOpenDirectory}
         />

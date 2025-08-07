@@ -294,9 +294,6 @@ function App() {
             selectedApp={selectedApp}
             onEdit={handleEdit}
             onDelete={handleDelete}
-            onDuplicate={handleDuplicate}
-            onExportApp={handleExportApp}
-            onImportApp={handleImportApp}
             onOpenUrl={handleOpenUrl}
             onOpenDirectory={handleOpenDirectory}
           />

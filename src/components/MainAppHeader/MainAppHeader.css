@@ -114,7 +114,8 @@
   letter-spacing: 0.5px;
 }
 
-.app-directory-full {
+.app-directory-full,
+.app-url-full {
   color: var(--text-primary);
   font-family: 'Courier New', monospace;
   font-size: 0.875rem;
@@ -123,23 +124,24 @@
   background: var(--bg-primary);
   border-radius: 4px;
   border: 1px solid var(--border-color);
+  text-align: left;
+  width: 100%;
+  transition: background-color 0.2s ease;
+}
+
+.app-url-full.clickable,
+.app-directory-full.clickable {
+  cursor: pointer;
+}
+
+.app-url-full.clickable:hover,
+.app-directory-full.clickable:hover {
+  background: var(--hover-color);
+  border-color: var(--accent-blue);
 }
 
 .app-url-full {
   color: var(--accent-blue);
-  text-decoration: none;
-  word-break: break-all;
-  padding: 0.5rem;
-  background: var(--bg-primary);
-  border-radius: 4px;
-  border: 1px solid var(--border-color);
-  font-family: 'Courier New', monospace;
-  font-size: 0.875rem;
-}
-
-.app-url-full:hover {
-  text-decoration: underline;
-  background: var(--hover-color);
 }
 
 .app-tags {
@@ -160,30 +162,33 @@
 /* App Controls Section */
 .app-controls-section {
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
   align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
 }
 
-.main-action-row {
+.controls-row {
   display: flex;
-  justify-content: center;
+  align-items: center;
+  gap: 1rem;
 }
 
 /* Start/Stop Button */
 .start-stop-button {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 2rem;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
   border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
+  border-radius: 3px;
+  font-size: 0.75rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-width: 140px;
-  justify-content: center;
+  min-width: 80px;
+  justify-content: flex-start;
 }
 
 .start-stop-button.stopped {
@@ -234,34 +239,32 @@
 }
 
 .button-icon {
-  font-size: 1rem;
+  font-size: 0.875rem;
 }
 
 .button-text {
-  font-size: 1rem;
+  font-size: 0.75rem;
 }
 
 /* Action Buttons */
 .action-buttons {
   display: flex;
   gap: 0.5rem;
-  justify-content: center;
 }
 
 .action-button {
-  width: 44px;
-  height: 44px;
+  width: 36px;
+  height: 36px;
   border: none;
-  border-radius: 6px;
+  border-radius: 4px;
   background: var(--bg-tertiary);
   color: var(--text-secondary);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
+  font-size: 0.875rem;
   transition: all 0.2s ease;
-  border: 2px solid transparent;
 }
 
 .action-button:hover {
@@ -310,10 +313,6 @@
     gap: 1rem;
   }
 
-  .app-info-section {
-    gap: 1rem;
-  }
-
   .app-title {
     font-size: 1.5rem;
   }
@@ -330,42 +329,50 @@
     padding: 0.375rem;
   }
 
+  .controls-row {
+    gap: 0.75rem;
+  }
+
   .action-buttons {
     gap: 0.375rem;
   }
 
   .action-button {
-    width: 40px;
-    height: 40px;
-    font-size: 0.875rem;
+    width: 32px;
+    height: 32px;
+    font-size: 0.8125rem;
   }
 
   .start-stop-button {
-    padding: 0.625rem 1.5rem;
-    min-width: 120px;
+    padding: 0.375rem 0.75rem;
+    min-width: 70px;
+    font-size: 0.6875rem;
+  }
+
+  .button-icon {
+    font-size: 0.75rem;
   }
 }
 
 @media (max-width: 480px) {
   .app-info-section {
-    flex-direction: column;
     text-align: left;
   }
 
-  .action-buttons {
-    justify-content: center;
+  .controls-row {
     flex-wrap: wrap;
-    gap: 0.375rem;
+    gap: 0.5rem;
+    justify-content: flex-start;
   }
 
   .start-stop-button {
-    min-width: 100px;
-    padding: 0.625rem 1.25rem;
+    min-width: 65px;
+    padding: 0.375rem 0.625rem;
   }
 
   .action-button {
-    width: 38px;
-    height: 38px;
+    width: 30px;
+    height: 30px;
   }
 
   .app-command-block {

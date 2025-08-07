@@ -1,17 +1,13 @@
-import { Play, Square, Loader, Edit, Trash2, ExternalLink, FolderOpen, Copy, Download, Upload } from 'lucide-react'
+import { Play, Square, Loader, Edit, Trash2 } from 'lucide-react'
 import type { AppConfig } from '../../types'
 import { useAppProcess } from '../../hooks/useProcessManager'
 import { useBrowser } from '../../hooks/useBrowser'
-import { exportApp, downloadJsonFile } from '../../utils/import-export'
 import './MainAppHeader.css'
 
 interface MainAppHeaderProps {
   selectedApp: AppConfig | null
   onEdit?: (app: AppConfig) => void
   onDelete?: (app: AppConfig) => void
-  onDuplicate?: (app: AppConfig) => void
-  onExportApp?: (app: AppConfig) => void
-  onImportApp?: () => void
   onOpenUrl?: (app: AppConfig) => void
   onOpenDirectory?: (app: AppConfig) => void
 }
@@ -20,9 +16,6 @@ export function MainAppHeader({
   selectedApp,
   onEdit,
   onDelete,
-  onDuplicate,
-  onExportApp,
-  onImportApp,
   onOpenUrl,
   onOpenDirectory,
 }: MainAppHeaderProps) {
@@ -90,31 +83,6 @@ export function MainAppHeader({
     }
   }
 
-  const handleDuplicateClick = () => {
-    if (selectedApp && onDuplicate) {
-      onDuplicate(selectedApp)
-    }
-  }
-
-  const handleExportClick = () => {
-    if (selectedApp) {
-      const exportData = exportApp(selectedApp)
-      const filename = `${selectedApp.name.replace(/[^a-zA-Z0-9]/g, '_')}_config.json`
-      downloadJsonFile(exportData, filename)
-
-      // Also call the optional callback if provided
-      if (onExportApp) {
-        onExportApp(selectedApp)
-      }
-    }
-  }
-
-  const handleImportClick = () => {
-    if (onImportApp) {
-      onImportApp()
-    }
-  }
-
   const handleOpenUrlClick = async () => {
     if (selectedApp && selectedApp.url) {
       try {
@@ -165,19 +133,29 @@ export function MainAppHeader({
                 </div>
               </div>
 
-              {selectedApp.workingDirectory && (
-                <div className="meta-item-full">
-                  <span className="meta-label">Working Directory:</span>
-                  <span className="app-directory-full">{selectedApp.workingDirectory}</span>
-                </div>
-              )}
-
               {selectedApp.url && (
                 <div className="meta-item-full">
                   <span className="meta-label">URL:</span>
-                  <a href={selectedApp.url} className="app-url-full" target="_blank" rel="noopener noreferrer">
+                  <button 
+                    className="app-url-full clickable" 
+                    onClick={handleOpenUrlClick}
+                    title="Click to open in browser"
+                  >
                     {selectedApp.url}
-                  </a>
+                  </button>
+                </div>
+              )}
+
+              {selectedApp.workingDirectory && (
+                <div className="meta-item-full">
+                  <span className="meta-label">Working Directory:</span>
+                  <button 
+                    className="app-directory-full clickable" 
+                    onClick={handleOpenDirectoryClick}
+                    title="Click to open in file manager"
+                  >
+                    {selectedApp.workingDirectory}
+                  </button>
                 </div>
               )}
 
@@ -196,7 +174,7 @@ export function MainAppHeader({
         </div>
 
         <div className="app-controls-section">
-          <div className="main-action-row">
+          <div className="controls-row">
             <button
               className={`start-stop-button ${statusInfo.className}`}
               onClick={handleStartStopClick}
@@ -205,68 +183,24 @@ export function MainAppHeader({
               <span className="button-icon">{statusInfo.icon}</span>
               <span className="button-text">{statusInfo.buttonText}</span>
             </button>
-          </div>
 
-          <div className="action-buttons">
-            <button
-              className="action-button edit"
-              onClick={handleEditClick}
-              title="Edit App Configuration"
-            >
-              <Edit size={16} />
-            </button>
-
-            <button
-              className="action-button duplicate"
-              onClick={handleDuplicateClick}
-              title="Duplicate App"
-            >
-              <Copy size={16} />
-            </button>
-
-            <button
-              className="action-button export"
-              onClick={handleExportClick}
-              title="Export App Configuration"
-            >
-              <Download size={16} />
-            </button>
-
-            <button
-              className="action-button import"
-              onClick={handleImportClick}
-              title="Import App Configuration"
-            >
-              <Upload size={16} />
-            </button>
-
-            {selectedApp.url && (
+            <div className="action-buttons">
               <button
-                className="action-button open-url"
-                onClick={handleOpenUrlClick}
-                title="Open URL in Browser"
+                className="action-button edit"
+                onClick={handleEditClick}
+                title="Edit App Configuration"
               >
-                <ExternalLink size={16} />
+                <Edit size={16} />
               </button>
-            )}
 
-            {selectedApp.workingDirectory && (
               <button
-                className="action-button open-directory"
-                onClick={handleOpenDirectoryClick}
-                title="Open Directory in File Manager"
+                className="action-button delete"
+                onClick={handleDeleteClick}
+                title="Delete App"
               >
-                <FolderOpen size={16} />
+                <Trash2 size={16} />
               </button>
-            )}
-
-            <button
-              className="action-button delete"
-              onClick={handleDeleteClick}
-              title="Delete App"
-            >
-              <Trash2 size={16} />
-            </button>
+            </div>
           </div>
         </div>
       </div>

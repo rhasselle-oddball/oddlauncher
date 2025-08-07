@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react'
-import { Search, Copy, RotateCcw, Settings, Terminal as TerminalIcon } from 'lucide-react'
+import { Search, Copy, RotateCcw, Settings, Terminal as TerminalIcon, ArrowDown } from 'lucide-react'
 import type { AppConfig } from '../../types'
 import './Terminal.css'
 
@@ -198,7 +198,7 @@ export function Terminal({
             onClick={handleAutoScrollToggle}
             title={`Auto-scroll: ${isAutoScrollEnabled ? 'ON' : 'OFF'}`}
           >
-            📜
+            <ArrowDown size={14} />
           </button>
           <button
             className="terminal-control-button"
