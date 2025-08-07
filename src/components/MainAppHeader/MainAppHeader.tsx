@@ -1,6 +1,7 @@
 import { Play, Square, Loader, Edit, Trash2, ExternalLink, FolderOpen, Smartphone } from 'lucide-react'
 import type { AppConfig } from '../../types'
 import { useAppProcess } from '../../hooks/useProcessManager'
+import { useBrowser } from '../../hooks/useBrowser'
 import './MainAppHeader.css'
 
 interface MainAppHeaderProps {
@@ -28,6 +29,9 @@ export function MainAppHeader({
     stop
   } = useAppProcess(selectedApp?.id || '')
 
+  // Use browser functionality for manual URL opening
+  const { openUrlInBrowser } = useBrowser()
+
   const getStatusDisplay = () => {
     if (isStarting) {
       return { text: 'Starting...', icon: <Loader size={16} className="spin" />, className: 'starting', buttonText: 'Starting...' }
@@ -54,7 +58,12 @@ export function MainAppHeader({
         await start(
           selectedApp.command,
           selectedApp.workingDirectory,
-          selectedApp.environmentVariables
+          selectedApp.environmentVariables,
+          selectedApp.url,
+          selectedApp.autoLaunchBrowser,
+          selectedApp.browserDelay,
+          selectedApp.portToCheck,
+          selectedApp.portCheckTimeout
         )
       }
     } catch (error) {
@@ -74,7 +83,16 @@ export function MainAppHeader({
     }
   }
 
-  const handleOpenUrlClick = () => {
+  const handleOpenUrlClick = async () => {
+    if (selectedApp && selectedApp.url) {
+      try {
+        await openUrlInBrowser(selectedApp.url)
+      } catch (error) {
+        console.error('Failed to open URL:', error)
+      }
+    }
+
+    // Also call the optional callback if provided
     if (selectedApp && onOpenUrl) {
       onOpenUrl(selectedApp)
     }

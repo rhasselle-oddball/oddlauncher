@@ -25,6 +25,8 @@ export interface ProcessEvent {
   pid?: number
   startedAt?: string
   timestamp: string
+  url?: string
+  reason?: string
 }
 
 /**
@@ -89,7 +91,12 @@ export function useProcessManager() {
       appId: string,
       command: string,
       workingDirectory?: string,
-      environmentVariables?: Record<string, string>
+      environmentVariables?: Record<string, string>,
+      url?: string,
+      autoLaunchBrowser?: boolean,
+      browserDelay?: number,
+      portToCheck?: number,
+      portCheckTimeout?: number
     ): Promise<ProcessResult> => {
       try {
         setIsLoading(true)
@@ -114,6 +121,11 @@ export function useProcessManager() {
           command,
           workingDirectory,
           environmentVariables,
+          url,
+          autoLaunchBrowser,
+          browserDelay,
+          portToCheck,
+          portCheckTimeout,
         })
 
         if (result.success && result.pid) {
@@ -375,7 +387,9 @@ export function useProcessManager() {
 
             // Format terminal line with type indicator for stderr
             const typePrefix = type === 'stderr' ? '[ERR] ' : ''
-            const formattedLine = `[${new Date(timestamp).toLocaleTimeString()}] ${typePrefix}${content}`
+            const formattedLine = `[${new Date(
+              timestamp
+            ).toLocaleTimeString()}] ${typePrefix}${content}`
 
             setProcesses((prev) => {
               const currentProcess = prev[appId]
@@ -386,9 +400,10 @@ export function useProcessManager() {
 
               // Limit buffer size (keep last 1000 lines)
               const maxLines = 1000
-              const trimmedOutput = newOutput.length > maxLines
-                ? newOutput.slice(-maxLines)
-                : newOutput
+              const trimmedOutput =
+                newOutput.length > maxLines
+                  ? newOutput.slice(-maxLines)
+                  : newOutput
 
               return {
                 ...prev,
@@ -401,6 +416,84 @@ export function useProcessManager() {
           }
         )
 
+        // Listen for browser launch success events
+        const unlistenBrowserLaunched = await listen<ProcessEvent>(
+          'browser-launched',
+          (event) => {
+            const { appId, url, timestamp } = event.payload
+
+            if (!appId || !url) return
+
+            const browserMessage = `[${new Date(
+              timestamp
+            ).toLocaleTimeString()}] ✅ Browser launched: ${url}`
+
+            setProcesses((prev) => {
+              const currentProcess = prev[appId]
+              if (!currentProcess) return prev
+
+              // Add browser launch notification to output buffer
+              const newOutput = [...currentProcess.output, browserMessage]
+
+              const maxLines = 1000
+              const trimmedOutput =
+                newOutput.length > maxLines
+                  ? newOutput.slice(-maxLines)
+                  : newOutput
+
+              return {
+                ...prev,
+                [appId]: {
+                  ...currentProcess,
+                  output: trimmedOutput,
+                },
+              }
+            })
+
+            console.log(`Browser launched for app ${appId}: ${url}`)
+          }
+        )
+
+        // Listen for browser launch failure events
+        const unlistenBrowserLaunchFailed = await listen<ProcessEvent>(
+          'browser-launch-failed',
+          (event) => {
+            const { appId, url, reason, timestamp } = event.payload
+
+            if (!appId) return
+
+            const browserMessage = `[${new Date(
+              timestamp
+            ).toLocaleTimeString()}] ❌ Browser launch failed: ${reason}${
+              url ? ` (${url})` : ''
+            }`
+
+            setProcesses((prev) => {
+              const currentProcess = prev[appId]
+              if (!currentProcess) return prev
+
+              // Add browser launch failure notification to output buffer
+              const newOutput = [...currentProcess.output, browserMessage]
+
+              const maxLines = 1000
+              const trimmedOutput =
+                newOutput.length > maxLines
+                  ? newOutput.slice(-maxLines)
+                  : newOutput
+
+              return {
+                ...prev,
+                [appId]: {
+                  ...currentProcess,
+                  output: trimmedOutput,
+                },
+              }
+            })
+
+            console.warn(`Browser launch failed for app ${appId}: ${reason}`)
+          }
+        )
+
         // Store unlisten functions for cleanup
         eventListeners.current = [
           unlistenStarted,
@@ -408,6 +501,8 @@ export function useProcessManager() {
           unlistenExit,
           unlistenError,
           unlistenOutput,
+          unlistenBrowserLaunched,
+          unlistenBrowserLaunchFailed,
         ]
       } catch (err) {
         console.error('Failed to setup process event listeners:', err)
@@ -463,8 +558,24 @@ export function useAppProcess(appId: string) {
     (
       command: string,
       workingDirectory?: string,
-      environmentVariables?: Record<string, string>
-    ) => startProcess(appId, command, workingDirectory, environmentVariables),
+      environmentVariables?: Record<string, string>,
+      url?: string,
+      autoLaunchBrowser?: boolean,
+      browserDelay?: number,
+      portToCheck?: number,
+      portCheckTimeout?: number
+    ) =>
+      startProcess(
+        appId,
+        command,
+        workingDirectory,
+        environmentVariables,
+        url,
+        autoLaunchBrowser,
+        browserDelay,
+        portToCheck,
+        portCheckTimeout
+      ),
     [appId, startProcess]
   )
 

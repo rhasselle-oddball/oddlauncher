@@ -40,16 +40,16 @@ export function Terminal({
   // Convert raw output to TerminalLine objects and combine with structured lines
   const displayLines = useMemo(() => {
     const structuredLines = lines || []
-    
+
     // Convert raw output strings to TerminalLine objects
     const convertedRawLines: TerminalLine[] = rawOutput.map((line, index) => {
       // Parse timestamp if present in format [HH:MM:SS]
       const timestampMatch = line.match(/^\[(\d{1,2}:\d{2}:\d{2})\]/)
       const timestamp = timestampMatch ? timestampMatch[1] : new Date().toLocaleTimeString()
-      
+
       // Extract content (remove timestamp if present)
       let content = timestampMatch ? line.substring(timestampMatch[0].length).trim() : line
-      
+
       // Detect line type based on content
       let type: TerminalLine['type'] = 'output'
       if (content.startsWith('[ERR]')) {

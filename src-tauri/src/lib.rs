@@ -36,6 +36,9 @@ pub fn run() {
       commands::get_process_status,
       commands::get_all_process_status,
       commands::kill_all_processes,
+      commands::open_url_in_browser,
+      commands::check_port_ready,
+      commands::wait_for_port_ready,
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

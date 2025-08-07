@@ -52,6 +52,11 @@ pub async fn start_app_process(
     command: String,
     working_directory: Option<String>,
     environment_variables: Option<HashMap<String, String>>,
+    url: Option<String>,
+    auto_launch_browser: Option<bool>,
+    browser_delay: Option<u32>,
+    port_to_check: Option<u16>,
+    port_check_timeout: Option<u32>,
     app_handle: AppHandle,
     process_manager: State<'_, ProcessManager>,
 ) -> Result<ProcessResult, String> {
@@ -250,6 +255,104 @@ pub async fn start_app_process(
         "pid": pid,
         "startedAt": started_at
     }));
+
+    // Handle browser auto-launch if configured
+    if let Some(url) = url {
+        let should_launch = auto_launch_browser.unwrap_or(true);
+
+        if should_launch {
+            let app_handle_browser = app_handle.clone();
+            let app_id_browser = app_id.clone();
+            let browser_delay = browser_delay.unwrap_or(0);
+            let port_to_check = port_to_check;
+            let port_check_timeout = port_check_timeout.unwrap_or(30);
+
+            tokio::spawn(async move {
+                // Wait for the specified delay
+                if browser_delay > 0 {
+                    log::info!("Waiting {}s before launching browser for app: {}", browser_delay, app_id_browser);
+                    tokio::time::sleep(std::time::Duration::from_secs(browser_delay as u64)).await;
+                }
+
+                let launch_url = if let Some(port) = port_to_check {
+                    // If port check is configured, wait for the port to be ready
+                    let check_url = if url.contains("://") {
+                        url.clone()
+                    } else {
+                        format!("http://localhost:{}", port)
+                    };
+
+                    log::info!("Checking if port {} is ready for app: {}", port, app_id_browser);
+
+                    match crate::commands::wait_for_port_ready(check_url.clone(), port_check_timeout as u64).await {
+                        Ok(true) => {
+                            log::info!("Port {} is ready for app: {}", port, app_id_browser);
+                            Some(url)
+                        },
+                        Ok(false) => {
+                            log::warn!("Port {} was not ready within {}s for app: {}, skipping browser launch", port, port_check_timeout, app_id_browser);
+
+                            // Emit browser launch failure event
+                            let _ = app_handle_browser.emit("browser-launch-failed", serde_json::json!({
+                                "appId": app_id_browser,
+                                "reason": "Port not ready within timeout",
+                                "url": url,
+                                "timestamp": chrono::Utc::now().to_rfc3339()
+                            }));
+
+                            None
+                        },
+                        Err(e) => {
+                            log::error!("Error checking port readiness for app {}: {}", app_id_browser, e);
+
+                            // Emit browser launch failure event
+                            let _ = app_handle_browser.emit("browser-launch-failed", serde_json::json!({
+                                "appId": app_id_browser,
+                                "reason": format!("Error checking port: {}", e),
+                                "url": url,
+                                "timestamp": chrono::Utc::now().to_rfc3339()
+                            }));
+
+                            None
+                        }
+                    }
+                } else {
+                    // No port checking, launch immediately
+                    Some(url)
+                };
+
+                if let Some(launch_url) = launch_url {
+                    log::info!("Launching browser for app: {} with URL: {}", app_id_browser, launch_url);
+
+                    match crate::commands::open_url_in_browser(launch_url.clone()).await {
+                        Ok(_) => {
+                            log::info!("Successfully launched browser for app: {}", app_id_browser);
+
+                            // Emit browser launch success event
+                            let _ = app_handle_browser.emit("browser-launched", serde_json::json!({
+                                "appId": app_id_browser,
+                                "url": launch_url,
+                                "timestamp": chrono::Utc::now().to_rfc3339()
+                            }));
+                        },
+                        Err(e) => {
+                            log::error!("Failed to launch browser for app {}: {}", app_id_browser, e);
+
+                            // Emit browser launch failure event
+                            let _ = app_handle_browser.emit("browser-launch-failed", serde_json::json!({
+                                "appId": app_id_browser,
+                                "reason": e,
+                                "url": launch_url,
+                                "timestamp": chrono::Utc::now().to_rfc3339()
+                            }));
+                        }
+                    }
+                }
+            });
+        } else {
+            log::info!("Auto-launch browser disabled for app: {}", app_id);
+        }
+    }
 
     Ok(ProcessResult {
         success: true,
