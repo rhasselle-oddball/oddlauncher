@@ -1,0 +1,151 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Oddbox Configuration",
+  "description": "Configuration file for Oddbox dev tools launcher",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Version of the config format",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "apps": {
+      "type": "array",
+      "description": "Array of application configurations",
+      "items": {
+        "$ref": "#/definitions/AppConfig"
+      }
+    },
+    "settings": {
+      "$ref": "#/definitions/GlobalSettings"
+    },
+    "lastModified": {
+      "type": "string",
+      "description": "Last modified timestamp in RFC3339 format",
+      "format": "date-time"
+    }
+  },
+  "required": ["version", "apps", "settings", "lastModified"],
+  "additionalProperties": false,
+  "definitions": {
+    "AppConfig": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the app",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name of the app",
+          "minLength": 1
+        },
+        "command": {
+          "type": "string",
+          "description": "Shell command to execute",
+          "minLength": 1
+        },
+        "workingDirectory": {
+          "type": "string",
+          "description": "Working directory for the command"
+        },
+        "url": {
+          "type": "string",
+          "description": "URL to open in browser when app starts",
+          "format": "uri"
+        },
+        "thumbnailPath": {
+          "type": "string",
+          "description": "Custom thumbnail/icon path"
+        },
+        "environmentVariables": {
+          "type": "object",
+          "description": "Environment variables to set",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "autoLaunchBrowser": {
+          "type": "boolean",
+          "description": "Auto-launch browser when app starts",
+          "default": true
+        },
+        "browserDelay": {
+          "type": "integer",
+          "description": "Delay in seconds before opening browser",
+          "minimum": 0,
+          "maximum": 300,
+          "default": 0
+        },
+        "portToCheck": {
+          "type": "integer",
+          "description": "Port to poll for readiness before opening browser",
+          "minimum": 1,
+          "maximum": 65535
+        },
+        "portCheckTimeout": {
+          "type": "integer",
+          "description": "Maximum time to wait for port to be ready in seconds",
+          "minimum": 1,
+          "maximum": 300,
+          "default": 30
+        },
+        "tags": {
+          "type": "array",
+          "description": "Tags for organization and filtering",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp in RFC3339 format",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last modified timestamp in RFC3339 format",
+          "format": "date-time"
+        }
+      },
+      "required": ["id", "name", "command", "createdAt", "updatedAt"],
+      "additionalProperties": false
+    },
+    "GlobalSettings": {
+      "type": "object",
+      "properties": {
+        "theme": {
+          "type": "string",
+          "description": "Theme preference",
+          "enum": ["dark"],
+          "default": "dark"
+        },
+        "defaultWorkingDirectory": {
+          "type": "string",
+          "description": "Default working directory for new apps"
+        },
+        "maxTerminalLines": {
+          "type": "integer",
+          "description": "Maximum lines to keep in terminal output buffer",
+          "minimum": 100,
+          "maximum": 10000,
+          "default": 1000
+        },
+        "defaultBrowser": {
+          "type": "string",
+          "description": "Default browser command"
+        },
+        "autoSave": {
+          "type": "boolean",
+          "description": "Auto-save configuration changes",
+          "default": true
+        }
+      },
+      "required": ["theme", "maxTerminalLines", "autoSave"],
+      "additionalProperties": false
+    }
+  }
+}
