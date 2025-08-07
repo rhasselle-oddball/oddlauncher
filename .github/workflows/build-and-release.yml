@@ -70,10 +70,23 @@ jobs:
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Enable automatic code signing on macOS
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         with:
           tagName: ${{ github.ref_name }}
           releaseName: 'Oddbox v__VERSION__'
-          releaseBody: 'See the assets below to download this version and install.'
+          releaseBody: |
+            See the assets below to download this version and install.
+
+            **Installation on macOS:**
+            - Download the appropriate .dmg file for your Mac
+            - If you get a "damaged" warning, run: `xattr -d com.apple.quarantine ~/Downloads/oddbox*.dmg`
+            - Then mount the .dmg and drag oddbox.app to Applications
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}

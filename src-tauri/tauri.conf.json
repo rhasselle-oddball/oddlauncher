@@ -32,6 +32,13 @@
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ]
+    ],
+    "category": "DeveloperTool",
+    "shortDescription": "Steam-like launcher for dev tools",
+    "longDescription": "A native desktop application that acts like a Steam Library for development tools, providing a GUI-first way to launch local development servers with real-time terminal output.",
+    "macOS": {
+      "minimumSystemVersion": "10.13",
+      "exceptionDomain": "localhost"
+    }
   }
 }
