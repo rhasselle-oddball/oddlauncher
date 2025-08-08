@@ -70,7 +70,13 @@ jobs:
         run: npm ci
 
       - name: Build
-        run: npm run tauri build -- --target aarch64-apple-darwin
+        env:
+          CI: true
+          DISPLAY: ":99"
+        run: |
+          # Start virtual display for headless GUI operations
+          sudo Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+          npm run tauri build -- --target aarch64-apple-darwin
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
