@@ -86,7 +86,7 @@ export function useConfig() {
   // Initialize by loading config
   useEffect(() => {
     loadConfig()
-  }, [loadConfig])
+  }, []) // Remove loadConfig from dependencies since it's stable with empty deps
 
   return {
     config,
