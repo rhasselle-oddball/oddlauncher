@@ -23,12 +23,15 @@ interface LibrarySidebarProps {
   selectedAppId: string | null
   onAppSelect: (app: AppConfig | null) => void
   onAddApp: () => void
+  /** Optional shared config manager instance to avoid duplicate state */
+  configManager?: ReturnType<typeof useConfigManager>
 }
 
-export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp }: LibrarySidebarProps) {
+export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configManager: externalManager }: LibrarySidebarProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [localAppOrder, setLocalAppOrder] = useState<AppConfig[]>([])
-  const configManager = useConfigManager()
+  const internalManager = useConfigManager()
+  const configManager = externalManager || internalManager
 
   // Set up drag sensors
   const sensors = useSensors(

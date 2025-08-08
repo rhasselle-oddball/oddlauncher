@@ -20,8 +20,6 @@ export interface AppConfigFormData {
   environmentVariables: Record<string, string>
   autoLaunchBrowser: boolean
   browserDelay: number
-  portToCheck: string
-  portCheckTimeout: number
   tags: string[]
 }
 
@@ -38,8 +36,6 @@ export interface AppConfigFormErrors {
   environmentVariables?: string
   autoLaunchBrowser?: string
   browserDelay?: string
-  portToCheck?: string
-  portCheckTimeout?: string
   tags?: string
 }
 

@@ -383,50 +383,26 @@ export function AppConfigModal({
                 </div>
               </div>
 
-              {/* Browser Delay and Port Settings */}
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="browserDelay" className="form-label">
-                    Browser Delay (seconds)
-                  </label>
-                  <input
-                    id="browserDelay"
-                    type="number"
-                    min="0"
-                    max="60"
-                    className={`form-input ${errors.browserDelay ? 'error' : ''}`}
-                    value={formData.browserDelay}
-                    onChange={(e) => handleInputChange('browserDelay', parseInt(e.target.value) || 0)}
-                  />
-                  {errors.browserDelay && (
-                    <div className="form-error">
-                      <AlertCircle size={12} />
-                      {errors.browserDelay}
-                    </div>
-                  )}
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="portToCheck" className="form-label">
-                    Port to Check
-                  </label>
-                  <input
-                    id="portToCheck"
-                    type="number"
-                    min="1"
-                    max="65535"
-                    className={`form-input ${errors.portToCheck ? 'error' : ''}`}
-                    value={formData.portToCheck}
-                    onChange={(e) => handleInputChange('portToCheck', e.target.value)}
-                    placeholder="3000"
-                  />
-                  {errors.portToCheck && (
-                    <div className="form-error">
-                      <AlertCircle size={12} />
-                      {errors.portToCheck}
-                    </div>
-                  )}
-                </div>
+              {/* Browser Delay (optional) */}
+              <div className="form-group">
+                <label htmlFor="browserDelay" className="form-label">
+                  Browser Delay (seconds)
+                </label>
+                <input
+                  id="browserDelay"
+                  type="number"
+                  min="0"
+                  max="60"
+                  className={`form-input ${errors.browserDelay ? 'error' : ''}`}
+                  value={formData.browserDelay}
+                  onChange={(e) => handleInputChange('browserDelay', parseInt(e.target.value) || 0)}
+                />
+                {errors.browserDelay && (
+                  <div className="form-error">
+                    <AlertCircle size={12} />
+                    {errors.browserDelay}
+                  </div>
+                )}
               </div>
 
               {/* Tags */}

@@ -182,17 +182,20 @@
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
+/* Error state: use subtle background only, no border or focus ring */
 .form-input.error,
 .form-textarea.error,
 .form-select.error {
-  border-color: var(--accent-red, #ef4444);
+  /* keep existing border color */
+  background: rgba(239, 68, 68, 0.08); /* soft red tint */
 }
 
 .form-input.error:focus,
 .form-textarea.error:focus,
 .form-select.error:focus {
-  border-color: var(--accent-red, #ef4444);
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  /* Use regular focus style without red emphasis */
+  border-color: var(--accent-blue, #3b82f6);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .form-textarea {
@@ -311,12 +314,13 @@
 }
 
 .tags-input-container.error {
-  border-color: var(--accent-red, #ef4444);
+  /* subtle background only */
+  background: rgba(239, 68, 68, 0.08);
 }
 
 .tags-input-container.error:focus-within {
-  border-color: var(--accent-red, #ef4444);
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  border-color: var(--accent-blue, #3b82f6);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .tag-item {

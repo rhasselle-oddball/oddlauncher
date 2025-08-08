@@ -50,7 +50,7 @@ export function validateAppConfig(
   return Boolean(
     config.id &&
       config.name &&
-      (config.launchCommands || config.url) && // Either launch commands or URL required
+  // Commands and URL/file are optional
       config.createdAt &&
       config.updatedAt
   )

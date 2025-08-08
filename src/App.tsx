@@ -287,6 +287,7 @@ function App() {
             selectedAppId={selectedApp?.id || null}
             onAppSelect={handleAppSelect}
             onAddApp={handleAddApp}
+            configManager={configManager}
           />
         }
         mainContent={

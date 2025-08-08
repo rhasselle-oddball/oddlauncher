@@ -27,8 +27,6 @@ export function appConfigToFormData(config: AppConfig): AppConfigFormData {
     environmentVariables: config.environmentVariables || {},
     autoLaunchBrowser: config.autoLaunchBrowser ?? true,
     browserDelay: config.browserDelay || 0,
-    portToCheck: config.portToCheck?.toString() || '',
-    portCheckTimeout: config.portCheckTimeout || 30,
     tags: config.tags || [],
   }
 }
@@ -63,11 +61,6 @@ export function formDataToAppConfig(
         : undefined,
     autoLaunchBrowser: formData.autoLaunchBrowser,
     browserDelay: formData.browserDelay > 0 ? formData.browserDelay : undefined,
-    portToCheck: formData.portToCheck.trim()
-      ? parseInt(formData.portToCheck.trim(), 10)
-      : undefined,
-    portCheckTimeout:
-      formData.portCheckTimeout > 0 ? formData.portCheckTimeout : undefined,
     tags:
       formData.tags.filter((tag) => tag.trim()).length > 0
         ? formData.tags.filter((tag) => tag.trim()).map((tag) => tag.trim())
@@ -91,8 +84,6 @@ export const getEmptyFormData = (): AppConfigFormData => ({
   environmentVariables: {},
   autoLaunchBrowser: true,
   browserDelay: 0,
-  portToCheck: '',
-  portCheckTimeout: 30,
   tags: [],
 })
 
@@ -120,19 +111,8 @@ export function validateFormData(
     errors.name = 'An app with this name already exists'
   }
 
-  if (!formData.launchCommands.trim() && !formData.url.trim()) {
-    // Consider both url modes
-    const hasFile = formData.urlMode === 'file' && formData.filePath.trim()
-    const hasUrl = formData.urlMode === 'url' && formData.url.trim()
-    if (!hasFile && !hasUrl) {
-      errors.launchCommands = 'Either launch commands or URL/File is required'
-      if (formData.urlMode === 'file') {
-        errors.filePath = 'Either launch commands or URL/File is required'
-      } else {
-        errors.url = 'Either launch commands or URL/File is required'
-      }
-    }
-  } else if (
+  // Commands and URL/file are optional; enforce only length limits if present
+  if (
     formData.launchCommands.trim() &&
     formData.launchCommands.trim().length > 2000
   ) {
@@ -162,17 +142,7 @@ export function validateFormData(
     errors.browserDelay = 'Browser delay must be between 0 and 60 seconds'
   }
 
-  if (formData.portToCheck.trim()) {
-    const port = parseInt(formData.portToCheck.trim(), 10)
-    if (isNaN(port) || port < 1 || port > 65535) {
-      errors.portToCheck = 'Port must be a number between 1 and 65535'
-    }
-  }
-
-  if (formData.portCheckTimeout < 1 || formData.portCheckTimeout > 300) {
-    errors.portCheckTimeout =
-      'Port check timeout must be between 1 and 300 seconds'
-  }
+  // Removed port validation – field no longer exists in UI
 
   // Validate tags
   if (formData.tags.length > 10) {
