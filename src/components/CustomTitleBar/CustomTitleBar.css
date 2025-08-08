@@ -50,7 +50,7 @@
 }
 
 .title-bar-btn svg {
-  shape-rendering: geometricPrecision;
+  stroke-linecap: butt;
 }
 
 .title-bar-btn:hover {

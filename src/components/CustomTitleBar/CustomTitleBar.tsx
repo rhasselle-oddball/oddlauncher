@@ -32,7 +32,7 @@ export const CustomTitleBar: React.FC<CustomTitleBarProps> = ({ title }) => {
           <Maximize2 size={16} />
         </button>
                 <button className="title-bar-btn close" onClick={handleClose}>
-          <X size={16} strokeWidth={2.5} />
+          <X size={16} />
         </button>
       </div>
     </div>

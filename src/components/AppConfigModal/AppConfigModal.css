@@ -107,7 +107,7 @@
 }
 
 .close-button svg {
-  shape-rendering: geometricPrecision;
+  stroke-linecap: butt;
 }
 
 .close-button:hover {
@@ -351,7 +351,7 @@
 }
 
 .tag-remove svg {
-  shape-rendering: geometricPrecision;
+  stroke-linecap: butt;
 }
 
 .tag-remove:hover {

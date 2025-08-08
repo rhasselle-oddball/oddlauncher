@@ -87,7 +87,7 @@
 }
 
 .confirmation-modal__close svg {
-  shape-rendering: geometricPrecision;
+  stroke-linecap: butt;
 }
 
 .confirmation-modal__close:hover {

@@ -66,7 +66,7 @@ export function ConfirmationModal({
             onClick={handleCancelClick}
             aria-label="Close confirmation"
           >
-            <X size={24} strokeWidth={2.5} />
+            <X size={24} />
           </button>
         </div>
 
