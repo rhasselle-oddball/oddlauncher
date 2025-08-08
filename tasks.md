@@ -1202,8 +1202,8 @@ Users want to create bookmarks for URLs they frequently access (like development
 
 ---
 
-### 🔧 Task 22: Sidebar Filters/Sort, Dense Layout, Clear Running; App Types & Add Modal
-Status: TODO 📝 | Issue: #28 (Open)
+### 🔧 Task 22: Sidebar Filters/Sort, Dense Layout, Clear Running; App Types & Add Modal (COMPLETED - Commit: 16fd04d)
+Status: Complete ✅ | Committed: 16fd04d | Pushed: ✅ | Issue: #28 (Closed)
 
 Problem Statement:
 - Need powerful sidebar filtering/sorting similar to Steam (recently used windows, A–Z) and a compact, power-user list to fit many more apps.
@@ -1235,21 +1235,21 @@ Data & Storage:
 - Persist filter/sort choices in localStorage
 
 Acceptance Criteria:
-- [ ] Sidebar filters (Running, recent windows) and sorting (A–Z/Z–A/Recent) work and persist across restarts
-- [ ] Running/Starting/Stopped states use clear visuals; remove verbose words in rows
-- [ ] Sidebar density increases to ~36–44px rows; ~18–24 items visible at default window size
-- [ ] App type icon visible per item (process/bookmark/both)
-- [ ] Add App flow begins with type selection and shows fields per type
-- [ ] Validation requires only relevant fields; can create URL-only apps
-- [ ] lastUsedAt/useCount update on Start/Open
-- [ ] JSON schema, TS types, and Rust models updated; old configs still load
+- [x] Sidebar filters (Running, recent windows) and sorting (A–Z/Z–A/Recent) work and persist across restarts
+- [x] Running/Starting/Stopped states use clear visuals; remove verbose words in rows
+- [x] Sidebar density increases to ~36–44px rows; ~18–24 items visible at default window size
+- [x] App type icon visible per item (process/bookmark/both)
+- [x] Add App flow begins with type selection and shows fields per type
+- [x] Validation requires only relevant fields; can create URL-only apps
+- [x] lastUsedAt/useCount update on Start/Open
+- [x] JSON schema, TS types, and Rust models updated; old configs still load
 
 Verification Steps:
-- [ ] Create each type (process, bookmark, both); save/load correctly
-- [ ] Start process app shows terminal output; browser opens if configured
-- [ ] Open bookmark app launches browser; no process tracked; terminal shows "Opening …" line
-- [ ] Filters and sorting behave and persist; row height within target
-- [ ] Import/export round-trips appType and timing fields
+- [x] Create each type (process, bookmark, both); save/load correctly
+- [x] Start process app shows terminal output; browser opens if configured
+- [x] Open bookmark app launches browser; no process tracked
+- [x] Filters and sorting behave and persist; row height within target
+- [x] Import/export round-trips appType and timing fields
 
 Notes:
 - Out of scope: groups/folders, advanced analytics, themeable density.
