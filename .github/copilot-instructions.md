@@ -23,6 +23,9 @@ Oddbox is a native desktop application built with Tauri + React that acts like a
 
 **CRITICAL**: Every completed task must be committed, pushed, and have its GitHub issue closed before moving to the next task.
 
+Note on branching/PRs:
+- For this project, unless explicitly requested otherwise, do NOT create branches or pull requests. Work directly on main, using GitHub issues for tracking. Commits must reference and close the related issue.
+
 ### Task File Management
 
 - Keep `tasks.md` up-to-date with current progress
@@ -35,22 +38,35 @@ Oddbox is a native desktop application built with Tauri + React that acts like a
 
 ```bash
 # Create issue when starting a task
-gh issue create --title "Task Title" --body "Task description with acceptance criteria"
+gh issue create --title 'Task Title' --body 'Task description with acceptance criteria'
 
 # Commit and push with issue closure (preferred method)
-git commit -m "feat: implement feature
+git commit -m 'feat: implement feature
 
-Closes #<issue-number>"
+Closes #<issue-number>'
 git push
 
 # Close issue manually if auto-close didn't work
-gh issue close <issue-number> --comment "Task completed and code deployed"
+gh issue close <issue-number> --comment 'Task completed and code deployed'
 
 # Check current issues (ALWAYS use GH_PAGER=cat to prevent user intervention)
 GH_PAGER=cat gh issue list
 GH_PAGER=cat gh issue list --state=open
 GH_PAGER=cat gh issue list --state=closed
 ```
+
+Quoting and shell notes (zsh):
+- Always use single quotes for gh commands (titles, bodies, comments) to avoid zsh multiline/dquote prompts and accidental interpolation.
+- Avoid double quotes in gh command arguments. They can cause interactive prompts (dquote>) or expand variables unexpectedly.
+- If your text contains single quotes, either:
+  - Escape them: 'Don'\''t forget' or
+  - Use a here-doc with single-quoted terminator:
+    ```bash
+    gh issue create --title 'Complex Title' --body <<'EOF'
+    Multi-line body with 'single quotes' and $variables that should not expand.
+    EOF
+    ```
+- Always prefix GitHub CLI listing commands with GH_PAGER=cat to prevent pager/vim from opening and blocking the session.
 
 **IMPORTANT**: Always use `GH_PAGER=cat` with GitHub CLI commands to prevent pager/vim from opening and requiring user intervention. This ensures commands run without blocking.
 
@@ -125,12 +141,11 @@ GH_PAGER=cat gh issue list --state=closed
 - Graceful process termination
 
 ### Git Workflow
-
-- Create feature branches for each task
+// Project-specific override: prefer direct commits to main
+- Work directly on `main` (no branches/PRs unless requested)
 - Use conventional commits: `feat:`, `fix:`, `docs:`, `refactor:`
-- Squash commits before merging to main
-- Always run tests before pushing
-- Include issue number in commit messages
+- Always run tests/typechecks before pushing
+- Include issue number in commit messages (e.g., `Closes #24`)
 
 ### Error Handling Patterns
 

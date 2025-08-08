@@ -6,7 +6,7 @@ import tseslint from '@typescript-eslint/eslint-plugin'
 import tseslintParser from '@typescript-eslint/parser'
 
 export default [
-  { ignores: ['dist'] },
+  { ignores: ['dist', 'src-tauri/target'] },
   {
     files: ['**/*.{ts,tsx}'],
     languageOptions: {

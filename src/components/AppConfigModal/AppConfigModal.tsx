@@ -250,7 +250,7 @@ export function AppConfigModal({
                   rows={4}
                 />
                 <div className="form-help">
-                  Enter commands to run a process, or just a URL for bookmarks. Either commands or URL is required.
+                  Optional. Add commands to run a process, a URL/file to open in a browser, or both.
                 </div>
                 {errors.launchCommands && (
                   <div className="form-error">
@@ -333,7 +333,7 @@ export function AppConfigModal({
                         {errors.url}
                       </div>
                     )}
-                    <div className="form-help">URL to open in browser when app starts</div>
+                    <div className="form-help">Optional URL to open in your browser when the app starts</div>
                   </>
                 ) : (
                   <>
@@ -362,7 +362,7 @@ export function AppConfigModal({
                         {errors.filePath}
                       </div>
                     )}
-                    <div className="form-help">Choose a local file to open when the app starts</div>
+                    <div className="form-help">Optional local file to open when the app starts</div>
                   </>
                 )}
               </div>

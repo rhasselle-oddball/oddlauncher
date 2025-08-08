@@ -155,8 +155,8 @@ Based on the PRD, here are the development tasks organized by priority and depen
 
 ## Phase 4 - Advanced Features & Polish
 
-### Task 16: Bugfixes – AppConfig UX + Sidebar Live Refresh (IN PROGRESS)
-Status: In Progress 🚧 | Issue: (pending number)
+### ✅ Task 16: Bugfixes – AppConfig UX + Sidebar Live Refresh (COMPLETED - Commit: 8a76ea8)
+Status: Complete ✅ | Committed: 8a76ea8 | Pushed: ✅ | Issue: #24 (Closed)
 
 Reported problems:
 - AppConfigModal error styling shows red borders; want only background color change (no error borders).
@@ -166,21 +166,21 @@ Reported problems:
 - After editing an app title, the header updates but the sidebar remains stale.
 
 Acceptance criteria:
-- Error inputs in AppConfigModal do not show red borders; instead use a subtle background change only. No red focus ring/box-shadow.
-- Validation allows saving an app with any combination: commands only, URL/file only, both, or neither (name still required).
-- The “Port to check” (and timeout) fields are removed from the AppConfigModal UI and related validation; existing stored values are preserved in config but no longer editable.
-- Sidebar instantly reflects add, delete, and edit (title) changes without requiring manual reload or search interaction.
+- Error inputs in AppConfigModal do not show red borders; instead use a subtle background change only. No red focus ring/box-shadow. ✅
+- Validation allows saving an app with any combination: commands only, URL/file only, both, or neither (name still required). ✅
+- The “Port to check” (and timeout) fields are removed from the AppConfigModal UI and related validation; existing stored values are preserved in config but no longer editable. ✅
+- Sidebar instantly reflects add, delete, and edit (title) changes without requiring manual reload or search interaction. ✅
 
 Verification steps:
-- [ ] Try to submit an empty app with just a name: form submits successfully and saves.
-- [ ] Try commands only: saves successfully.
-- [ ] Try URL/file only: saves successfully.
-- [ ] Try both commands + URL/file: saves successfully.
-- [ ] No red borders/box-shadows appear on invalid fields; only background change is visible.
-- [ ] “Port to check” and timeout controls are not visible in the modal.
-- [ ] Add an app: new item appears in the sidebar immediately.
-- [ ] Delete an app: item disappears from the sidebar immediately.
-- [ ] Edit an app name: both header and sidebar show the new title immediately.
+- [x] Try to submit an empty app with just a name: form submits successfully and saves.
+- [x] Try commands only: saves successfully.
+- [x] Try URL/file only: saves successfully.
+- [x] Try both commands + URL/file: saves successfully.
+- [x] No red borders/box-shadows appear on invalid fields; only background change is visible.
+- [x] “Port to check” and timeout controls are not visible in the modal.
+- [x] Add an app: new item appears in the sidebar immediately.
+- [x] Delete an app: item disappears from the sidebar immediately.
+- [x] Edit an app name: both header and sidebar show the new title immediately.
 
 Planned changes:
 - CSS: adjust AppConfigModal error styles to remove border/box-shadow emphasis; keep simple background indication.
