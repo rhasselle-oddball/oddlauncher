@@ -3,6 +3,7 @@
  */
 
 import type { AppConfig } from '../../types'
+import { getAppType } from '../../types'
 import type {
   AppConfigFormData,
   AppConfigFormErrors,
@@ -18,6 +19,7 @@ export function appConfigToFormData(config: AppConfig): AppConfigFormData {
   const isFile = url.startsWith('file://')
   return {
     name: config.name || '',
+  appType: config.appType || getAppType(config),
     launchCommands: config.launchCommands || '',
     workingDirectory: config.workingDirectory || '',
     urlMode: isFile ? 'file' : 'url',
@@ -52,6 +54,7 @@ export function formDataToAppConfig(
   return {
     id: existingConfig?.id || crypto.randomUUID(),
     name: formData.name.trim(),
+  appType: formData.appType,
     launchCommands: formData.launchCommands.trim() || undefined,
     workingDirectory: formData.workingDirectory.trim() || undefined,
     url,
@@ -65,7 +68,7 @@ export function formDataToAppConfig(
       formData.tags.filter((tag) => tag.trim()).length > 0
         ? formData.tags.filter((tag) => tag.trim()).map((tag) => tag.trim())
         : undefined,
-    createdAt: existingConfig?.createdAt || now,
+  createdAt: existingConfig?.createdAt || now,
     updatedAt: now,
   }
 }
@@ -75,6 +78,7 @@ export function formDataToAppConfig(
  */
 export const getEmptyFormData = (): AppConfigFormData => ({
   name: '',
+  appType: 'process',
   launchCommands: '',
   workingDirectory: '',
   urlMode: 'url',
@@ -111,7 +115,29 @@ export function validateFormData(
     errors.name = 'An app with this name already exists'
   }
 
-  // Commands and URL/file are optional; enforce only length limits if present
+  // Validate appType-specific requirements
+  if (formData.appType === 'process') {
+    if (!formData.launchCommands.trim()) {
+      errors.launchCommands = 'Launch commands are required for process apps'
+    }
+  }
+  if (formData.appType === 'bookmark') {
+    const hasUrl = formData.urlMode === 'url' ? !!formData.url.trim() : !!formData.filePath.trim()
+    if (!hasUrl) {
+      errors.url = 'A URL or file is required for bookmark apps'
+    }
+  }
+  if (formData.appType === 'both') {
+    if (!formData.launchCommands.trim()) {
+      errors.launchCommands = 'Launch commands are required for apps that run and open a site'
+    }
+    const hasUrl = formData.urlMode === 'url' ? !!formData.url.trim() : !!formData.filePath.trim()
+    if (!hasUrl) {
+      errors.url = 'A URL or file is required for apps that run and open a site'
+    }
+  }
+
+  // Commands and URL/file length limits if present
   if (
     formData.launchCommands.trim() &&
     formData.launchCommands.trim().length > 2000

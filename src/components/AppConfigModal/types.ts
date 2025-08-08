@@ -9,6 +9,7 @@ import type { AppConfig } from '../../types'
  */
 export interface AppConfigFormData {
   name: string
+  appType: 'process' | 'bookmark' | 'both'
   launchCommands: string
   workingDirectory: string
   /** How the destination is provided */
@@ -28,6 +29,7 @@ export interface AppConfigFormData {
  */
 export interface AppConfigFormErrors {
   name?: string
+  appType?: string
   launchCommands?: string
   workingDirectory?: string
   url?: string

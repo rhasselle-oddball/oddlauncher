@@ -1,5 +1,6 @@
 import type { AppConfig } from '../../types'
-import { isBookmarkApp } from '../../types'
+import { getAppType, isBookmarkApp } from '../../types'
+import { TerminalSquare, Link2 } from 'lucide-react'
 import { useAppProcess } from '../../hooks/useProcessManager'
 import './AppListItem.css'
 
@@ -20,7 +21,7 @@ export function AppListItem({ app, isSelected, onClick }: AppListItemProps) {
   const getStatusDisplay = () => {
     // Check if this is a bookmark app
     if (isBookmarkApp(app)) {
-      return { text: 'Bookmark', icon: '', className: 'bookmark' }
+  return { text: 'Bookmark', icon: '', className: 'bookmark' }
     }
 
     // Process app status logic
@@ -36,7 +37,7 @@ export function AppListItem({ app, isSelected, onClick }: AppListItemProps) {
     if (hasError) {
       return { text: 'Error', icon: '', className: 'error' }
     }
-    return { text: 'Stopped', icon: '', className: 'stopped' }
+  return { text: 'Stopped', icon: '', className: 'stopped' }
   }
 
   const statusInfo = getStatusDisplay()
@@ -48,19 +49,30 @@ export function AppListItem({ app, isSelected, onClick }: AppListItemProps) {
     >
       <div className="app-list-item__content">
         <div className="app-list-item__header">
-          <h3 className="app-list-item__name">{app.name}</h3>
-          <div className={`app-list-item__status status-${statusInfo.className}`}>
+          <div className="app-list-item__name-row">
+            <span className="app-type-icon" title={getAppType(app)}>
+              {(() => {
+                const t = getAppType(app)
+                if (t === 'bookmark') return <Link2 size={12} />
+                if (t === 'process') return <TerminalSquare size={12} />
+                return (
+                  <span className="both-icons">
+                    <TerminalSquare size={12} />
+                    <Link2 size={12} />
+                  </span>
+                )
+              })()}
+            </span>
+            <h3 className="app-list-item__name" title={app.name}>{app.name}</h3>
+          </div>
+          <div className={`app-list-item__status status-${statusInfo.className}`} title={statusInfo.text}>
             <div className="status-icon"></div>
-            <span className="status-text">{statusInfo.text}</span>
           </div>
         </div>
-
         <div className="app-list-item__details">
-          {app.workingDirectory && (
-            <div className="app-list-item__directory" title={app.workingDirectory}>
-              {app.workingDirectory.replace(/^.*\//, '')}
-            </div>
-          )}
+          <div className="app-list-item__meta" title={app.url || app.workingDirectory || ''}>
+            {app.url ? (new URL(app.url).host || app.url) : (app.workingDirectory ? app.workingDirectory.replace(/^.*\//, '') : '')}
+          </div>
         </div>
       </div>
     </div>

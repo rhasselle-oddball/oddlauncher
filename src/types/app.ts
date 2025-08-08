@@ -15,7 +15,7 @@ export type AppStatus =
 /**
  * Type of application
  */
-export type AppType = 'process' | 'bookmark'
+export type AppType = 'process' | 'bookmark' | 'both'
 
 /**
  * Configuration for an individual app
@@ -43,6 +43,12 @@ export interface AppConfig {
   portCheckTimeout?: number
   /** Tags for organization and filtering (optional) */
   tags?: string[]
+  /** Explicit app type (process, bookmark, or both). If missing, inferred at runtime for back-compat */
+  appType?: AppType
+  /** Last time the app was used (process started or bookmark opened) */
+  lastUsedAt?: string
+  /** Total times the app has been used */
+  useCount?: number
   /** Creation timestamp */
   createdAt: string
   /** Last modified timestamp */
@@ -146,9 +152,14 @@ export type AppEvent =
  * Utility function to determine app type based on configuration
  */
 export const getAppType = (app: AppConfig): AppType => {
-  return app.launchCommands && app.launchCommands.trim()
-    ? 'process'
-    : 'bookmark'
+  // Prefer explicit type if present
+  if (app.appType) return app.appType
+
+  const hasCmd = !!(app.launchCommands && app.launchCommands.trim())
+  const hasUrl = !!(app.url && app.url.trim())
+  if (hasCmd && hasUrl) return 'both'
+  if (hasCmd) return 'process'
+  return 'bookmark'
 }
 
 /**
@@ -162,5 +173,9 @@ export const isBookmarkApp = (app: AppConfig): boolean => {
  * Check if an app is a process app
  */
 export const isProcessApp = (app: AppConfig): boolean => {
-  return getAppType(app) === 'process'
+  const t = getAppType(app)
+  return t === 'process' || t === 'both'
 }
+
+/** Check if an app is of type both */
+export const isBothApp = (app: AppConfig): boolean => getAppType(app) === 'both'

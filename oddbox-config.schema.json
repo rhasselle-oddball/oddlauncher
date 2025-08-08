@@ -95,6 +95,21 @@
           },
           "uniqueItems": true
         },
+        "appType": {
+          "type": "string",
+          "description": "Explicit app type (process | bookmark | both)",
+          "enum": ["process", "bookmark", "both"]
+        },
+        "lastUsedAt": {
+          "type": "string",
+          "description": "Last time app was used (RFC3339)",
+          "format": "date-time"
+        },
+        "useCount": {
+          "type": "integer",
+          "description": "Total number of times the app has been used",
+          "minimum": 0
+        },
         "createdAt": {
           "type": "string",
           "description": "Creation timestamp in RFC3339 format",

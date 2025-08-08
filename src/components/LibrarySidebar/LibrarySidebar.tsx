@@ -3,6 +3,8 @@ import { Smartphone, Search } from 'lucide-react'
 import { AppListItem } from '../AppListItem'
 import { useConfigManager } from '../../hooks/useConfig'
 import type { AppConfig } from '../../types'
+// import { getAppType } from '../../types'
+import { useProcessManager } from '../../hooks/useProcessManager'
 import {
   DndContext,
   DragEndEvent,
@@ -29,9 +31,36 @@ interface LibrarySidebarProps {
 
 export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configManager: externalManager }: LibrarySidebarProps) {
   const [searchQuery, setSearchQuery] = useState('')
+  const [showRunningOnly, setShowRunningOnly] = useState(false)
+  const [recentWindow, setRecentWindow] = useState<'none' | 'thisMonth' | 'lastMonth' | 'last3Months'>('none')
+  const [sortBy, setSortBy] = useState<'recent' | 'az' | 'za'>('recent')
   const [localAppOrder, setLocalAppOrder] = useState<AppConfig[]>([])
   const internalManager = useConfigManager()
   const configManager = externalManager || internalManager
+  const { processes } = useProcessManager()
+  // Restore persisted filters
+  useEffect(() => {
+    try {
+      const persisted = localStorage.getItem('sidebarFilters')
+      if (persisted) {
+        const parsed = JSON.parse(persisted)
+        if (typeof parsed.showRunningOnly === 'boolean') setShowRunningOnly(parsed.showRunningOnly)
+        if (parsed.recentWindow) setRecentWindow(parsed.recentWindow)
+        if (parsed.sortBy) setSortBy(parsed.sortBy)
+      }
+    } catch (e) {
+      console.warn('Failed to restore sidebar filters', e)
+    }
+  }, [])
+
+  // Persist filters
+  useEffect(() => {
+    try {
+      localStorage.setItem('sidebarFilters', JSON.stringify({ showRunningOnly, recentWindow, sortBy }))
+    } catch (e) {
+      console.warn('Failed to persist sidebar filters', e)
+    }
+  }, [showRunningOnly, recentWindow, sortBy])
 
   // Set up drag sensors
   const sensors = useSensors(
@@ -49,21 +78,61 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configMan
     }
   }, [configManager.config?.apps])
 
-  // Filter apps based on search query - use localAppOrder when not searching
+  // Filter + sort apps
   const filteredApps = useMemo(() => {
-    const appsToFilter = searchQuery.trim() ? configManager.config?.apps || [] : localAppOrder
+    const appsSource = searchQuery.trim() ? (configManager.config?.apps || []) : localAppOrder
+    const now = new Date()
 
-    if (!searchQuery.trim()) {
-      return appsToFilter
+    const inRecentWindow = (app: AppConfig) => {
+      if (recentWindow === 'none') return true
+      const ts = app.lastUsedAt ? new Date(app.lastUsedAt) : null
+      if (!ts) return false
+      const month = now.getMonth()
+      const year = now.getFullYear()
+      const appMonth = ts.getMonth()
+      const appYear = ts.getFullYear()
+      if (recentWindow === 'thisMonth') return appYear === year && appMonth === month
+      if (recentWindow === 'lastMonth') {
+        const lastMonth = (month + 11) % 12
+        const lastYear = month === 0 ? year - 1 : year
+        return appYear === lastYear && appMonth === lastMonth
+      }
+      if (recentWindow === 'last3Months') {
+        const diffMonths = (year - appYear) * 12 + (month - appMonth)
+        return diffMonths >= 0 && diffMonths <= 2
+      }
+      return true
     }
 
-    const query = searchQuery.toLowerCase().trim()
-    return appsToFilter.filter(app =>
-      app.name.toLowerCase().includes(query) ||
-      (app.launchCommands && app.launchCommands.toLowerCase().includes(query)) ||
-      (app.tags && app.tags.some(tag => tag.toLowerCase().includes(query)))
-    )
-  }, [configManager.config?.apps, localAppOrder, searchQuery])
+    const matchesSearch = (app: AppConfig) => {
+      if (!searchQuery.trim()) return true
+      const q = searchQuery.toLowerCase().trim()
+      return (
+        app.name.toLowerCase().includes(q) ||
+        (app.launchCommands && app.launchCommands.toLowerCase().includes(q)) ||
+        (app.tags && app.tags.some(tag => tag.toLowerCase().includes(q)))
+      )
+    }
+
+    let list = appsSource.filter(app => matchesSearch(app) && inRecentWindow(app))
+
+    if (showRunningOnly) {
+      // Use live process state to include only currently running apps
+      list = list.filter(a => processes[a.id]?.status === 'running')
+    }
+
+    // Sorting
+    list = [...list]
+    if (sortBy === 'recent') {
+      list.sort((a, b) => (b.lastUsedAt ? Date.parse(b.lastUsedAt) : 0) - (a.lastUsedAt ? Date.parse(a.lastUsedAt) : 0))
+    } else if (sortBy === 'az') {
+      list.sort((a, b) => a.name.localeCompare(b.name))
+    } else if (sortBy === 'za') {
+      list.sort((a, b) => b.name.localeCompare(a.name))
+    }
+
+    return list
+  }, [configManager.config?.apps, localAppOrder, searchQuery, showRunningOnly, recentWindow, sortBy, processes])
 
   // Handle drag end - reorder apps
   const handleDragEnd = async (event: DragEndEvent) => {
@@ -223,6 +292,22 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configMan
           value={searchQuery}
           onChange={handleSearchChange}
         />
+        <div className="sidebar-filters">
+          <label className="filter-chip">
+            <input type="checkbox" checked={showRunningOnly} onChange={(e) => setShowRunningOnly(e.target.checked)} /> Running
+          </label>
+          <select className="filter-select" value={recentWindow} onChange={(e) => setRecentWindow(e.target.value as 'none' | 'thisMonth' | 'lastMonth' | 'last3Months')}>
+            <option value="none">All time</option>
+            <option value="thisMonth">This month</option>
+            <option value="lastMonth">Last month</option>
+            <option value="last3Months">Last 3 months</option>
+          </select>
+          <select className="filter-select" value={sortBy} onChange={(e) => setSortBy(e.target.value as 'recent' | 'az' | 'za')}>
+            <option value="recent">Sort: Recently used</option>
+            <option value="az">Sort: A–Z</option>
+            <option value="za">Sort: Z–A</option>
+          </select>
+        </div>
       </div>
 
       <div className="app-list">

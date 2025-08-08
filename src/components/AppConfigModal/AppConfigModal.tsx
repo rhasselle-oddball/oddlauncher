@@ -213,6 +213,36 @@ export function AppConfigModal({
         <form onSubmit={handleSubmit}>
           <div className="modal-body">
             <div className="form-grid">
+              {/* App Type */}
+              <div className="form-group">
+                <label className="form-label">What is this?</label>
+                <div className="toggle-group" role="tablist" aria-label="App Type">
+                  <button
+                    type="button"
+                    className={`toggle-button ${formData.appType === 'both' ? 'active' : ''}`}
+                    onClick={() => handleInputChange('appType', 'both')}
+                    aria-pressed={formData.appType === 'both'}
+                  >
+                    Terminal + Browser
+                  </button>
+                  <button
+                    type="button"
+                    className={`toggle-button ${formData.appType === 'bookmark' ? 'active' : ''}`}
+                    onClick={() => handleInputChange('appType', 'bookmark')}
+                    aria-pressed={formData.appType === 'bookmark'}
+                  >
+                    Just Browser (Bookmark)
+                  </button>
+                  <button
+                    type="button"
+                    className={`toggle-button ${formData.appType === 'process' ? 'active' : ''}`}
+                    onClick={() => handleInputChange('appType', 'process')}
+                    aria-pressed={formData.appType === 'process'}
+                  >
+                    Just Terminal
+                  </button>
+                </div>
+              </div>
               {/* App Name */}
               <div className="form-group">
                 <label htmlFor="name" className="form-label">
@@ -235,8 +265,8 @@ export function AppConfigModal({
                 )}
               </div>
 
-              {/* Launch Commands */}
-              <div className="form-group">
+        {/* Launch Commands */}
+        <div className="form-group">
                 <label htmlFor="launchCommands" className="form-label">
                   Launch Commands
                 </label>
@@ -250,7 +280,7 @@ export function AppConfigModal({
                   rows={4}
                 />
                 <div className="form-help">
-                  Optional. Add commands to run a process, a URL/file to open in a browser, or both.
+          {formData.appType === 'bookmark' ? 'Ignored for bookmarks.' : 'Required for terminal apps.'}
                 </div>
                 {errors.launchCommands && (
                   <div className="form-error">
@@ -317,7 +347,7 @@ export function AppConfigModal({
                   </button>
                 </div>
 
-                {formData.urlMode === 'url' ? (
+        {formData.urlMode === 'url' ? (
                   <>
                     <input
                       id="url"
@@ -333,7 +363,7 @@ export function AppConfigModal({
                         {errors.url}
                       </div>
                     )}
-                    <div className="form-help">Optional URL to open in your browser when the app starts</div>
+          <div className="form-help">{formData.appType === 'process' ? 'Optional for pure terminal apps.' : 'Required for bookmarks and apps that also open a site.'}</div>
                   </>
                 ) : (
                   <>
@@ -362,7 +392,7 @@ export function AppConfigModal({
                         {errors.filePath}
                       </div>
                     )}
-                    <div className="form-help">Optional local file to open when the app starts</div>
+                    <div className="form-help">{formData.appType === 'process' ? 'Optional for pure terminal apps.' : 'Required for bookmarks and apps that also open a site.'}</div>
                   </>
                 )}
               </div>

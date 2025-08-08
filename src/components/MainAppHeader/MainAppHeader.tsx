@@ -1,8 +1,9 @@
 import { Play, Square, Loader, Edit, Trash2, ExternalLink } from 'lucide-react'
 import type { AppConfig } from '../../types'
-import { isBookmarkApp } from '../../types'
+import { getAppType, isBookmarkApp } from '../../types'
 import { useAppProcess } from '../../hooks/useProcessManager'
 import { useBrowser } from '../../hooks/useBrowser'
+import { useConfigManager } from '../../hooks/useConfig'
 import './MainAppHeader.css'
 
 interface MainAppHeaderProps {
@@ -32,10 +33,11 @@ export function MainAppHeader({
 
   // Use browser functionality for manual URL opening
   const { openUrlInBrowser } = useBrowser()
+  const configManager = useConfigManager()
 
   const getStatusDisplay = () => {
     // Check if this is a bookmark app
-    const isBookmark = selectedApp ? isBookmarkApp(selectedApp) : false
+  const isBookmark = selectedApp ? getAppType(selectedApp) === 'bookmark' : false
 
     if (isBookmark) {
       // Bookmark apps just show "Open" button
@@ -67,6 +69,15 @@ export function MainAppHeader({
         // For bookmark apps, just open the URL
         if (selectedApp.url) {
           await openUrlInBrowser(selectedApp.url)
+          // Bump usage on successful open
+          const now = new Date().toISOString()
+          const updated = {
+            ...selectedApp,
+            lastUsedAt: now,
+            useCount: (selectedApp.useCount || 0) + 1,
+            updatedAt: now,
+          }
+          await configManager.updateApp(updated)
         }
         return
       }
@@ -75,7 +86,7 @@ export function MainAppHeader({
       if (isRunning) {
         await stop()
       } else {
-        await start(
+        const result = await start(
           selectedApp.launchCommands || '',
           selectedApp.workingDirectory,
           selectedApp.environmentVariables,
@@ -85,6 +96,17 @@ export function MainAppHeader({
           selectedApp.portToCheck,
           selectedApp.portCheckTimeout
         )
+        // If process started successfully, bump usage
+        if (result?.success) {
+          const now = new Date().toISOString()
+          const updated = {
+            ...selectedApp,
+            lastUsedAt: now,
+            useCount: (selectedApp.useCount || 0) + 1,
+            updatedAt: now,
+          }
+          await configManager.updateApp(updated)
+        }
       }
     } catch (error) {
       console.error('Failed to start/stop process:', error)
@@ -107,6 +129,15 @@ export function MainAppHeader({
     if (selectedApp && selectedApp.url) {
       try {
         await openUrlInBrowser(selectedApp.url)
+        // Consider URL open as a usage event too
+        const now = new Date().toISOString()
+        const updated = {
+          ...selectedApp,
+          lastUsedAt: now,
+          useCount: (selectedApp.useCount || 0) + 1,
+          updatedAt: now,
+        }
+        await configManager.updateApp(updated)
       } catch (error) {
         console.error('Failed to open URL:', error)
       }

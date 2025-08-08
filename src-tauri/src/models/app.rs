@@ -48,6 +48,12 @@ pub struct AppConfig {
     pub port_check_timeout: Option<u32>,
     /// Tags for organization and filtering (optional)
     pub tags: Option<Vec<String>>,
+    /// Explicit app type (process, bookmark, both) - optional for back-compat
+    pub app_type: Option<AppType>,
+    /// Last time the app was used (process started or bookmark opened)
+    pub last_used_at: Option<String>,
+    /// Total times the app has been used
+    pub use_count: Option<u64>,
     /// Creation timestamp
     pub created_at: String,
     /// Last modified timestamp
@@ -202,14 +208,31 @@ pub enum AppEvent {
 pub enum AppType {
     Process,
     Bookmark,
+    Both,
 }
 
 impl AppConfig {
     /// Determine the type of app based on configuration
     pub fn get_app_type(&self) -> AppType {
-        match &self.launch_commands {
-            Some(commands) if !commands.trim().is_empty() => AppType::Process,
-            _ => AppType::Bookmark,
+        if let Some(t) = &self.app_type {
+            return t.clone();
+        }
+        let has_cmd = self
+            .launch_commands
+            .as_ref()
+            .map(|s| !s.trim().is_empty())
+            .unwrap_or(false);
+        let has_url = self
+            .url
+            .as_ref()
+            .map(|s| !s.trim().is_empty())
+            .unwrap_or(false);
+        if has_cmd && has_url {
+            AppType::Both
+        } else if has_cmd {
+            AppType::Process
+        } else {
+            AppType::Bookmark
         }
     }
 
@@ -220,6 +243,9 @@ impl AppConfig {
 
     /// Check if this is a process app
     pub fn is_process_app(&self) -> bool {
-        self.get_app_type() == AppType::Process
+        match self.get_app_type() {
+            AppType::Process | AppType::Both => true,
+            _ => false,
+        }
     }
 }
