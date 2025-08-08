@@ -1,12 +1,12 @@
-/* Global styles for Oddbox - Dark theme as specified in PRD */
+/* Global styles for OddLauncher - Dark theme as specified in PRD */
 :root {
   --bg-primary: #1e1e1e;
   --bg-secondary: #2d2d2d;
   --bg-tertiary: #3c3c3c;
   --text-primary: #ffffff;
   --text-secondary: #b3b3b3;
-  --accent-blue: #007acc;
-  --accent-green: #4fc3f7;
+  --accent-blue: #00A187; /* teal primary */
+  --accent-green: #00A187; /* align any green to primary */
   --accent-red: #f44336;
   --border-color: #404040;
   --hover-color: #4a4a4a;
@@ -114,7 +114,7 @@ code {
 }
 
 .test-button:hover:not(:disabled) {
-  background-color: #0056b3;
+  background-color: #008b76;
   transform: translateY(-2px);
 }
 

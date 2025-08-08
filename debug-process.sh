@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# Debug script for Oddbox process issues
+# Debug script for OddLauncher process issues
 # This script helps debug common issues with starting processes
 
-echo "=== Oddbox Process Debug Helper ==="
+echo "=== OddLauncher Process Debug Helper ==="
 echo "Date: $(date)"
 echo "OS: $(uname -a)"
 echo ""

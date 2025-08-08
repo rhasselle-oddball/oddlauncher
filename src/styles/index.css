@@ -37,7 +37,7 @@ body {
   --icon-lg: 24px;
 }
 
-/* Dark theme base colors for Oddbox */
+/* Dark theme base colors for OddLauncher */
 :root {
   --bg-primary: #1a1a1a;
   --bg-secondary: #2d2d2d;
@@ -45,8 +45,9 @@ body {
   --text-primary: #ffffff;
   --text-secondary: #b3b3b3;
   --text-muted: #808080;
-  --accent-primary: #007acc;
-  --accent-hover: #005999;
+  /* Primary action color (teal) */
+  --accent-blue: #00A187; /* keep token name for minimal change */
+  --accent-hover: #008b76;
   --border: #404040;
   --success: #28a745;
   --danger: #dc3545;

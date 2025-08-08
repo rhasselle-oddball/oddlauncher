@@ -1,5 +1,5 @@
 /**
- * Core application data types for Oddbox
+ * Core application data types for OddLauncher
  */
 
 /**

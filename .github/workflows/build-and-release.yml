@@ -9,7 +9,7 @@ on:
       create_release:
         description: 'Create a new release'
         required: false
-        default: 'false'
+  default: false
         type: boolean
 
 jobs:
@@ -79,14 +79,14 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         with:
           tagName: ${{ github.ref_name }}
-          releaseName: 'Oddbox v__VERSION__'
+          releaseName: 'OddLauncher v__VERSION__'
           releaseBody: |
             See the assets below to download this version and install.
 
             **Installation on macOS:**
             - Download the appropriate .dmg file for your Mac
-            - If you get a "damaged" warning, run: `xattr -d com.apple.quarantine ~/Downloads/oddbox*.dmg`
-            - Then mount the .dmg and drag oddbox.app to Applications
+            - If you get a "damaged" warning, run: `xattr -d com.apple.quarantine ~/Downloads/oddlauncher*.dmg`
+            - Then mount the .dmg and drag OddLauncher.app to Applications
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
@@ -100,9 +100,9 @@ jobs:
         run: |
           echo "## Release Assets" >> $GITHUB_STEP_SUMMARY
           echo "The following builds have been created:" >> $GITHUB_STEP_SUMMARY
-          echo "- **macOS (Intel)**: oddbox_*_x64.dmg" >> $GITHUB_STEP_SUMMARY
-          echo "- **macOS (Apple Silicon)**: oddbox_*_aarch64.dmg" >> $GITHUB_STEP_SUMMARY
-          echo "- **Windows**: oddbox_*_x64_en-US.msi" >> $GITHUB_STEP_SUMMARY
-          echo "- **Linux**: oddbox_*_amd64.deb, oddbox_*_amd64.AppImage" >> $GITHUB_STEP_SUMMARY
+          echo "- **macOS (Intel)**: oddlauncher_*_x64.dmg" >> $GITHUB_STEP_SUMMARY
+          echo "- **macOS (Apple Silicon)**: oddlauncher_*_aarch64.dmg" >> $GITHUB_STEP_SUMMARY
+          echo "- **Windows**: oddlauncher_*_x64_en-US.msi" >> $GITHUB_STEP_SUMMARY
+          echo "- **Linux**: oddlauncher_*_amd64.deb, oddlauncher_*_amd64.AppImage" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "Check the [Releases page](https://github.com/${{ github.repository }}/releases) for downloads." >> $GITHUB_STEP_SUMMARY

@@ -4,10 +4,10 @@ use std::fs;
 use std::path::PathBuf;
 use tauri::AppHandle;
 
-/// Get the path to the Oddbox configuration directory (~/.oddbox/)
+/// Get the path to the OddLauncher configuration directory (~/.oddlauncher/)
 fn get_config_dir() -> AppResult<PathBuf> {
     match dirs::home_dir() {
-        Some(home) => Ok(home.join(".oddbox")),
+        Some(home) => Ok(home.join(".oddlauncher")),
         None => Err(AppError::new(
             "HOME_DIR_ERROR",
             "Could not determine user home directory",
@@ -15,7 +15,7 @@ fn get_config_dir() -> AppResult<PathBuf> {
     }
 }
 
-/// Get the path to the main configuration file (~/.oddbox/apps.json)
+/// Get the path to the main configuration file (~/.oddlauncher/apps.json)
 fn get_config_file_path() -> AppResult<PathBuf> {
     Ok(get_config_dir()?.join("apps.json"))
 }
@@ -43,6 +43,27 @@ pub async fn load_config(_app: AppHandle) -> AppResult<GlobalConfig> {
     log::info!("Loading configuration from file");
 
     let config_file = get_config_file_path()?;
+
+    // Migration fallback: if new file doesn't exist, try old Oddbox path
+    if !config_file.exists() {
+        if let Some(home) = dirs::home_dir() {
+            let legacy_dir = home.join(".oddbox");
+            let legacy_file = legacy_dir.join("apps.json");
+            if legacy_file.exists() {
+                log::info!(
+                    "Legacy config detected at {:?}; loading for migration",
+                    legacy_file
+                );
+                let content = fs::read_to_string(&legacy_file).map_err(|e| {
+                    AppError::new("FILE_READ_ERROR", &format!("Failed to read legacy config file: {}", e))
+                })?;
+                let config: GlobalConfig = serde_json::from_str(&content).map_err(|e| {
+                    AppError::new("JSON_PARSE_ERROR", &format!("Failed to parse legacy config file: {}", e))
+                })?;
+                return Ok(config);
+            }
+        }
+    }
 
     // If config file doesn't exist, return default config
     if !config_file.exists() {

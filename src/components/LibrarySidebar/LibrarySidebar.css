@@ -46,7 +46,7 @@
 .search-input:focus {
   outline: none;
   border-color: var(--accent-blue);
-  box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.1);
+  box-shadow: 0 0 0 2px rgba(0, 161, 135, 0.2);
 }
 
 .search-input::placeholder {
@@ -152,7 +152,7 @@
 }
 
 .retry-button:hover {
-  background: #005999;
+  background: var(--accent-hover);
 }
 
 /* Empty State */
@@ -202,9 +202,9 @@
 }
 
 .add-app-button:hover {
-  background: #005999;
+  background: var(--accent-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 122, 204, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 161, 135, 0.3);
 }
 
 .add-app-button:active {
@@ -217,7 +217,7 @@
 }
 
 .add-app-button.primary:hover {
-  background: #005999;
+  background: var(--accent-hover);
 }
 
 /* Responsive Design */

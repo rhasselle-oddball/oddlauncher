@@ -1,4 +1,4 @@
-# Oddbox Development Tasks
+# OddLauncher Development Tasks
 
 Based on the PRD, here are the development tasks organized by priority and dependency. Each task should become a GitHub issue when started.
 

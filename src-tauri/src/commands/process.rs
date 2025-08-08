@@ -14,7 +14,7 @@ use std::os::unix::process::CommandExt;
 #[cfg(unix)]
 use libc;
 
-// Process management module for Oddbox application
+// Process management module for OddLauncher application
 
 /**
  * Cross-platform path and command utilities
@@ -264,7 +264,7 @@ fn prepare_unix_multi_command(commands: &[&str], working_dir: Option<&str>) -> R
     let mut script_lines = vec!["#!/bin/bash".to_string(), "set -e".to_string()];
 
     // Add initial logging to show what we're executing
-    script_lines.push("echo \"Oddbox: Starting app process...\"".to_string());
+    script_lines.push("echo \"OddLauncher: Starting app process...\"".to_string());
 
     // Check if any commands use nvm, rbenv, or other version managers that need shell initialization
     let needs_nvm = commands.iter().any(|cmd| {
@@ -301,13 +301,13 @@ fn prepare_unix_multi_command(commands: &[&str], working_dir: Option<&str>) -> R
     // Add working directory change if specified
     if let Some(dir) = working_dir {
         let normalized_dir = platform_utils::normalize_path(dir)?;
-        script_lines.push(format!("echo \"Oddbox: Changing to working directory: {}\"", normalized_dir));
+    script_lines.push(format!("echo \"OddLauncher: Changing to working directory: {}\"", normalized_dir));
         script_lines.push(format!("cd '{}'", normalized_dir));
     }
 
     // Add command execution with logging
     for (i, command) in commands.iter().enumerate() {
-        script_lines.push(format!("echo \"Oddbox: Executing command {}: {}\"", i + 1, command));
+    script_lines.push(format!("echo \"OddLauncher: Executing command {}: {}\"", i + 1, command));
         script_lines.push(command.to_string());
     }
 
@@ -746,7 +746,7 @@ pub async fn start_app_process(
                 let _ = app_handle_monitor.emit("process-output", serde_json::json!({
                     "appId": app_id_monitor,
                     "type": "stdout",
-                    "content": format!("Oddbox: Process exited with code {:?}", status.code()),
+                    "content": format!("OddLauncher: Process exited with code {:?}", status.code()),
                     "timestamp": chrono::Utc::now().to_rfc3339()
                 }));
 
@@ -762,7 +762,7 @@ pub async fn start_app_process(
                 let _ = app_handle_monitor.emit("process-output", serde_json::json!({
                     "appId": app_id_monitor,
                     "type": "stderr",
-                    "content": format!("Oddbox: Process wait failed: {}", e),
+                    "content": format!("OddLauncher: Process wait failed: {}", e),
                     "timestamp": chrono::Utc::now().to_rfc3339()
                 }));
 
@@ -1076,7 +1076,7 @@ pub async fn stop_app_process(
     let _ = app_handle.emit("process-output", serde_json::json!({
         "appId": app_id,
         "type": "stdout",
-        "content": "Oddbox: Process stopped",
+    "content": "OddLauncher: Process stopped",
         "timestamp": chrono::Utc::now().to_rfc3339()
     }));
 

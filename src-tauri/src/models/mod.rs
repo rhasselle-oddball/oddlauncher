@@ -1,5 +1,5 @@
 /**
- * Data models for Oddbox application
+ * Data models for OddLauncher application
  */
 
 pub mod app;

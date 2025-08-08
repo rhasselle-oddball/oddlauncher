@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "oddbox",
+  "productName": "OddLauncher",
   "version": "0.1.0",
-  "identifier": "com.oddbox.dev",
+  "identifier": "com.oddlauncher.dev",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:5173",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "Oddbox - Dev Tools Launcher",
+  "title": "OddLauncher - Dev Tools Launcher",
   "width": 1400,
   "height": 900,
   "minWidth": 1100,

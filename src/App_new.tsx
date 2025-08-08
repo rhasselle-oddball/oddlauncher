@@ -36,7 +36,7 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>🎛️ Oddbox</h1>
+  <h1>🎛️ OddLauncher</h1>
         <p>Your Steam Library for Dev Tools</p>
 
         {/* Temporary test buttons - will be removed in final version */}

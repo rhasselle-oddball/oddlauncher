@@ -1,8 +1,8 @@
-# Oddbox – Product Requirements Document (PRD)
+# OddLauncher – Product Requirements Document (PRD)
 
 ## 🌟 Product Vision
 
-**Oddbox** is a native desktop application that acts like a **Steam Library for your dev tools**. It lets users launch local development servers with a single click, run their startup command (e.g. `npm run dev`), view terminal output in real-time, and open the relevant browser tab — all without ever touching a terminal.
+**OddLauncher** is a native desktop application that acts like a **Steam Library for your dev tools**. It lets users launch local development servers with a single click, run their startup command (e.g. `npm run dev`), view terminal output in real-time, and open the relevant browser tab — all without ever touching a terminal.
 
 ---
 
@@ -29,7 +29,7 @@
 
 ### ✅ 2. App Configuration
 
-Stored in a local JSON file (e.g. `~/.oddbox/apps.json`):
+Stored in a local JSON file (e.g. `~/.oddlauncher/apps.json`):
 
 ```json
 {
@@ -86,14 +86,14 @@ Stored in a local JSON file (e.g. `~/.oddbox/apps.json`):
 | ---------- | ---------------------------------------- |
 | UI         | Tauri + React + TypeScript               |
 | Backend    | Tauri Rust backend using `Command`       |
-| Storage    | JSON file (`~/.oddbox/apps.json`)        |
+| Storage    | JSON file (`~/.oddlauncher/apps.json`)        |
 | Log View   | Live pipe of `stdout`/`stderr`           |
 | Screenshot | User-uploaded thumbnails                  |
 
 ## 📁 Project Structure
 
 ```
-oddbox/
+oddlauncher/
 ├── prd.md                    # Product Requirements Document
 ├── tasks.md                  # Development task tracker
 ├── README.md                 # Project setup and documentation
@@ -129,7 +129,7 @@ oddbox/
 
 ## 🔧 Example Flow
 
-1. User opens Oddbox
+1. User opens OddLauncher
 2. Sees a grid of their dev apps
 3. Clicks ▶️ on "26-4555"
 4. App runs `yarn watch --env=adapted-home-grants-4555` in background
@@ -167,5 +167,5 @@ oddbox/
 
 ## ✅ Summary
 
-> **Oddbox** is a no-terminal, click-to-run launcher for dev tools. Think: **Steam for local dev servers** — with live logs, instant browser launch, and a friendly UI.
+> **OddLauncher** is a no-terminal, click-to-run launcher for dev tools. Think: **Steam for local dev servers** — with live logs, instant browser launch, and a friendly UI.
 

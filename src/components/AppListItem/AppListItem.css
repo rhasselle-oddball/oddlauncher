@@ -21,12 +21,12 @@
 
 .app-list-item.selected {
   border-color: var(--accent-blue);
-  background-color: rgba(0, 122, 204, 0.12);
+  background-color: rgba(0, 161, 135, 0.12);
 }
 
 .app-list-item.selected:hover {
-  background-color: rgba(0, 122, 204, 0.2);
-  box-shadow: 0 2px 8px rgba(0, 122, 204, 0.35);
+  background-color: rgba(0, 161, 135, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 161, 135, 0.35);
 }
 
 /* Content */
@@ -65,7 +65,7 @@
 
 .status-running {
   color: var(--accent-blue);
-  background: rgba(0, 122, 204, 0.1);
+  background: rgba(0, 161, 135, 0.1);
 }
 
 .status-starting,
@@ -86,7 +86,7 @@
 
 .status-bookmark {
   color: var(--accent-blue);
-  background: rgba(33, 150, 243, 0.1);
+  background: rgba(0, 161, 135, 0.1);
 }
 
 .status-icon {
@@ -167,9 +167,9 @@
   transform: translateY(-1px);
 }
 .row-action.idle { color: #ffffff; background: var(--accent-blue); }
-.row-action.idle:hover { background: rgba(0, 122, 204, 0.9); color: #ffffff; }
+.row-action.idle:hover { background: var(--accent-hover); color: #ffffff; }
 .row-action.terminal.running { color: white; background: var(--accent-red); }
-.row-action:focus { outline: none; box-shadow: 0 0 0 2px rgba(0,122,204,0.25); }
+.row-action:focus { outline: none; box-shadow: 0 0 0 2px rgba(0,161,135,0.25); }
 
 /* Hover Effects */
 .app-list-item:hover .app-list-item__name {

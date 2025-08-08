@@ -2,11 +2,11 @@
 applyTo: '**'
 ---
 
-# Oddbox Development Instructions for GitHub Copilot
+# OddLauncher Development Instructions for GitHub Copilot
 
 ## Project Overview
 
-Oddbox is a native desktop application built with Tauri + React that acts like a "Steam Library for dev tools". It provides a GUI-first way to launch local development servers with a single click, view terminal output in real-time, and open browser tabs automatically.
+OddLauncher is a native desktop application built with Tauri + React that acts like a "Steam Library for dev tools". It provides a GUI-first way to launch local development servers with a single click, view terminal output in real-time, and open browser tabs automatically.
 
 ## Task Management Workflow
 
@@ -85,7 +85,7 @@ Quoting and shell notes (zsh):
 - **Backend**: Rust Tauri backend in `/src-tauri/`
   - `/src-tauri/src/commands/` - Tauri command handlers
   - `/src-tauri/src/models/` - Rust data structures and models
-- **Configuration**: JSON storage at `~/.oddbox/apps.json`
+- **Configuration**: JSON storage at `~/.oddlauncher/apps.json`
 - **Assets**: Screenshots/thumbnails in local storage
 - **Build Output**: Generated frontend in `/dist/`
 

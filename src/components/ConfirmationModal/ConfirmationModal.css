@@ -68,7 +68,7 @@
 }
 
 .confirmation-modal--info .confirmation-modal__title svg {
-  color: var(--color-info, #3b82f6);
+  color: var(--color-info, #00A187);
 }
 
 .confirmation-modal__close {
@@ -193,17 +193,17 @@
 }
 
 .confirmation-modal__button--info {
-  background: var(--color-info, #3b82f6);
+  background: var(--color-info, #00A187);
 }
 
 .confirmation-modal__button--info:hover {
-  background: #2563eb;
+  background: #008b76;
 }
 
 /* Focus states for accessibility */
 .confirmation-modal__button:focus,
 .confirmation-modal__close:focus {
-  outline: 2px solid var(--color-primary, #3b82f6);
+  outline: 2px solid var(--color-primary, #00A187);
   outline-offset: 2px;
 }
 

@@ -7,7 +7,7 @@ interface AppLayoutProps {
   mainContent: ReactNode
 }
 
-const STORAGE_KEY = 'oddbox-layout-state'
+const STORAGE_KEY = 'oddlauncher-layout-state'
 const DEFAULT_SIDEBAR_WIDTH = 300
 const MIN_SIDEBAR_WIDTH = 200
 const MAX_SIDEBAR_WIDTH = 600

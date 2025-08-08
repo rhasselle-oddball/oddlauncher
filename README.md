@@ -1,4 +1,5 @@
-# Oddbox - Dev Tools Launcher
+# OddLauncher - Dev Tools Launcher
+# OddLauncher - Dev Tools Launcher
 
 A native desktop application that acts like a "Steam Library for dev tools". Launch local development servers with a single click, view terminal output in real-time, and open browser tabs automatically.
 
@@ -44,8 +45,8 @@ xcode-select --install
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/rhasselle-oddball/oddbox.git
-   cd oddbox
+   git clone https://github.com/rhasselle-oddball/oddlauncher.git
+   cd oddlauncher
    ```
 
 2. **Install Node.js dependencies**
@@ -146,7 +147,7 @@ To build only specific formats, modify `src-tauri/tauri.conf.json`:
 ## 📁 Project Structure
 
 ```
-oddbox/
+oddlauncher/
 ├── src/                      # React frontend
 │   ├── components/           # React components
 │   ├── hooks/               # Custom React hooks
@@ -168,7 +169,7 @@ oddbox/
 - **Frontend**: React + TypeScript + Vite
 - **Backend**: Tauri (Rust)
 - **Styling**: CSS with CSS variables for theming
-- **Storage**: JSON files in `~/.oddbox/`
+- **Storage**: JSON files in `~/.oddlauncher/`
 
 ## 📝 Development Workflow
 
@@ -185,7 +186,7 @@ oddbox/
 - Real-time process status indicators
 - App configuration with form validation
 - File/directory pickers for easy setup
-- Configuration persistence (`~/.oddbox/apps.json`)
+- Configuration persistence (`~/.oddlauncher/apps.json`)
 - Process management with cleanup
 - Cross-platform support (Windows, macOS, Linux)
 

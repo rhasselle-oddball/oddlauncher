@@ -54,7 +54,7 @@ Scope
   - Helpful inline hints and examples
 
 Data Model & Storage
-- Add appType to AppConfig (TS + Rust serde) and oddbox-config.schema.json
+- Add appType to AppConfig (TS + Rust serde) and oddlauncher-config.schema.json
 - Track lastUsedAt (ISO string) + increment useCount on Start/Open
 - Migration: existing apps infer appType:
   - has launchCommands only => process

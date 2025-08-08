@@ -7,7 +7,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-console.log('=== Oddbox Cross-Platform Debug Tool ===\n');
+console.log('=== OddLauncher Cross-Platform Debug Tool ===\n');
 
 // Test different path formats for your specific case
 const testPaths = [

@@ -178,8 +178,8 @@
 .form-textarea:focus,
 .form-select:focus {
   outline: none;
-  border-color: var(--accent-blue, #3b82f6);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--accent-blue, #00A187);
+  box-shadow: 0 0 0 3px rgba(0, 161, 135, 0.15);
 }
 
 /* Error state: use subtle background only, no border or focus ring */
@@ -194,8 +194,8 @@
 .form-textarea.error:focus,
 .form-select.error:focus {
   /* Use regular focus style without red emphasis */
-  border-color: var(--accent-blue, #3b82f6);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--accent-blue, #00A187);
+  box-shadow: 0 0 0 3px rgba(0, 161, 135, 0.15);
 }
 
 .form-textarea {
@@ -234,7 +234,7 @@
 .checkbox-input {
   width: 1rem;
   height: 1rem;
-  accent-color: var(--accent-blue, #3b82f6);
+  accent-color: var(--accent-blue, #00A187);
 }
 
 .checkbox-label {
@@ -286,7 +286,7 @@
 }
 
 .toggle-button.active {
-  background: var(--accent, #3b82f6);
+  background: var(--accent, #00A187);
   color: white;
   border-color: transparent;
 }
@@ -309,8 +309,8 @@
 }
 
 .tags-input-container:focus-within {
-  border-color: var(--accent-blue, #3b82f6);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--accent-blue, #00A187);
+  box-shadow: 0 0 0 3px rgba(0, 161, 135, 0.15);
 }
 
 .tags-input-container.error {
@@ -319,15 +319,15 @@
 }
 
 .tags-input-container.error:focus-within {
-  border-color: var(--accent-blue, #3b82f6);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--accent-blue, #00A187);
+  box-shadow: 0 0 0 3px rgba(0, 161, 135, 0.15);
 }
 
 .tag-item {
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  background: var(--accent-blue, #3b82f6);
+  background: var(--accent-blue, #00A187);
   color: white;
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
@@ -401,14 +401,14 @@
 }
 
 .modal-button-primary {
-  background: var(--accent-blue, #3b82f6);
-  border: 1px solid var(--accent-blue, #3b82f6);
+  background: var(--accent-blue, #00A187);
+  border: 1px solid var(--accent-blue, #00A187);
   color: white;
 }
 
 .modal-button-primary:hover:not(:disabled) {
-  background: var(--accent-blue-hover, #2563eb);
-  border-color: var(--accent-blue-hover, #2563eb);
+  background: var(--accent-blue-hover, #008b76);
+  border-color: var(--accent-blue-hover, #008b76);
 }
 
 .loading-spinner {
