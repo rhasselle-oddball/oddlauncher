@@ -86,6 +86,10 @@
   min-height: 36px;
 }
 
+.confirmation-modal__close svg {
+  shape-rendering: geometricPrecision;
+}
+
 .confirmation-modal__close:hover {
   background: var(--bg-hover, #333);
   color: var(--text-primary, #ffffff);

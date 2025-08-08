@@ -197,7 +197,7 @@ export function AppConfigModal({
             onClick={handleClose}
             disabled={isSubmitting}
           >
-            <X size={20} />
+            <X size={20} strokeWidth={2.5} />
           </button>
         </header>
 
@@ -451,7 +451,7 @@ export function AppConfigModal({
                         className="tag-remove"
                         onClick={() => handleRemoveTag(tag)}
                       >
-                        <X size={12} />
+                        <X size={12} strokeWidth={2.5} />
                       </button>
                     </div>
                   ))}

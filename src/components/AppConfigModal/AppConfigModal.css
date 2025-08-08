@@ -96,7 +96,7 @@
 .close-button {
   background: none;
   border: none;
-  color: var(--text-secondary, #aaaaaa);
+  color: var(--text-primary, #ffffff);
   cursor: pointer;
   padding: 0.5rem;
   border-radius: 6px;
@@ -104,6 +104,10 @@
   align-items: center;
   justify-content: center;
   transition: all 0.15s ease;
+}
+
+.close-button svg {
+  shape-rendering: geometricPrecision;
 }
 
 .close-button:hover {
@@ -344,6 +348,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.tag-remove svg {
+  shape-rendering: geometricPrecision;
 }
 
 .tag-remove:hover {

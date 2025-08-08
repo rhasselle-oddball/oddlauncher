@@ -49,6 +49,10 @@
   cursor: pointer;
 }
 
+.title-bar-btn svg {
+  shape-rendering: geometricPrecision;
+}
+
 .title-bar-btn:hover {
   background: var(--hover-color);
   color: var(--text-primary);
