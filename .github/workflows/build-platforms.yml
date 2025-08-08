@@ -133,7 +133,8 @@ jobs:
             librsvg2-dev \
             libjavascriptcoregtk-4.1-dev \
             libsoup-3.0-dev \
-            libwebkit2gtk-4.1-dev
+            libwebkit2gtk-4.1-dev \
+            xvfb
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
@@ -148,7 +149,14 @@ jobs:
         run: npm ci
 
       - name: Build
-        run: npm run tauri build
+        env:
+          CI: true
+          DISPLAY: ":99"
+        run: |
+          # Start virtual display for headless GUI operations
+          sudo Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+          sleep 2
+          npm run tauri build
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
