@@ -348,7 +348,7 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configMan
   // Normal state with apps
   return (
     <div className="library-sidebar">
-      <div className="sidebar-search">
+      <div className="sidebar-search row">
         <input
           type="text"
           placeholder="Search apps..."
@@ -356,15 +356,13 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configMan
           value={searchQuery}
           onChange={handleSearchChange}
         />
-        <div className="sidebar-filters compact">
-          <button
-            className="sort-toggle"
-            onClick={() => setSortBy(prev => prev === 'recent' ? 'az' : 'recent')}
-            title={sortBy === 'recent' ? 'Sorting: Recents (click for A–Z)' : 'Sorting: A–Z (click for Recents)'}
-          >
-            {sortBy === 'recent' ? <Clock size={16} /> : <ArrowDownAZ size={16} />}
-          </button>
-        </div>
+        <button
+          className="sort-toggle"
+          onClick={() => setSortBy(prev => prev === 'recent' ? 'az' : 'recent')}
+          title={sortBy === 'recent' ? 'Sorting: Recents (click for A–Z)' : 'Sorting: A–Z (click for Recents)'}
+        >
+          {sortBy === 'recent' ? <Clock size={16} /> : <ArrowDownAZ size={16} />}
+        </button>
       </div>
 
       <div className="app-list">
@@ -372,8 +370,10 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configMan
           // Grouped by recents
           groupedApps.map(section => (
             <div key={section.id} className={`section ${collapsedSections[section.id] ? 'collapsed' : ''}`}>
-              <button className="section-header" onClick={() => toggleSection(section.id)} title="Collapse/Expand">
+              <button className="section-header" onClick={() => toggleSection(section.id)} title="Collapse/Expand" aria-expanded={!collapsedSections[section.id]}>
+                <span className="section-sign" aria-hidden>{collapsedSections[section.id] ? '+' : '−'}</span>
                 <span className="section-title">{section.title}</span>
+                <span className="section-spacer" />
                 <span className="section-count">{section.items.length}</span>
               </button>
               {!collapsedSections[section.id] && (

@@ -78,7 +78,7 @@ export function formDataToAppConfig(
  */
 export const getEmptyFormData = (): AppConfigFormData => ({
   name: '',
-  appType: 'process',
+  appType: 'both',
   launchCommands: '',
   workingDirectory: '',
   urlMode: 'url',

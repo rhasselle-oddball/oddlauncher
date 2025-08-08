@@ -1,7 +1,7 @@
 import React from 'react'
 import type { AppConfig } from '../../types'
 import { getAppType, isBookmarkApp } from '../../types'
-import { TerminalSquare, ExternalLink } from 'lucide-react'
+import { Play, Square, ExternalLink } from 'lucide-react'
 import { useAppProcess } from '../../hooks/useProcessManager'
 import { useBrowser } from '../../hooks/useBrowser'
 import { useConfigManager } from '../../hooks/useConfig'
@@ -72,18 +72,18 @@ export function AppListItem({ app, isSelected, onClick }: AppListItemProps) {
               }
               return (
                 <button
-                  className={`row-action terminal ${isRunning ? 'running' : ''}`}
+                  className={`row-action terminal ${isRunning ? 'running' : 'idle'}`}
                   onClick={onTerminalClick}
                   title={isRunning ? 'Stop process' : 'Start process'}
                 >
-                  <TerminalSquare size={16} />
+                  {isRunning ? <Square size={14} /> : <Play size={14} />}
                 </button>
               )
             })()}
             {/* Browser open (if URL) */}
             {app.url && (
               <button
-                className="row-action browser"
+                className="row-action browser idle"
                 onClick={async (e) => {
                   e.stopPropagation()
                   try {
