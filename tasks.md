@@ -4,6 +4,32 @@ Based on the PRD, here are the development tasks organized by priority and depen
 
 ## ✅ COMPLETED TASKS
 
+### ✅ Task 15: Fix WSL Browser/File Open Fallback (COMPLETED - Commit: ec23066)
+**Status:** Complete ✅ | **Committed:** ec23066 | **Pushed:** ✅ | **Issue:** #23 (Closed)
+
+**What was accomplished:**
+- ✅ Fixed file and URL opening when Oddbox is launched from WSL
+- ✅ Prefer `wslview` in WSL; if unavailable, use `powershell.exe Start-Process`
+- ✅ Converted `/mnt/<drive>/...` paths to proper Windows paths before invoking PowerShell
+- ✅ Kept native Windows/macOS/Linux behaviors unchanged
+- ✅ Applied same WSL fallback for both `file://` and `http(s)://` URLs
+- ✅ Build verified (`cargo check`)
+
+**Why:**
+- Opening via `cmd.exe /C start` failed in WSL when the current directory resolved to a UNC path (\\\\wsl.localhost\\...). PowerShell `Start-Process` avoids this limitation.
+
+**Verification steps:**
+- [x] Launch Oddbox from WSL and select a file under `/mnt/c/...` — opens in default Windows browser/app without UNC errors
+- [x] Open `http(s)` URLs from WSL — opens correctly
+- [x] With `wslview` installed, it remains the first choice; with it missing, PowerShell fallback works
+- [x] `cargo check` passes without errors
+
+**Relevant files:**
+- `src-tauri/src/commands/browser.rs`
+
+**Current State for Next Developer:**
+- WSL opening behavior is robust. No action needed. Proceed with other enhancements.
+
 ### ✅ Task 1: Setup Tauri + React Project Structure (COMPLETED - Commit: cce81d5)
 **Status:** Complete ✅ | **Committed:** cce81d5 | **Pushed:** ✅
 
