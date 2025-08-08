@@ -615,7 +615,20 @@ pub async fn start_app_process(
 
             loop {
                 match reader.read_line(&mut line).await {
-                    Ok(0) => break, // EOF
+                    Ok(0) => {
+                        // EOF: if there's leftover data without a trailing newline, emit it
+                        if !line.is_empty() {
+                            let output_line = line.trim_end().to_string();
+                            let _ = app_handle_stdout.emit("process-output", serde_json::json!({
+                                "appId": app_id_stdout,
+                                "type": "stdout",
+                                "content": output_line,
+                                "timestamp": chrono::Utc::now().to_rfc3339()
+                            }));
+                            line.clear();
+                        }
+                        break;
+                    }
                     Ok(_) => {
                         let output_line = line.trim_end().to_string();
 
@@ -649,7 +662,20 @@ pub async fn start_app_process(
 
             loop {
                 match reader.read_line(&mut line).await {
-                    Ok(0) => break, // EOF
+                    Ok(0) => {
+                        // EOF: emit any leftover data without trailing newline
+                        if !line.is_empty() {
+                            let output_line = line.trim_end().to_string();
+                            let _ = app_handle_stderr.emit("process-output", serde_json::json!({
+                                "appId": app_id_stderr,
+                                "type": "stderr",
+                                "content": output_line,
+                                "timestamp": chrono::Utc::now().to_rfc3339()
+                            }));
+                            line.clear();
+                        }
+                        break;
+                    }
                     Ok(_) => {
                         let output_line = line.trim_end().to_string();
 

@@ -166,6 +166,12 @@
   color: #f85149;
 }
 
+/* Ensure no borders/background leak into terminal error lines from global styles */
+.terminal .terminal-line.error {
+  border: none;
+  background: transparent;
+}
+
 .terminal-line.warning .terminal-output {
   color: #d29922;
 }

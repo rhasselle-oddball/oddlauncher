@@ -24,6 +24,7 @@ Oddbox is a native desktop application built with Tauri + React that acts like a
 **CRITICAL**: Every completed task must be committed, pushed, and have its GitHub issue closed before moving to the next task.
 
 Note on branching/PRs:
+
 - For this project, unless explicitly requested otherwise, do NOT create branches or pull requests. Work directly on main, using GitHub issues for tracking. Commits must reference and close the related issue.
 
 ### Task File Management
@@ -56,6 +57,7 @@ GH_PAGER=cat gh issue list --state=closed
 ```
 
 Quoting and shell notes (zsh):
+
 - Always use single quotes for gh commands (titles, bodies, comments) to avoid zsh multiline/dquote prompts and accidental interpolation.
 - Avoid double quotes in gh command arguments. They can cause interactive prompts (dquote>) or expand variables unexpectedly.
 - If your text contains single quotes, either:
@@ -141,7 +143,9 @@ Quoting and shell notes (zsh):
 - Graceful process termination
 
 ### Git Workflow
+
 // Project-specific override: prefer direct commits to main
+
 - Work directly on `main` (no branches/PRs unless requested)
 - Use conventional commits: `feat:`, `fix:`, `docs:`, `refactor:`
 - Always run tests/typechecks before pushing

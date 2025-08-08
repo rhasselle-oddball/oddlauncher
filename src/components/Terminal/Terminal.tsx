@@ -39,6 +39,10 @@ export function Terminal({
 
   // Convert raw output to TerminalLine objects and combine with structured lines
   const displayLines = useMemo(() => {
+    // Debug: observe rawOutput length reaching Terminal
+    if (rawOutput) {
+      console.log('[Terminal] rawOutput len', rawOutput.length)
+    }
     const structuredLines = lines || []
 
     // Convert raw output strings to TerminalLine objects
@@ -77,6 +81,8 @@ export function Terminal({
 
   // Auto-scroll to bottom when new lines are added
   useEffect(() => {
+  // Debug: observe how many lines will render
+  console.log('[Terminal] displayLines len', displayLines.length)
     if (isAutoScrollEnabled && terminalEndRef.current) {
       terminalEndRef.current.scrollIntoView({ behavior: 'smooth' })
     }
