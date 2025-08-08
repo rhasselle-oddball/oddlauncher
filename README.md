@@ -62,7 +62,6 @@ For security, you can verify the files match the official release:
 
 ## 🎯 Features
 
-### ✅ What's Working Now
 - Steam-like sidebar layout for dev tools
 - Dark theme UI with responsive design
 - One-click server launching and stopping
@@ -72,8 +71,6 @@ For security, you can verify the files match the official release:
 - **Drag-and-drop reordering** of apps in sidebar
 - Cross-platform support (Windows, macOS, Linux)
 - Configuration persistence (`~/.oddlauncher/apps.json`)
-
-### 🚧 Coming Soon
 - Real-time terminal output display
 - Auto-launch browser functionality
 - Custom thumbnails for apps
