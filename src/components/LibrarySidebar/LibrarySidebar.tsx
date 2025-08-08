@@ -101,7 +101,7 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configMan
         appsSource = configManager.config?.apps || []
       }
     }
-    
+
     const matchesSearch = (app: AppConfig) => {
       if (!searchQuery.trim()) return true
       const q = searchQuery.toLowerCase().trim()
@@ -143,7 +143,7 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configMan
 
     for (const app of byRecent) {
       const ts = app.lastUsedAt ? new Date(app.lastUsedAt) : null
-      
+
       if (!ts) {
         // Apps that have never been used go into "never used" section
         neverUsed.push(app)

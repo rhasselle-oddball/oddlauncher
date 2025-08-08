@@ -270,7 +270,9 @@ export function AppConfigModal({
                       className={`form-input ${errors.launchCommands ? 'error' : ''}`}
                       value={formData.launchCommands}
                       onChange={(e) => handleInputChange('launchCommands', e.target.value)}
-                      placeholder="Enter commands to run a process\nnvm use 14.15\nyarn watch"
+                      placeholder={`Enter commands to run a process
+nvm use 14.15
+yarn watch`}
                       maxLength={2000}
                       rows={4}
                     />
