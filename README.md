@@ -1,4 +1,4 @@
-# OddLauncher - Dev Tools Launcher
+# Od## 💾 Download & InstallationLauncher - Dev Tools Launcher
 
 A native desktop application that acts like a "Steam Library for dev tools". Launch local development servers with a single click, view terminal output in real-time, and open browser tabs automatically.
 
