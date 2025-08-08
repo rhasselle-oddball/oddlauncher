@@ -222,7 +222,7 @@ export function AppConfigModal({
                     onClick={() => handleInputChange('appType', 'bookmark')}
                     aria-pressed={formData.appType === 'bookmark'}
                   >
-                    Just Browser (Bookmark)
+                    Just Browser
                   </button>
                   <button
                     type="button"
@@ -397,43 +397,47 @@ export function AppConfigModal({
                     )}
                   </div>
 
-                  {/* Browser Settings */}
-                  <div className="form-group">
-                    <div className="checkbox-group">
-                      <input
-                        id="autoLaunchBrowser"
-                        type="checkbox"
-                        className="checkbox-input"
-                        checked={formData.autoLaunchBrowser}
-                        onChange={(e) => handleInputChange('autoLaunchBrowser', e.target.checked)}
-                      />
-                      <label htmlFor="autoLaunchBrowser" className="checkbox-label">
-                        Auto-launch browser when app starts
-                      </label>
-                    </div>
-                  </div>
-
-                  {/* Browser Delay (optional) */}
-                  <div className="form-group">
-                    <label htmlFor="browserDelay" className="form-label">
-                      Browser Delay (seconds)
-                    </label>
-                    <input
-                      id="browserDelay"
-                      type="number"
-                      min="0"
-                      max="60"
-                      className={`form-input ${errors.browserDelay ? 'error' : ''}`}
-                      value={formData.browserDelay}
-                      onChange={(e) => handleInputChange('browserDelay', parseInt(e.target.value) || 0)}
-                    />
-                    {errors.browserDelay && (
-                      <div className="form-error">
-                        <AlertCircle size={12} />
-                        {errors.browserDelay}
+                  {/* Browser Settings - only show for apps that also have terminal */}
+                  {formData.appType === 'both' && (
+                    <>
+                      <div className="form-group">
+                        <div className="checkbox-group">
+                          <input
+                            id="autoLaunchBrowser"
+                            type="checkbox"
+                            className="checkbox-input"
+                            checked={formData.autoLaunchBrowser}
+                            onChange={(e) => handleInputChange('autoLaunchBrowser', e.target.checked)}
+                          />
+                          <label htmlFor="autoLaunchBrowser" className="checkbox-label">
+                            Auto-launch browser when app starts
+                          </label>
+                        </div>
                       </div>
-                    )}
-                  </div>
+
+                      {/* Browser Delay (optional) */}
+                      <div className="form-group">
+                        <label htmlFor="browserDelay" className="form-label">
+                          Browser Delay (seconds)
+                        </label>
+                        <input
+                          id="browserDelay"
+                          type="number"
+                          min="0"
+                          max="60"
+                          className={`form-input ${errors.browserDelay ? 'error' : ''}`}
+                          value={formData.browserDelay}
+                          onChange={(e) => handleInputChange('browserDelay', parseInt(e.target.value) || 0)}
+                        />
+                        {errors.browserDelay && (
+                          <div className="form-error">
+                            <AlertCircle size={12} />
+                            {errors.browserDelay}
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
                 </>
               )}
 
