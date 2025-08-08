@@ -3,12 +3,22 @@ import { ProcessManagerContext } from '../context/ProcessManagerContext'
 
 export function useProcessManager() {
   const ctx = useContext(ProcessManagerContext)
-  if (!ctx) throw new Error('useProcessManager must be used within ProcessManagerProvider')
+  if (!ctx)
+    throw new Error(
+      'useProcessManager must be used within ProcessManagerProvider'
+    )
   return ctx
 }
 
 export function useAppProcess(appId: string) {
-  const { processes, isLoading, error, startProcess, stopProcess, getProcessStatus } = useProcessManager()
+  const {
+    processes,
+    isLoading,
+    error,
+    startProcess,
+    stopProcess,
+    getProcessStatus,
+  } = useProcessManager()
 
   const process = processes[appId] || null
   const isRunning = process?.status === 'running'
@@ -41,5 +51,16 @@ export function useAppProcess(appId: string) {
   const stop = () => stopProcess(appId)
   const refresh = () => getProcessStatus(appId)
 
-  return { process, isRunning, isStarting, isStopping, hasError, isLoading, error, start, stop, refresh }
+  return {
+    process,
+    isRunning,
+    isStarting,
+    isStopping,
+    hasError,
+    isLoading,
+    error,
+    start,
+    stop,
+    refresh,
+  }
 }

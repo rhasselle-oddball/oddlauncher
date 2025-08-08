@@ -1,17 +1,29 @@
 import { useCallback, useContext } from 'react'
-import { ProcessManagerContext, type ProcessManagerAPI } from '../context/ProcessManagerContext'
+import {
+  ProcessManagerContext,
+  type ProcessManagerAPI,
+} from '../context/ProcessManagerContext'
 import type { AppProcess } from '../types'
 
 export function useProcessManager(): ProcessManagerAPI {
   const ctx = useContext(ProcessManagerContext)
   if (!ctx) {
-    throw new Error('useProcessManager must be used within a ProcessManagerProvider')
+    throw new Error(
+      'useProcessManager must be used within a ProcessManagerProvider'
+    )
   }
   return ctx
 }
 
 export function useAppProcess(appId: string) {
-  const { processes, isLoading, error, startProcess, stopProcess, getProcessStatus } = useProcessManager()
+  const {
+    processes,
+    isLoading,
+    error,
+    startProcess,
+    stopProcess,
+    getProcessStatus,
+  } = useProcessManager()
 
   const process: AppProcess | null = processes[appId] || null
   const isRunning = process?.status === 'running'
@@ -45,7 +57,21 @@ export function useAppProcess(appId: string) {
   )
 
   const stop = useCallback(() => stopProcess(appId), [appId, stopProcess])
-  const refresh = useCallback(() => getProcessStatus(appId), [appId, getProcessStatus])
+  const refresh = useCallback(
+    () => getProcessStatus(appId),
+    [appId, getProcessStatus]
+  )
 
-  return { process, isRunning, isStarting, isStopping, hasError, isLoading, error, start, stop, refresh }
+  return {
+    process,
+    isRunning,
+    isStarting,
+    isStopping,
+    hasError,
+    isLoading,
+    error,
+    start,
+    stop,
+    refresh,
+  }
 }
