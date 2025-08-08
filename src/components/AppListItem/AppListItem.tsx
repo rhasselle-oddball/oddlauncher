@@ -1,4 +1,5 @@
 import type { AppConfig } from '../../types'
+import { isBookmarkApp } from '../../types'
 import { useAppProcess } from '../../hooks/useProcessManager'
 import './AppListItem.css'
 
@@ -17,6 +18,12 @@ export function AppListItem({ app, isSelected, onClick }: AppListItemProps) {
   }
 
   const getStatusDisplay = () => {
+    // Check if this is a bookmark app
+    if (isBookmarkApp(app)) {
+      return { text: 'Bookmark', icon: '', className: 'bookmark' }
+    }
+
+    // Process app status logic
     if (isStarting) {
       return { text: 'Starting', icon: '', className: 'starting' }
     }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { X, Folder, Plus, AlertCircle, Settings } from 'lucide-react'
+import { X, Folder, Plus, AlertCircle, Settings, Link as LinkIcon, File as FileIcon } from 'lucide-react'
 import { invoke } from '@tauri-apps/api/core'
 import { useConfigManager } from '../../hooks/useConfig'
 import { generateAppId } from '../../utils/app-data'
@@ -46,10 +46,11 @@ export function AppConfigModal({
     setFormData(prev => ({ ...prev, [field]: value }))
 
     // Clear error for this field when user starts typing
-    if (errors[field]) {
+    const errorField = field as keyof AppConfigFormErrors
+    if (errors[errorField]) {
       setErrors(prev => {
         const newErrors = { ...prev }
-        delete newErrors[field]
+        delete newErrors[errorField]
         return newErrors
       })
     }
@@ -64,6 +65,18 @@ export function AppConfigModal({
       }
     } catch (error) {
       console.error('Failed to pick directory:', error)
+    }
+  }, [handleInputChange])
+
+  // Handle file picker for URL file mode
+  const handlePickFile = useCallback(async () => {
+    try {
+      const result = await invoke<string | null>('pick_file')
+      if (result) {
+        handleInputChange('filePath', result)
+      }
+    } catch (error) {
+      console.error('Failed to pick file:', error)
     }
   }, [handleInputChange])
 
@@ -225,17 +238,20 @@ export function AppConfigModal({
               {/* Launch Commands */}
               <div className="form-group">
                 <label htmlFor="launchCommands" className="form-label">
-                  Launch Commands <span className="required">*</span>
+                  Launch Commands
                 </label>
                 <textarea
                   id="launchCommands"
                   className={`form-input ${errors.launchCommands ? 'error' : ''}`}
                   value={formData.launchCommands}
                   onChange={(e) => handleInputChange('launchCommands', e.target.value)}
-                  placeholder="nvm use 14.15&#10;yarn watch"
+                  placeholder="Enter commands to run a process, or just add a URL below for bookmarks&#10;nvm use 14.15&#10;yarn watch"
                   maxLength={2000}
                   rows={4}
                 />
+                <div className="form-help">
+                  Enter commands to run a process, or just a URL for bookmarks. Either commands or URL is required.
+                </div>
                 {errors.launchCommands && (
                   <div className="form-error">
                     <AlertCircle size={12} />
@@ -279,28 +295,76 @@ export function AppConfigModal({
                 )}
               </div>
 
-              {/* URL */}
+              {/* URL / File destination */}
               <div className="form-group">
-                <label htmlFor="url" className="form-label">
-                  URL
-                </label>
-                <input
-                  id="url"
-                  type="url"
-                  className={`form-input ${errors.url ? 'error' : ''}`}
-                  value={formData.url}
-                  onChange={(e) => handleInputChange('url', e.target.value)}
-                  placeholder="http://localhost:3000"
-                />
-                {errors.url && (
-                  <div className="form-error">
-                    <AlertCircle size={12} />
-                    {errors.url}
-                  </div>
-                )}
-                <div className="form-help">
-                  URL to open in browser when app starts
+                <label className="form-label">Destination</label>
+                <div className="toggle-group" role="tablist" aria-label="Destination Type">
+                  <button
+                    type="button"
+                    className={`toggle-button ${formData.urlMode === 'url' ? 'active' : ''}`}
+                    onClick={() => handleInputChange('urlMode', 'url')}
+                    aria-pressed={formData.urlMode === 'url'}
+                  >
+                    <LinkIcon size={14} /> URL
+                  </button>
+                  <button
+                    type="button"
+                    className={`toggle-button ${formData.urlMode === 'file' ? 'active' : ''}`}
+                    onClick={() => handleInputChange('urlMode', 'file')}
+                    aria-pressed={formData.urlMode === 'file'}
+                  >
+                    <FileIcon size={14} /> Local file
+                  </button>
                 </div>
+
+                {formData.urlMode === 'url' ? (
+                  <>
+                    <input
+                      id="url"
+                      type="url"
+                      className={`form-input ${errors.url ? 'error' : ''}`}
+                      value={formData.url}
+                      onChange={(e) => handleInputChange('url', e.target.value)}
+                      placeholder="http://localhost:3000"
+                    />
+                    {errors.url && (
+                      <div className="form-error">
+                        <AlertCircle size={12} />
+                        {errors.url}
+                      </div>
+                    )}
+                    <div className="form-help">URL to open in browser when app starts</div>
+                  </>
+                ) : (
+                  <>
+                    <div className="file-picker-group">
+                      <input
+                        id="filePath"
+                        type="text"
+                        className={`form-input file-picker-input ${errors.filePath ? 'error' : ''}`}
+                        value={formData.filePath}
+                        onChange={(e) => handleInputChange('filePath', e.target.value)}
+                        placeholder="/path/to/file.html"
+                      />
+                      <button
+                        type="button"
+                        className="file-picker-button"
+                        onClick={handlePickFile}
+                        disabled={isSubmitting}
+                      >
+                        <Folder size={16} />
+                        Browse
+                      </button>
+                    </div>
+                    {errors.filePath && (
+                      <div className="form-error">
+                        <AlertCircle size={12} />
+                        {errors.filePath}
+                      </div>
+                    )}
+                    <div className="form-help">Choose a local file to open when the app starts</div>
+                  </>
+                )}
               </div>
 
               {/* Browser Settings */}

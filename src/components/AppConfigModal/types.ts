@@ -11,7 +11,11 @@ export interface AppConfigFormData {
   name: string
   launchCommands: string
   workingDirectory: string
+  /** How the destination is provided */
+  urlMode: 'url' | 'file'
   url: string
+  /** Raw local file path when urlMode === 'file' */
+  filePath: string
   description: string
   environmentVariables: Record<string, string>
   autoLaunchBrowser: boolean
@@ -29,6 +33,7 @@ export interface AppConfigFormErrors {
   launchCommands?: string
   workingDirectory?: string
   url?: string
+  filePath?: string
   description?: string
   environmentVariables?: string
   autoLaunchBrowser?: string

@@ -33,6 +33,7 @@ pub fn run() {
       commands::backup_config,
       commands::restore_config,
       commands::pick_directory,
+  commands::pick_file,
       commands::validate_directory,
       commands::validate_file,
       commands::start_app_process,

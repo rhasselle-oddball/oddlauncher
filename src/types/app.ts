@@ -13,6 +13,11 @@ export type AppStatus =
   | 'error'
 
 /**
+ * Type of application
+ */
+export type AppType = 'process' | 'bookmark'
+
+/**
  * Configuration for an individual app
  */
 export interface AppConfig {
@@ -20,8 +25,8 @@ export interface AppConfig {
   id: string
   /** Display name of the app */
   name: string
-  /** Shell commands to execute sequentially (one per line) */
-  launchCommands: string
+  /** Shell commands to execute sequentially (one per line) - optional for bookmark apps */
+  launchCommands?: string
   /** Working directory for the command (optional) */
   workingDirectory?: string
   /** URL to open in browser when app starts (optional) */
@@ -136,3 +141,26 @@ export type AppEvent =
   | { type: 'app_added'; appId: string; config: AppConfig }
   | { type: 'app_removed'; appId: string }
   | { type: 'error_occurred'; appId: string; error: AppError }
+
+/**
+ * Utility function to determine app type based on configuration
+ */
+export const getAppType = (app: AppConfig): AppType => {
+  return app.launchCommands && app.launchCommands.trim()
+    ? 'process'
+    : 'bookmark'
+}
+
+/**
+ * Check if an app is a bookmark (URL-only) app
+ */
+export const isBookmarkApp = (app: AppConfig): boolean => {
+  return getAppType(app) === 'bookmark'
+}
+
+/**
+ * Check if an app is a process app
+ */
+export const isProcessApp = (app: AppConfig): boolean => {
+  return getAppType(app) === 'process'
+}

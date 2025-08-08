@@ -264,6 +264,30 @@
   white-space: nowrap;
 }
 
+/* Toggle group for URL/File */
+.toggle-group {
+  display: inline-flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.toggle-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color, #333);
+  background: var(--bg-muted, #1e1e1e);
+  color: var(--text-color, #ddd);
+}
+
+.toggle-button.active {
+  background: var(--accent, #3b82f6);
+  color: white;
+  border-color: transparent;
+}
+
 .file-picker-button:hover {
   background: var(--bg-primary, #111);
   border-color: var(--text-secondary, #aaaaaa);
