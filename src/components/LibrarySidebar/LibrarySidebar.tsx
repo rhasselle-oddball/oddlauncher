@@ -207,6 +207,8 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configMan
       return
     }
 
+    // For Recent view with sections, we need to handle reordering within the global app list
+    // while preserving the visual grouping by recency
     const oldIndex = localAppOrder.findIndex(app => app.id === active.id)
     const newIndex = localAppOrder.findIndex(app => app.id === over.id)
 
@@ -219,6 +221,51 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configMan
         const newConfig = {
           ...configManager.config!,
           apps: newOrder
+        }
+        await configManager.saveConfig(newConfig)
+      } catch (error) {
+        console.error('Failed to save app order:', error)
+        // Revert on error
+        setLocalAppOrder(localAppOrder)
+      }
+    }
+  }
+
+  // Handle drag end within a section - reorder apps and update global order
+  const handleDragEndInSection = async (event: DragEndEvent, sectionItems: AppConfig[]) => {
+    const { active, over } = event
+
+    if (!over || active.id === over.id) {
+      return
+    }
+
+    const oldIndex = sectionItems.findIndex(app => app.id === active.id)
+    const newIndex = sectionItems.findIndex(app => app.id === over.id)
+
+    if (oldIndex !== -1 && newIndex !== -1) {
+      // Reorder within the section
+      const newSectionOrder = arrayMove(sectionItems, oldIndex, newIndex)
+      
+      // Update the global order to reflect this change
+      const newGlobalOrder = [...localAppOrder]
+      
+      // Replace each item in the global order with its new position relative to others in the section
+      sectionItems.forEach((originalItem, originalSectionIndex) => {
+        const globalIndex = newGlobalOrder.findIndex(app => app.id === originalItem.id)
+        if (globalIndex !== -1) {
+          // Find what item should be at this position in the new section order
+          const newItem = newSectionOrder[originalSectionIndex]
+          newGlobalOrder[globalIndex] = newItem
+        }
+      })
+      
+      setLocalAppOrder(newGlobalOrder)
+
+      // Update the order in the backend
+      try {
+        const newConfig = {
+          ...configManager.config!,
+          apps: newGlobalOrder
         }
         await configManager.saveConfig(newConfig)
       } catch (error) {
@@ -390,7 +437,7 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configMan
 
       <div className="app-list">
         {sortBy === 'recent' && groupedApps ? (
-          // Grouped by recents
+          // Grouped by recents - now with drag and drop support within each section
           groupedApps.map(section => (
             <div key={section.id} className={`section ${collapsedSections[section.id] ? 'collapsed' : ''}`}>
               <button className="section-header" onClick={() => toggleSection(section.id)} title="Collapse/Expand" aria-expanded={!collapsedSections[section.id]}>
@@ -401,14 +448,38 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configMan
               </button>
               {!collapsedSections[section.id] && (
                 <div className="section-items">
-                  {(searchQuery.trim() ? section.items : section.items).map(app => (
-                    <AppListItem
-                      key={app.id}
-                      app={app}
-                      isSelected={selectedAppId === app.id}
-                      onClick={handleAppClick}
-                    />
-                  ))}
+                  {searchQuery.trim() ? (
+                    // When searching, no drag and drop
+                    section.items.map(app => (
+                      <AppListItem
+                        key={app.id}
+                        app={app}
+                        isSelected={selectedAppId === app.id}
+                        onClick={handleAppClick}
+                      />
+                    ))
+                  ) : (
+                    // When not searching, enable drag and drop within this section
+                    <DndContext
+                      sensors={sensors}
+                      collisionDetection={closestCenter}
+                      onDragEnd={(event) => handleDragEndInSection(event, section.items)}
+                    >
+                      <SortableContext
+                        items={section.items.map(app => app.id)}
+                        strategy={verticalListSortingStrategy}
+                      >
+                        {section.items.map(app => (
+                          <SortableAppListItem
+                            key={app.id}
+                            app={app}
+                            selectedAppId={selectedAppId}
+                            onAppSelect={handleAppClick}
+                          />
+                        ))}
+                      </SortableContext>
+                    </DndContext>
+                  )}
                 </div>
               )}
             </div>
