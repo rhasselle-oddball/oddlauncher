@@ -1375,3 +1375,4 @@ Notes:
 - Update this file with progress (check off completed tasks)
 - Use `gh issue close` when task verification is complete
 - Follow conventional commit messages with issue numbers
+- [x] Show only relevant options in Add App modal based on app type (COMPLETED - Commit: 62eb559)
