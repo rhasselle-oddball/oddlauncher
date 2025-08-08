@@ -120,7 +120,7 @@
 }
 
 .add-app-button:hover:not(:disabled) {
-  background-color: #0066aa;
+  background-color: var(--accent-hover);
   transform: translateY(-1px);
 }
 

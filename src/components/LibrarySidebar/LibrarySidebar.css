@@ -201,11 +201,11 @@
   overflow: hidden;
 }
 
-.add-app-button:hover {
+.add-app-button:hover:not(:disabled) {
   background: var(--accent-hover);
 }
 
-.add-app-button:active {
+.add-app-button:active:not(:disabled) {
   background: var(--accent-blue);
 }
 
@@ -214,7 +214,7 @@
   font-weight: 600;
 }
 
-.add-app-button.primary:hover {
+.add-app-button.primary:hover:not(:disabled) {
   background: var(--accent-hover);
 }
 
