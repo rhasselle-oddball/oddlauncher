@@ -1202,6 +1202,58 @@ Users want to create bookmarks for URLs they frequently access (like development
 
 ---
 
+### 🔧 Task 22: Sidebar Filters/Sort, Dense Layout, Clear Running; App Types & Add Modal
+Status: TODO 📝 | Issue: #28 (Open)
+
+Problem Statement:
+- Need powerful sidebar filtering/sorting similar to Steam (recently used windows, A–Z) and a compact, power-user list to fit many more apps.
+- Running state should be visually obvious without verbose text.
+- Add App flow should first classify the app type: terminal command (process), browser (bookmark), or both, and validate accordingly.
+
+Scope:
+1) Sidebar Filters & Sorting
+- Filters: Running only toggle; Recently used (This month, Last month, Last 3 months)
+- Sorting: A–Z / Z–A; Recently used (desc)
+- Behavior: composable filter+sort, persisted in localStorage, default to Recently used
+
+2) Clear Running Indicators (Sidebar)
+- Replace words with compact icons/animation (blue dot pulse for running; spinner for starting/stopping; grey dot for stopped)
+
+3) Sidebar Density (Compact List)
+- Target ~36–44px row height; tighter paddings/line-heights; one subtle metadata line (cwd or domain)
+- Remove verbose labels; add small type glyph (process/bookmark/both)
+
+4) App Type Classification
+- Add appType: 'process' | 'bookmark' | 'both' to AppConfig (TS, Rust, JSON schema)
+- Infer for existing configs for backward compatibility
+
+5) Add App Modal – “What is this?” first
+- First step: choose type; fields shown per type; validation requires only relevant fields; URL-only apps allowed
+
+Data & Storage:
+- Track lastUsedAt (ISO) and useCount; update on Start/Open
+- Persist filter/sort choices in localStorage
+
+Acceptance Criteria:
+- [ ] Sidebar filters (Running, recent windows) and sorting (A–Z/Z–A/Recent) work and persist across restarts
+- [ ] Running/Starting/Stopped states use clear visuals; remove verbose words in rows
+- [ ] Sidebar density increases to ~36–44px rows; ~18–24 items visible at default window size
+- [ ] App type icon visible per item (process/bookmark/both)
+- [ ] Add App flow begins with type selection and shows fields per type
+- [ ] Validation requires only relevant fields; can create URL-only apps
+- [ ] lastUsedAt/useCount update on Start/Open
+- [ ] JSON schema, TS types, and Rust models updated; old configs still load
+
+Verification Steps:
+- [ ] Create each type (process, bookmark, both); save/load correctly
+- [ ] Start process app shows terminal output; browser opens if configured
+- [ ] Open bookmark app launches browser; no process tracked; terminal shows "Opening …" line
+- [ ] Filters and sorting behave and persist; row height within target
+- [ ] Import/export round-trips appType and timing fields
+
+Notes:
+- Out of scope: groups/folders, advanced analytics, themeable density.
+
 ## Task Management Notes
 
 - Each main task should be broken into a GitHub issue when started
