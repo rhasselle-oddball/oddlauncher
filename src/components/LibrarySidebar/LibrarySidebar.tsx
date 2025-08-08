@@ -245,10 +245,10 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configMan
     if (oldIndex !== -1 && newIndex !== -1) {
       // Reorder within the section
       const newSectionOrder = arrayMove(sectionItems, oldIndex, newIndex)
-      
+
       // Update the global order to reflect this change
       const newGlobalOrder = [...localAppOrder]
-      
+
       // Replace each item in the global order with its new position relative to others in the section
       sectionItems.forEach((originalItem, originalSectionIndex) => {
         const globalIndex = newGlobalOrder.findIndex(app => app.id === originalItem.id)
@@ -258,7 +258,7 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configMan
           newGlobalOrder[globalIndex] = newItem
         }
       })
-      
+
       setLocalAppOrder(newGlobalOrder)
 
       // Update the order in the backend

@@ -24,7 +24,8 @@ pub fn run() {
       Ok(())
     })
     .invoke_handler(tauri::generate_handler![
-      commands::load_config,
+      // Temporarily comment out config commands that might cause build hangs
+      // commands::load_config,
       commands::save_config,
       commands::add_app_config,
       commands::update_app_config,
