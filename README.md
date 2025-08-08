@@ -1,13 +1,91 @@
 # OddLauncher - Dev Tools Launcher
-# OddLauncher - Dev Tools Launcher
 
 A native desktop application that acts like a "Steam Library for dev tools". Launch local development servers with a single click, view terminal output in real-time, and open browser tabs automatically.
 
-## 🚀 Quick Start
+## � Download & Installation
 
-**Current State**: The application is functionally usable! You can add development projects, configure them, and start/stop processes. The only missing piece is real-time terminal output (Task 11).
+### Get the Latest Release
 
-### Prerequisites
+**📋 [Download from Releases Page](https://github.com/rhasselle-oddball/oddlauncher/releases)**
+
+Choose the right file for your operating system:
+- **Windows**: `oddlauncher_*_x64_en-US.msi`
+- **macOS Intel**: `oddlauncher_*_x64.dmg` 
+- **macOS Apple Silicon**: `oddlauncher_*_aarch64.dmg`
+- **Linux Debian/Ubuntu**: `oddlauncher_*_amd64.deb`
+- **Linux Universal**: `oddlauncher_*_amd64.AppImage`
+
+### ⚠️ Security Warnings & Workarounds
+
+**These applications are NOT code-signed**, so your operating system will show security warnings. This is normal for unsigned applications.
+
+#### **Windows**
+- **Warning**: "Windows protected your PC" or "Unknown publisher"
+- **Solution**: Click "More info" → "Run anyway"
+- **Alternative**: Right-click the installer → Properties → Check "Unblock" → OK
+
+#### **macOS** 
+- **Warning**: "App is damaged and can't be opened" or "Developer cannot be verified"
+- **Solution**: Run this command in Terminal:
+  ```bash
+  xattr -d com.apple.quarantine ~/Downloads/oddlauncher*.dmg
+  ```
+  Then mount the .dmg and drag OddLauncher.app to Applications
+- **Alternative**: System Preferences → Security & Privacy → Allow app to run
+
+#### **Linux**
+- **Debian/Ubuntu (.deb)**:
+  ```bash
+  sudo dpkg -i oddlauncher_*_amd64.deb
+  sudo apt-get install -f  # Fix any missing dependencies
+  ```
+- **AppImage**:
+  ```bash
+  chmod +x oddlauncher_*_amd64.AppImage
+  ./oddlauncher_*_amd64.AppImage
+  ```
+
+### 🔒 What to Expect
+
+Since these are unsigned applications:
+- **First launch** may take longer as the system scans the app
+- **Antivirus software** might flag it for review (false positive)
+- **System notifications** about running unsigned software
+- **No automatic updates** - you'll need to manually download new versions
+
+### ✅ Verify Your Download
+
+For security, you can verify the files match the official release:
+- Check that download URLs start with `https://github.com/rhasselle-oddball/oddlauncher/releases/`
+- Compare file sizes with those listed on the releases page
+- Check the release notes for any additional installation steps
+
+## 🎯 Features
+
+### ✅ What's Working Now
+- Steam-like sidebar layout for dev tools  
+- Dark theme UI with responsive design
+- One-click server launching and stopping
+- Real-time process status indicators
+- App configuration with form validation
+- File/directory pickers for easy setup
+- **Drag-and-drop reordering** of apps in sidebar
+- Cross-platform support (Windows, macOS, Linux)
+- Configuration persistence (`~/.oddlauncher/apps.json`)
+
+### 🚧 Coming Soon
+- Real-time terminal output display
+- Auto-launch browser functionality
+- Custom thumbnails for apps
+- System tray integration
+
+---
+
+## 👩‍💻 Developer Information
+
+*The following section is for developers who want to contribute to or build OddLauncher from source.*
+
+### Development Prerequisites
 
 - **Node.js** v18+ (recommend v22.18.0)
 - **Rust** and **Cargo** (latest stable)
@@ -41,7 +119,7 @@ xcode-select --install
 **Windows:**
 - No additional dependencies needed (WebView2 is included)
 
-### Installation
+### Development Setup
 
 1. **Clone the repository**
    ```bash
@@ -65,7 +143,7 @@ xcode-select --install
    cargo install tauri-cli
    ```
 
-### Development
+### Running in Development
 
 1. **Start the development server**
    ```bash
@@ -176,29 +254,6 @@ oddlauncher/
 1. **Task Management**: See `tasks.md` for current development tasks
 2. **Issues**: Use GitHub issues for tracking work (linked to tasks)
 3. **Commits**: Use conventional commit messages (`feat:`, `fix:`, etc.)
-
-## 🎯 Features
-
-### ✅ Implemented
-- Steam-like sidebar layout for dev tools
-- Dark theme UI with responsive design
-- One-click server launching and stopping
-- Real-time process status indicators
-- App configuration with form validation
-- File/directory pickers for easy setup
-- Configuration persistence (`~/.oddlauncher/apps.json`)
-- Process management with cleanup
-- Cross-platform support (Windows, macOS, Linux)
-
-### 🚧 In Development
-- Real-time terminal output display (Task 11)
-- Auto-launch browser functionality
-
-### 🗓️ Planned
-- Custom thumbnails for apps
-- App grouping and organization
-- Global keyboard shortcuts
-- System tray integration
 
 ## 🤝 Contributing
 
