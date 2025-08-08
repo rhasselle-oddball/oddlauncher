@@ -1,5 +1,5 @@
 import { useState, useMemo, ChangeEvent, useEffect } from 'react'
-import { Smartphone, Search, Clock, ArrowDownAZ } from 'lucide-react'
+import { Search, Clock, ArrowDownAZ } from 'lucide-react'
 import { AppListItem } from '../AppListItem'
 import { useConfigManager } from '../../hooks/useConfig'
 import type { AppConfig } from '../../types'
@@ -284,9 +284,6 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configMan
           </div>
         </div>
         <div className="empty-state">
-          <div className="empty-icon">
-            <Smartphone size={48} />
-          </div>
           <h3>No Apps Yet</h3>
           <p>Get started by adding your first development app.</p>
           <button

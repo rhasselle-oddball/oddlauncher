@@ -47,7 +47,7 @@ pub async fn load_config(_app: AppHandle) -> AppResult<GlobalConfig> {
     // Migration fallback: if new file doesn't exist, try old Oddbox path
     if !config_file.exists() {
         if let Some(home) = dirs::home_dir() {
-            let legacy_dir = home.join(".oddbox");
+            let legacy_dir = home.join(".oddlauncher");
             let legacy_file = legacy_dir.join("apps.json");
             if legacy_file.exists() {
                 log::info!(

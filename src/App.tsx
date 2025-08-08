@@ -280,7 +280,7 @@ function App() {
   })
 
   return (
-    <div className="app">
+  <div className="app">
       <AppLayout
         sidebar={
           <LibrarySidebar
@@ -322,7 +322,7 @@ function App() {
         onConfirm={handleDeleteConfirm}
         onCancel={handleDeleteCancel}
       />
-    </div>
+  </div>
   )
 }
 

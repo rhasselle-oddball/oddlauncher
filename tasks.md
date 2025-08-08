@@ -69,7 +69,7 @@ Based on the PRD, here are the development tasks organized by priority and depen
   - `AppEvent` union types for event system
 - ✅ Created corresponding Rust structs with serde serialization support
 - ✅ Added proper dependencies (serde, chrono, uuid) to Cargo.toml
-- ✅ Created comprehensive JSON schema validation (oddbox-config.schema.json)
+- ✅ Created comprehensive JSON schema validation (oddlauncher-config.schema.json)
 - ✅ Built utility functions for app data management (createDefaultAppConfig, etc.)
 - ✅ Verified TypeScript compiles without errors
 - ✅ Verified Rust compiles without errors
@@ -89,7 +89,7 @@ Based on the PRD, here are the development tasks organized by priority and depen
 
 **What was accomplished:**
 - ✅ Created comprehensive Tauri commands for configuration CRUD operations:
-  - `load_config` - loads configuration from ~/.oddbox/apps.json
+  - `load_config` - loads configuration from ~/.oddlauncher/apps.json
   - `save_config` - saves configuration with automatic timestamp updates
   - `add_app_config` - adds new app with duplicate ID validation
   - `update_app_config` - updates existing app configuration
@@ -97,7 +97,7 @@ Based on the PRD, here are the development tasks organized by priority and depen
   - `get_config_info` - provides config directory and file information
   - `backup_config` - creates timestamped backup files
   - `restore_config` - restores configuration from backup
-- ✅ Implemented robust file system operations for ~/.oddbox/ directory:
+- ✅ Implemented robust file system operations for ~/.oddlauncher/ directory:
   - Automatic directory creation with proper permissions
   - JSON file reading/writing with pretty formatting
   - Comprehensive error handling for all file operations
@@ -116,7 +116,7 @@ Based on the PRD, here are the development tasks organized by priority and depen
   - `tokio` for async file operations
 - ✅ Verified all acceptance criteria:
   - Apps save to and load from JSON file correctly
-  - Configuration directory (~/.oddbox/) created automatically
+  - Configuration directory (~/.oddlauncher/) created automatically
   - Error handling works for missing/corrupt files
   - React hooks properly manage state updates
   - No console errors during configuration operations
@@ -720,9 +720,9 @@ Production build testing revealed several critical issues that needed immediate 
 **Production Build Results:**
 - Built successfully with `npm run tauri build`
 - Generated .deb, .rpm, and AppImage packages at:
-  - `/src-tauri/target/release/bundle/deb/oddbox_0.1.0_amd64.deb`
-  - `/src-tauri/target/release/bundle/rpm/oddbox-0.1.0-1.x86_64.rpm`
-  - `/src-tauri/target/release/bundle/appimage/oddbox_0.1.0_amd64.AppImage`
+  - `/src-tauri/target/release/bundle/deb/oddlauncher_0.1.0_amd64.deb`
+  - `/src-tauri/target/release/bundle/rpm/oddlauncher-0.1.0-1.x86_64.rpm`
+  - `/src-tauri/target/release/bundle/appimage/oddlauncher_0.1.0_amd64.AppImage`
 - All fixes verified working in production executable
 
 **Current State for Next Developer:**

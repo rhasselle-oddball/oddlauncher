@@ -12,13 +12,13 @@
   "app": {
     "windows": [
       {
-  "title": "OddLauncher - Dev Tools Launcher",
-  "width": 1400,
-  "height": 900,
-  "minWidth": 1100,
-  "minHeight": 700,
+        "title": "OddLauncher - Dev Tools Launcher",
+        "width": 1400,
+        "height": 900,
+        "minWidth": 1100,
+        "minHeight": 700,
         "resizable": true,
-        "fullscreen": false
+  "fullscreen": false
       }
     ],
     "security": {
