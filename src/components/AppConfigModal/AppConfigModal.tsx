@@ -243,6 +243,7 @@ export function AppConfigModal({
                   </button>
                 </div>
               </div>
+
               {/* App Name */}
               <div className="form-group">
                 <label htmlFor="name" className="form-label">
@@ -265,175 +266,185 @@ export function AppConfigModal({
                 )}
               </div>
 
-        {/* Launch Commands */}
-        <div className="form-group">
-                <label htmlFor="launchCommands" className="form-label">
-                  Launch Commands
-                </label>
-                <textarea
-                  id="launchCommands"
-                  className={`form-input ${errors.launchCommands ? 'error' : ''}`}
-                  value={formData.launchCommands}
-                  onChange={(e) => handleInputChange('launchCommands', e.target.value)}
-                  placeholder="Enter commands to run a process, or just add a URL below for bookmarks&#10;nvm use 14.15&#10;yarn watch"
-                  maxLength={2000}
-                  rows={4}
-                />
-                <div className="form-help">
-          {formData.appType === 'bookmark' ? 'Ignored for bookmarks.' : 'Required for terminal apps.'}
-                </div>
-                {errors.launchCommands && (
-                  <div className="form-error">
-                    <AlertCircle size={12} />
-                    {errors.launchCommands}
-                  </div>
-                )}
-                <div className="form-help">
-                  Shell commands to execute when starting this app (one command per line)
-                </div>
-              </div>
-
-              {/* Working Directory */}
-              <div className="form-group">
-                <label htmlFor="workingDirectory" className="form-label">
-                  Working Directory
-                </label>
-                <div className="file-picker-group">
-                  <input
-                    id="workingDirectory"
-                    type="text"
-                    className={`form-input file-picker-input ${errors.workingDirectory ? 'error' : ''}`}
-                    value={formData.workingDirectory}
-                    onChange={(e) => handleInputChange('workingDirectory', e.target.value)}
-                    placeholder="/path/to/project"
-                  />
-                  <button
-                    type="button"
-                    className="file-picker-button"
-                    onClick={handlePickDirectory}
-                    disabled={isSubmitting}
-                  >
-                    <Folder size={16} />
-                    Browse
-                  </button>
-                </div>
-                {errors.workingDirectory && (
-                  <div className="form-error">
-                    <AlertCircle size={12} />
-                    {errors.workingDirectory}
-                  </div>
-                )}
-              </div>
-
-              {/* URL / File destination */}
-              <div className="form-group">
-                <label className="form-label">Destination</label>
-                <div className="toggle-group" role="tablist" aria-label="Destination Type">
-                  <button
-                    type="button"
-                    className={`toggle-button ${formData.urlMode === 'url' ? 'active' : ''}`}
-                    onClick={() => handleInputChange('urlMode', 'url')}
-                    aria-pressed={formData.urlMode === 'url'}
-                  >
-                    <LinkIcon size={14} /> URL
-                  </button>
-                  <button
-                    type="button"
-                    className={`toggle-button ${formData.urlMode === 'file' ? 'active' : ''}`}
-                    onClick={() => handleInputChange('urlMode', 'file')}
-                    aria-pressed={formData.urlMode === 'file'}
-                  >
-                    <FileIcon size={14} /> Local file
-                  </button>
-                </div>
-
-        {formData.urlMode === 'url' ? (
-                  <>
-                    <input
-                      id="url"
-                      type="url"
-                      className={`form-input ${errors.url ? 'error' : ''}`}
-                      value={formData.url}
-                      onChange={(e) => handleInputChange('url', e.target.value)}
-                      placeholder="http://localhost:3000"
+              {/* Terminal-related fields: only for process or both */}
+              {(formData.appType === 'process' || formData.appType === 'both') && (
+                <>
+                  {/* Launch Commands */}
+                  <div className="form-group">
+                    <label htmlFor="launchCommands" className="form-label">
+                      Launch Commands
+                    </label>
+                    <textarea
+                      id="launchCommands"
+                      className={`form-input ${errors.launchCommands ? 'error' : ''}`}
+                      value={formData.launchCommands}
+                      onChange={(e) => handleInputChange('launchCommands', e.target.value)}
+                      placeholder="Enter commands to run a process\nnvm use 14.15\nyarn watch"
+                      maxLength={2000}
+                      rows={4}
                     />
-                    {errors.url && (
+                    <div className="form-help">
+                      Required for terminal apps.
+                    </div>
+                    {errors.launchCommands && (
                       <div className="form-error">
                         <AlertCircle size={12} />
-                        {errors.url}
+                        {errors.launchCommands}
                       </div>
                     )}
-          <div className="form-help">{formData.appType === 'process' ? 'Optional for pure terminal apps.' : 'Required for bookmarks and apps that also open a site.'}</div>
-                  </>
-                ) : (
-                  <>
+                    <div className="form-help">
+                      Shell commands to execute when starting this app (one command per line)
+                    </div>
+                  </div>
+
+                  {/* Working Directory */}
+                  <div className="form-group">
+                    <label htmlFor="workingDirectory" className="form-label">
+                      Working Directory
+                    </label>
                     <div className="file-picker-group">
                       <input
-                        id="filePath"
+                        id="workingDirectory"
                         type="text"
-                        className={`form-input file-picker-input ${errors.filePath ? 'error' : ''}`}
-                        value={formData.filePath}
-                        onChange={(e) => handleInputChange('filePath', e.target.value)}
-                        placeholder="/path/to/file.html"
+                        className={`form-input file-picker-input ${errors.workingDirectory ? 'error' : ''}`}
+                        value={formData.workingDirectory}
+                        onChange={(e) => handleInputChange('workingDirectory', e.target.value)}
+                        placeholder="/path/to/project"
                       />
                       <button
                         type="button"
                         className="file-picker-button"
-                        onClick={handlePickFile}
+                        onClick={handlePickDirectory}
                         disabled={isSubmitting}
                       >
                         <Folder size={16} />
                         Browse
                       </button>
                     </div>
-                    {errors.filePath && (
+                    {errors.workingDirectory && (
                       <div className="form-error">
                         <AlertCircle size={12} />
-                        {errors.filePath}
+                        {errors.workingDirectory}
                       </div>
                     )}
-                    <div className="form-help">{formData.appType === 'process' ? 'Optional for pure terminal apps.' : 'Required for bookmarks and apps that also open a site.'}</div>
-                  </>
-                )}
-              </div>
-
-              {/* Browser Settings */}
-              <div className="form-group">
-                <div className="checkbox-group">
-                  <input
-                    id="autoLaunchBrowser"
-                    type="checkbox"
-                    className="checkbox-input"
-                    checked={formData.autoLaunchBrowser}
-                    onChange={(e) => handleInputChange('autoLaunchBrowser', e.target.checked)}
-                  />
-                  <label htmlFor="autoLaunchBrowser" className="checkbox-label">
-                    Auto-launch browser when app starts
-                  </label>
-                </div>
-              </div>
-
-              {/* Browser Delay (optional) */}
-              <div className="form-group">
-                <label htmlFor="browserDelay" className="form-label">
-                  Browser Delay (seconds)
-                </label>
-                <input
-                  id="browserDelay"
-                  type="number"
-                  min="0"
-                  max="60"
-                  className={`form-input ${errors.browserDelay ? 'error' : ''}`}
-                  value={formData.browserDelay}
-                  onChange={(e) => handleInputChange('browserDelay', parseInt(e.target.value) || 0)}
-                />
-                {errors.browserDelay && (
-                  <div className="form-error">
-                    <AlertCircle size={12} />
-                    {errors.browserDelay}
                   </div>
-                )}
-              </div>
+                </>
+              )}
+
+              {/* Browser-related fields: only for bookmark or both */}
+              {(formData.appType === 'bookmark' || formData.appType === 'both') && (
+                <>
+                  {/* URL / File destination */}
+                  <div className="form-group">
+                    <label className="form-label">Destination</label>
+                    <div className="toggle-group" role="tablist" aria-label="Destination Type">
+                      <button
+                        type="button"
+                        className={`toggle-button ${formData.urlMode === 'url' ? 'active' : ''}`}
+                        onClick={() => handleInputChange('urlMode', 'url')}
+                        aria-pressed={formData.urlMode === 'url'}
+                      >
+                        <LinkIcon size={14} /> URL
+                      </button>
+                      <button
+                        type="button"
+                        className={`toggle-button ${formData.urlMode === 'file' ? 'active' : ''}`}
+                        onClick={() => handleInputChange('urlMode', 'file')}
+                        aria-pressed={formData.urlMode === 'file'}
+                      >
+                        <FileIcon size={14} /> Local file
+                      </button>
+                    </div>
+
+                    {formData.urlMode === 'url' ? (
+                      <>
+                        <input
+                          id="url"
+                          type="url"
+                          className={`form-input ${errors.url ? 'error' : ''}`}
+                          value={formData.url}
+                          onChange={(e) => handleInputChange('url', e.target.value)}
+                          placeholder="http://localhost:3000"
+                        />
+                        {errors.url && (
+                          <div className="form-error">
+                            <AlertCircle size={12} />
+                            {errors.url}
+                          </div>
+                        )}
+                        <div className="form-help">Required for bookmarks and apps that also open a site.</div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="file-picker-group">
+                          <input
+                            id="filePath"
+                            type="text"
+                            className={`form-input file-picker-input ${errors.filePath ? 'error' : ''}`}
+                            value={formData.filePath}
+                            onChange={(e) => handleInputChange('filePath', e.target.value)}
+                            placeholder="/path/to/file.html"
+                          />
+                          <button
+                            type="button"
+                            className="file-picker-button"
+                            onClick={handlePickFile}
+                            disabled={isSubmitting}
+                          >
+                            <Folder size={16} />
+                            Browse
+                          </button>
+                        </div>
+                        {errors.filePath && (
+                          <div className="form-error">
+                            <AlertCircle size={12} />
+                            {errors.filePath}
+                          </div>
+                        )}
+                        <div className="form-help">Required for bookmarks and apps that also open a site.</div>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Browser Settings */}
+                  <div className="form-group">
+                    <div className="checkbox-group">
+                      <input
+                        id="autoLaunchBrowser"
+                        type="checkbox"
+                        className="checkbox-input"
+                        checked={formData.autoLaunchBrowser}
+                        onChange={(e) => handleInputChange('autoLaunchBrowser', e.target.checked)}
+                      />
+                      <label htmlFor="autoLaunchBrowser" className="checkbox-label">
+                        Auto-launch browser when app starts
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Browser Delay (optional) */}
+                  <div className="form-group">
+                    <label htmlFor="browserDelay" className="form-label">
+                      Browser Delay (seconds)
+                    </label>
+                    <input
+                      id="browserDelay"
+                      type="number"
+                      min="0"
+                      max="60"
+                      className={`form-input ${errors.browserDelay ? 'error' : ''}`}
+                      value={formData.browserDelay}
+                      onChange={(e) => handleInputChange('browserDelay', parseInt(e.target.value) || 0)}
+                    />
+                    {errors.browserDelay && (
+                      <div className="form-error">
+                        <AlertCircle size={12} />
+                        {errors.browserDelay}
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
 
               {/* Tags */}
               <div className="form-group">
