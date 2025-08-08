@@ -1,5 +1,6 @@
 use crate::models::app::{AppProcess, AppStatus};
 use serde::{Deserialize, Serialize};
+use serde_json;
 use std::collections::HashMap;
 use std::process::Stdio;
 use std::sync::{Arc, Mutex};
@@ -352,7 +353,7 @@ impl Default for ProcessManager {
 #[tauri::command]
 pub async fn start_app_process(
     app_id: String,
-    launch_commands: String,
+    launch_commands: Option<String>,
     working_directory: Option<String>,
     environment_variables: Option<HashMap<String, String>>,
     url: Option<String>,
@@ -364,6 +365,57 @@ pub async fn start_app_process(
     process_manager: State<'_, ProcessManager>,
 ) -> Result<ProcessResult, String> {
     log::info!("Starting process for app: {}", app_id);
+
+    // Check if this is a bookmark app (no launch commands)
+    let is_bookmark = launch_commands.as_ref().map_or(true, |cmd| cmd.trim().is_empty());
+
+    if is_bookmark {
+        log::info!("Bookmark app detected - opening URL only");
+
+        // For bookmark apps, we only handle browser launching
+        if let Some(url) = url {
+            // Use the browser command to open URL
+            match crate::commands::browser::open_url_in_browser(url.clone()).await {
+                Ok(_message) => {
+                    // Emit success event for bookmark opening
+                    let _ = app_handle.emit("process-started", serde_json::json!({
+                        "appId": app_id,
+                        "message": format!("Opened URL: {}", url)
+                    }));
+
+                    return Ok(ProcessResult {
+                        success: true,
+                        message: format!("Opened URL: {}", url),
+                        pid: None,
+                        error: None,
+                    });
+                },
+                Err(error_msg) => {
+                    let _ = app_handle.emit("process-error", serde_json::json!({
+                        "appId": app_id,
+                        "message": error_msg.clone()
+                    }));
+
+                    return Ok(ProcessResult {
+                        success: false,
+                        message: error_msg.clone(),
+                        pid: None,
+                        error: Some(error_msg),
+                    });
+                }
+            }
+        } else {
+            return Ok(ProcessResult {
+                success: false,
+                message: "Bookmark apps require a URL".to_string(),
+                pid: None,
+                error: Some("No URL provided for bookmark app".to_string()),
+            });
+        }
+    }
+
+    // Handle process apps (with launch commands)
+    let launch_commands = launch_commands.unwrap_or_default();
     log::info!("Raw launch commands: {}", launch_commands);
     if let Some(ref dir) = working_directory {
         log::info!("Raw working directory: {}", dir);

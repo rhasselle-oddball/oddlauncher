@@ -90,7 +90,7 @@ export function useProcessManager() {
   const startProcess = useCallback(
     async (
       appId: string,
-      launchCommands: string,
+      launchCommands?: string,
       workingDirectory?: string,
       environmentVariables?: Record<string, string>,
       url?: string,

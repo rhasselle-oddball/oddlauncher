@@ -41,10 +41,9 @@
           "description": "Display name of the app",
           "minLength": 1
         },
-        "command": {
+        "launchCommands": {
           "type": "string",
-          "description": "Shell command to execute",
-          "minLength": 1
+          "description": "Shell commands to execute sequentially (one per line)"
         },
         "workingDirectory": {
           "type": "string",
@@ -107,7 +106,11 @@
           "format": "date-time"
         }
       },
-      "required": ["id", "name", "command", "createdAt", "updatedAt"],
+      "required": ["id", "name", "createdAt", "updatedAt"],
+      "anyOf": [
+        { "required": ["launchCommands"] },
+        { "required": ["url"] }
+      ],
       "additionalProperties": false
     },
     "GlobalSettings": {

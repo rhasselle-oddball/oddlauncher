@@ -30,8 +30,8 @@ pub struct AppConfig {
     pub id: String,
     /// Display name of the app
     pub name: String,
-    /// Shell commands to execute sequentially (one per line)
-    pub launch_commands: String,
+    /// Shell commands to execute sequentially (one per line) - optional for bookmark apps
+    pub launch_commands: Option<String>,
     /// Working directory for the command (optional)
     pub working_directory: Option<String>,
     /// URL to open in browser when app starts (optional)
@@ -192,4 +192,34 @@ pub enum AppEvent {
     AppAdded { app_id: String, config: AppConfig },
     AppRemoved { app_id: String },
     ErrorOccurred { app_id: String, error: AppError },
+}
+
+/**
+ * Type of application
+ */
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "lowercase")]
+pub enum AppType {
+    Process,
+    Bookmark,
+}
+
+impl AppConfig {
+    /// Determine the type of app based on configuration
+    pub fn get_app_type(&self) -> AppType {
+        match &self.launch_commands {
+            Some(commands) if !commands.trim().is_empty() => AppType::Process,
+            _ => AppType::Bookmark,
+        }
+    }
+
+    /// Check if this is a bookmark app (URL-only)
+    pub fn is_bookmark_app(&self) -> bool {
+        self.get_app_type() == AppType::Bookmark
+    }
+
+    /// Check if this is a process app
+    pub fn is_process_app(&self) -> bool {
+        self.get_app_type() == AppType::Process
+    }
 }

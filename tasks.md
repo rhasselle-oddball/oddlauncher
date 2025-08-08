@@ -904,7 +904,7 @@ Users needed distributable builds for macOS (both Intel and Apple Silicon), Wind
   - Universal macOS build support for both architectures
 - ✅ **Automated Distribution Files**:
   - **macOS**: `.dmg` installers and `.app` bundles for both Intel and Apple Silicon
-  - **Windows**: `.msi` installers and `.exe` executables  
+  - **Windows**: `.msi` installers and `.exe` executables
   - **Linux**: `.deb`, `.rpm` packages and `.AppImage` portables
 - ✅ **Release Management**:
   - Automatic draft releases when version tags are created
@@ -913,7 +913,7 @@ Users needed distributable builds for macOS (both Intel and Apple Silicon), Wind
 
 **Verified Acceptance Criteria:**
 - ✅ GitHub Actions workflows successfully build for all target platforms
-- ✅ macOS builds generate proper .dmg and .app files for distribution  
+- ✅ macOS builds generate proper .dmg and .app files for distribution
 - ✅ Windows builds create .msi installers for easy installation
 - ✅ Linux builds maintain existing .deb, .rpm, and .AppImage formats
 - ✅ Manual build workflow allows testing individual platforms during development
@@ -927,20 +927,103 @@ Users needed distributable builds for macOS (both Intel and Apple Silicon), Wind
 - Development workflow supports manual builds for testing individual platforms
 - Release workflow automates the entire distribution process when creating version tags
 - No need for local cross-compilation or multiple development machines
-- Ready to distribute to users on any supported platform
-
-**Distribution Instructions:**
-- **For Mac Users**: Download the appropriate `.dmg` file:
-  - `oddbox_*_aarch64.dmg` for Apple Silicon Macs (M1/M2/M3)
-  - `oddbox_*_x64.dmg` for Intel Macs
-- **For Windows Users**: Download `oddbox_*_x64_en-US.msi` installer
-- **For Linux Users**: Choose from `.deb`, `.rpm`, or `.AppImage` based on your distribution
 
 ---
 
-## �🚧 TODO: REMAINING TASKS
+### 🔧 Task 20: Support URL-Only Bookmarks (URL without Terminal Commands)
+**Priority:** Medium | **Status:** TODO 📝
 
-### 🔧 Task 20: Add Multi-Command Dev Server Launch Support
+**Problem Statement:**
+Users want to create bookmarks for URLs they frequently access (like development dashboards, documentation, or web apps) without needing to run any terminal commands. Currently, the "Launch Commands" field is required, preventing users from creating URL-only entries that simply open the browser when clicked.
+
+**Use Cases:**
+- Development dashboards (Grafana, Kibana, etc.)
+- Documentation sites (API docs, internal wikis)
+- Web-based development tools (GitHub repos, Figma designs, etc.)
+- Database admin interfaces (phpMyAdmin, MongoDB Compass web, etc.)
+- Local development URLs that are already running (external servers, Docker containers)
+
+**Current Limitations:**
+- `launchCommands` field is required in form validation
+- `start_app_process` Tauri command expects launch commands
+- No way to create URL-only entries that just open browsers
+- "Start/Stop" button is misleading for URL-only bookmarks (implies process starting)
+
+**Implementation Plan:**
+
+1. **Data Model Changes**:
+   - Make `launchCommands` optional in TypeScript `AppConfig` interface
+   - Make `launch_commands` optional in Rust `AppConfig` struct
+   - Update JSON schema to allow empty/null launch commands
+   - Add `appType` field to distinguish between "process" and "bookmark" apps
+
+2. **Form Validation Updates**:
+   - Remove required validation for `launchCommands` field in AppConfigModal
+   - Remove red asterisk (*) from "Launch Commands" field label (no longer required)
+   - Add validation: require either `launchCommands` OR `url` (not both empty)
+   - Update form help text: "Enter commands to run a process, or just a URL for bookmarks"
+   - Show contextual validation messages when both fields are empty
+   - Consider adding radio buttons or toggle for "Process App" vs "URL Bookmark"
+
+3. **Backend Process Logic**:
+   - Update `start_app_process` to handle URL-only apps
+   - For bookmark apps: skip process spawning, only handle browser launching
+   - Return appropriate process result for bookmark actions
+   - Emit different events for bookmark vs process actions
+
+4. **UI/UX Changes**:
+   - Change "Start/Stop" button to "Open" button for URL-only bookmark apps
+   - Show different status indicators (no "running/stopping" status for bookmarks)
+   - Update terminal display for bookmark apps (show "Opening URL..." message instead of process output)
+   - Different visual treatment in sidebar for bookmark vs process apps (maybe bookmark icon)
+   - Add visual indicator (icon) to distinguish bookmark apps from process apps in sidebar
+   - Button should show "Open" text and maybe use external link icon instead of play icon
+
+5. **Process Management**:
+   - Handle URL-only apps in `useProcessManager` hook
+   - No process tracking needed for bookmark apps
+   - Proper status management for bookmark actions (opening → opened)
+
+**Acceptance Criteria:**
+- [ ] Can create apps with only URL field filled (no launch commands required)
+- [ ] URL-only apps show "Open" button instead of "Start/Stop" button
+- [ ] Clicking "Open" on URL-only app opens browser and shows success feedback
+- [ ] Form validation requires either launch commands OR URL (not both empty)
+- [ ] Sidebar visually distinguishes between process apps and bookmark apps
+- [ ] Terminal shows appropriate message for bookmark apps ("Opening [URL]...")
+- [ ] No process status tracking for URL-only bookmark apps
+- [ ] Existing process-based apps continue working unchanged (backward compatibility)
+- [ ] Import/export works with both app types
+
+**Verification Steps:**
+- [ ] Create new app with only URL field populated (no commands)
+- [ ] Verify form saves successfully without launch commands
+- [ ] Click "Open" button opens URL in default browser
+- [ ] Verify terminal shows "Opening URL" message instead of process output
+- [ ] Verify sidebar shows bookmark icon or visual indicator
+- [ ] Test that process-based apps still work normally
+- [ ] Test import/export with mixed bookmark and process apps
+- [ ] Verify no process tracking or status updates for bookmark apps
+
+**Technical Implementation Notes:**
+- Add `appType: 'process' | 'bookmark'` field to AppConfig (inferred from presence of launchCommands)
+- Update form to show contextual help text based on filled fields
+- Consider using different icons in sidebar for bookmark vs process apps (ExternalLink icon for bookmarks)
+- Terminal component should handle "bookmark opened" vs "process output" states
+- Process manager should handle bookmark operations differently from process operations
+
+**Out of Scope:**
+- Custom browser selection (use system default browser)
+- Bookmark organization features (folders, categories)
+- Bookmark syncing or cloud storage
+- Advanced URL handling (authentication, headers, etc.)
+- Batch bookmark operations
+
+---
+
+## 🚧 TODO: REMAINING TASKS
+
+### 🔧 Task 21: Add Multi-Command Dev Server Launch Support
   - Implement user-friendly error messages throughout the application
   - Add error boundaries for React components
   - Create error logging system for debugging

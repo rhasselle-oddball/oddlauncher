@@ -163,7 +163,7 @@ export const AppCard: React.FC<AppCardProps> = ({
         isOpen={showDebugModal}
         onClose={() => setShowDebugModal(false)}
         appName={config.name}
-        command={config.launchCommands}
+        command={config.launchCommands || ''}
         workingDirectory={config.workingDirectory}
         errorMessage={process?.errorMessage}
       />

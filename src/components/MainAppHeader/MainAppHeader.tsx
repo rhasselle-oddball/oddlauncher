@@ -1,5 +1,6 @@
-import { Play, Square, Loader, Edit, Trash2 } from 'lucide-react'
+import { Play, Square, Loader, Edit, Trash2, ExternalLink } from 'lucide-react'
 import type { AppConfig } from '../../types'
+import { isBookmarkApp } from '../../types'
 import { useAppProcess } from '../../hooks/useProcessManager'
 import { useBrowser } from '../../hooks/useBrowser'
 import './MainAppHeader.css'
@@ -33,6 +34,15 @@ export function MainAppHeader({
   const { openUrlInBrowser } = useBrowser()
 
   const getStatusDisplay = () => {
+    // Check if this is a bookmark app
+    const isBookmark = selectedApp ? isBookmarkApp(selectedApp) : false
+
+    if (isBookmark) {
+      // Bookmark apps just show "Open" button
+      return { text: 'Open', icon: <ExternalLink size={16} />, className: 'bookmark', buttonText: 'Open' }
+    }
+
+    // Process app status logic
     if (isStarting) {
       return { text: 'Starting...', icon: <Loader size={16} className="spin" />, className: 'starting', buttonText: 'Starting...' }
     }
@@ -52,11 +62,21 @@ export function MainAppHeader({
     if (!selectedApp) return
 
     try {
+      // Check if this is a bookmark app
+      if (isBookmarkApp(selectedApp)) {
+        // For bookmark apps, just open the URL
+        if (selectedApp.url) {
+          await openUrlInBrowser(selectedApp.url)
+        }
+        return
+      }
+
+      // Handle process apps
       if (isRunning) {
         await stop()
       } else {
         await start(
-          selectedApp.launchCommands,
+          selectedApp.launchCommands || '',
           selectedApp.workingDirectory,
           selectedApp.environmentVariables,
           selectedApp.url,

@@ -93,6 +93,11 @@
   background: rgba(128, 128, 128, 0.1);
 }
 
+.status-bookmark {
+  color: var(--accent-blue);
+  background: rgba(33, 150, 243, 0.1);
+}
+
 .status-icon {
   width: 8px;
   height: 8px;
@@ -119,6 +124,10 @@
 
 .status-stopped .status-icon {
   background: var(--text-secondary);
+}
+
+.status-bookmark .status-icon {
+  background: var(--accent-blue);
 }
 
 .status-text {
