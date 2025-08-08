@@ -177,12 +177,14 @@ export function MainAppHeader({
             <h2 className="app-title">{selectedApp.name}</h2>
 
             <div className="app-meta-primary">
-              <div className="command-section">
-                <span className="meta-label">Launch Commands:</span>
-                <div className="app-command-block">
-                  <pre>{selectedApp.launchCommands}</pre>
+              {getAppType(selectedApp) !== 'bookmark' && (
+                <div className="command-section">
+                  <span className="meta-label">Launch Commands:</span>
+                  <div className="app-command-block">
+                    <pre>{selectedApp.launchCommands}</pre>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {selectedApp.url && (
                 <div className="meta-item-full">

@@ -1,6 +1,7 @@
 import { MainAppHeader } from '../MainAppHeader'
 import { Terminal } from '../Terminal'
 import { useProcessManager } from '../../hooks/useProcessManager'
+import { getAppType } from '../../types'
 import type { AppConfig } from '../../types'
 import './MainContent.css'
 
@@ -74,18 +75,20 @@ export function MainContent({
         />
       </div>
 
-      <div className="main-content-terminal">
-        <Terminal
-          selectedApp={selectedApp}
-          lines={terminalLines}
-          rawOutput={processOutput}
-          onClear={handleTerminalClear}
-          onCopy={handleTerminalCopy}
-          onSearch={handleTerminalSearch}
-          autoScroll={true}
-          maxLines={1000}
-        />
-      </div>
+      {(!selectedApp || getAppType(selectedApp) !== 'bookmark') && (
+        <div className="main-content-terminal">
+          <Terminal
+            selectedApp={selectedApp}
+            lines={terminalLines}
+            rawOutput={processOutput}
+            onClear={handleTerminalClear}
+            onCopy={handleTerminalCopy}
+            onSearch={handleTerminalSearch}
+            autoScroll={true}
+            maxLines={1000}
+          />
+        </div>
+      )}
     </div>
   )
 }

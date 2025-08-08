@@ -1,7 +1,7 @@
 import React from 'react'
 import type { AppConfig } from '../../types'
 import { getAppType, isBookmarkApp } from '../../types'
-import { TerminalSquare, Link2, ExternalLink } from 'lucide-react'
+import { TerminalSquare, ExternalLink } from 'lucide-react'
 import { useAppProcess } from '../../hooks/useProcessManager'
 import { useBrowser } from '../../hooks/useBrowser'
 import { useConfigManager } from '../../hooks/useConfig'
@@ -55,19 +55,6 @@ export function AppListItem({ app, isSelected, onClick }: AppListItemProps) {
       <div className="app-list-item__content">
         <div className="app-list-item__header">
           <div className="app-list-item__name-row">
-            <span className="app-type-icon" title={getAppType(app)}>
-              {(() => {
-                const t = getAppType(app)
-                if (t === 'bookmark') return <Link2 size={16} />
-                if (t === 'process') return <TerminalSquare size={16} />
-                return (
-                  <span className="both-icons">
-                    <TerminalSquare size={16} />
-                    <Link2 size={16} />
-                  </span>
-                )
-              })()}
-            </span>
             <h3 className="app-list-item__name" title={app.name}>{app.name}</h3>
           </div>
           <div className="app-list-item__row-actions">
