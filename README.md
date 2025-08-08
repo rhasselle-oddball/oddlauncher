@@ -1,4 +1,8 @@
-# Od## 💾 Download & InstallationLauncher - Dev Tools Launcher
+# OddLauncher - Dev Tools Launcher
+
+A native desktop application that acts like a "Steam Library for dev tools". Launch local development servers with a single click, view terminal output in real-time, and open browser tabs automatically.
+
+## 💾 Download & Installation# 💾 Download & InstallationLauncher - Dev Tools Launcher
 
 A native desktop application that acts like a "Steam Library for dev tools". Launch local development servers with a single click, view terminal output in real-time, and open browser tabs automatically.
 
@@ -10,7 +14,7 @@ A native desktop application that acts like a "Steam Library for dev tools". Lau
 
 Choose the right file for your operating system:
 - **Windows**: `oddlauncher_*_x64_en-US.msi`
-- **macOS Intel**: `oddlauncher_*_x64.dmg` 
+- **macOS Intel**: `oddlauncher_*_x64.dmg`
 - **macOS Apple Silicon**: `oddlauncher_*_aarch64.dmg`
 - **Linux Debian/Ubuntu**: `oddlauncher_*_amd64.deb`
 - **Linux Universal**: `oddlauncher_*_amd64.AppImage`
@@ -24,7 +28,7 @@ Choose the right file for your operating system:
 - **Solution**: Click "More info" → "Run anyway"
 - **Alternative**: Right-click the installer → Properties → Check "Unblock" → OK
 
-#### **macOS** 
+#### **macOS**
 - **Warning**: "App is damaged and can't be opened" or "Developer cannot be verified"
 - **Solution**: Run this command in Terminal:
   ```bash
@@ -63,7 +67,7 @@ For security, you can verify the files match the official release:
 ## 🎯 Features
 
 ### ✅ What's Working Now
-- Steam-like sidebar layout for dev tools  
+- Steam-like sidebar layout for dev tools
 - Dark theme UI with responsive design
 - One-click server launching and stopping
 - Real-time process status indicators
