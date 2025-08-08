@@ -23,41 +23,18 @@ export function AppListItem({ app, isSelected, onClick }: AppListItemProps) {
     onClick(app)
   }
 
-  const getStatusDisplay = () => {
-    // Check if this is a bookmark app
-    if (isBookmarkApp(app)) {
-  return { text: 'Bookmark', icon: '', className: 'bookmark' }
-    }
-
-    // Process app status logic
-    if (isStarting) {
-      return { text: 'Starting', icon: '', className: 'starting' }
-    }
-    if (isStopping) {
-      return { text: 'Stopping', icon: '', className: 'stopping' }
-    }
-    if (isRunning) {
-      return { text: 'Running', icon: '', className: 'running' }
-    }
-    if (hasError) {
-      return { text: 'Error', icon: '', className: 'error' }
-    }
-  return { text: 'Stopped', icon: '', className: 'stopped' }
-  }
-
-  const statusInfo = getStatusDisplay()
+  const statusClass = isBookmarkApp(app)
+    ? 'bookmark'
+    : (isStarting ? 'starting' : isStopping ? 'stopping' : isRunning ? 'running' : hasError ? 'error' : 'stopped')
 
   return (
     <div
-      className={`app-list-item ${isSelected ? 'selected' : ''} ${statusInfo.className}`}
+      className={`app-list-item ${isSelected ? 'selected' : ''} ${statusClass}`}
       onClick={handleClick}
     >
-      <div className="app-list-item__content">
-        <div className="app-list-item__header">
-          <div className="app-list-item__name-row">
-            <h3 className="app-list-item__name" title={app.name}>{app.name}</h3>
-          </div>
-          <div className="app-list-item__row-actions">
+      <div className="app-list-item__row">
+        <h3 className="app-list-item__name" title={app.name}>{app.name}</h3>
+        <div className="app-list-item__row-actions">
             {/* Terminal start/stop toggle (only if has commands) */}
             {(() => {
               const t = getAppType(app)
@@ -103,7 +80,6 @@ export function AppListItem({ app, isSelected, onClick }: AppListItemProps) {
                 </button>
               )
             })()}
-
             {/* Browser open (if URL) */}
             {app.url && (
               <button
@@ -130,12 +106,6 @@ export function AppListItem({ app, isSelected, onClick }: AppListItemProps) {
                 <ExternalLink size={16} />
               </button>
             )}
-          </div>
-        </div>
-        <div className="app-list-item__details">
-          <div className="app-list-item__meta" title={app.url || app.workingDirectory || ''}>
-            {app.url ? (new URL(app.url).host || app.url) : (app.workingDirectory ? app.workingDirectory.replace(/^.*\\\//, '') : '')}
-          </div>
         </div>
       </div>
     </div>

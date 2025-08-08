@@ -171,6 +171,102 @@ Verification (ongoing):
 
 Relevant commits: pending push in this session.
 
+### Task 19: Steam-like Sidebar Density + Sort Toggle + Grouped Sections; Larger Default Window (QUEUED)
+Status: Not started — queued for handoff
+
+Problem / Goals
+- Default window real estate is too small; increase initial size so more content is visible.
+- Sidebar shows only ~10 items without scrolling; target ~20 visible items on a larger default window.
+- Prefer information density over card styling: convert to single-line rows, minimal padding, no extra details under the name.
+- Keep quick action buttons for terminal/browser on each row.
+- Simplify filters: search box + a single icon toggle (clock ↔ A–Z) for sorting; remove other filter controls.
+- When sorting by recents, group items into collapsible sections like Steam (RECENT, months, year buckets).
+
+Scope
+1) Default window size
+- Increase Tauri initial window size (e.g., width: 1400px, height: 900px) and sensible minimums (minWidth ~ 1100, minHeight ~ 700).
+- Preserve existing behavior for remembering last window size if already implemented.
+
+2) Sidebar density overhaul
+- Convert `AppListItem` to a single-line row with ellipsized name.
+- Remove secondary metadata line; no “card” padding/borders; compact vertical spacing (row height target ~28–32px).
+- Prefer enough width in the sidebar to accommodate longer app names.
+- Keep right-aligned action buttons (terminal toggle + browser open) with background-only active states, no borders.
+- Ensure keyboard/mouse interactions: row click selects; action clicks don’t change selection.
+- Aim: On a 900px-tall content area, visible rows ≥ 20 without scrolling (exact count depends on header height).
+
+3) Filters → Sort toggle + search
+- Replace filter chip/selects with:
+  - Search input (existing).
+  - Single icon button that toggles sorting between Recents and A–Z.
+    - Icon states: Clock = Recents; A–Z = alphabetical. Tooltip reflects current mode.
+  - Persist last chosen sort in localStorage.
+
+4) Grouped sections for Recents
+- When sort=Recents, group apps into collapsible headings:
+  - RECENT: last 14 days (configurable constant), ordered by lastUsedAt desc.
+  - Month buckets for the current calendar year (e.g., AUGUST, JULY, JUNE, …) excluding items already in RECENT.
+  - Year buckets for prior years (e.g., 2024, 2023) when older than the current year.
+- Headings are collapsible; collapsed state persists per heading via localStorage.
+- Collapsing/expanding should not change selection.
+
+5) Performance & UX
+- Virtualize list later if needed (deferred if not required for typical app counts).
+- Keep drag/drop reorder disabled in search mode; if reorder is still desired, only in A–Z mode (optional/deferred).
+
+Acceptance Criteria
+- On launch, the window opens larger (≈ 1400×900); app remembers user-resized values as before.
+- Sidebar rows are single-line, dense, and show only the name + right-aligned action buttons; at least ~20 rows visible on a typical 900px content height.
+- The previous multi-filter controls are removed; only search and a single sort toggle icon remain.
+- Sort toggle switches between A–Z and Recents; choice persists across sessions.
+- Recents view shows collapsible sections: RECENT (≤14 days), month buckets for the current year, and older years as year buckets. Collapsed states persist.
+- Row interactions: clicking actions doesn’t change selection; clicking the name selects the row.
+- TypeScript build and cargo check pass.
+
+Verification Steps
+- [ ] Launch app: initial window is larger (≈ 1400×900); resizing persists across restarts (if previously supported).
+- [ ] Sidebar renders ≥ 20 single-line items without scrolling at typical window height (visual check).
+- [ ] Terminal/Browser action buttons still function; do not change selection when clicked.
+- [ ] Filter area contains only search input + sort toggle icon; toggling updates order and persists after reload.
+- [ ] Recents view shows RECENT/month/year group headings, collapsible; collapsing state persists after reload.
+- [ ] Alphabetical view shows flat A–Z list with single-line rows.
+- [ ] `npm run build` succeeds; `cargo check` succeeds.
+
+Implementation Notes (for handoff)
+- Window size: update `src-tauri/tauri.conf.json` → `tauri.windows[0].width/height/minWidth/minHeight`.
+- Sidebar rows: adjust `AppListItem` markup/CSS to 1-line; reduce padding; keep `.row-action` buttons.
+- Filters: simplify `LibrarySidebar` header; remove Running/Recent window selects; add single sort-toggle state + icon.
+- Grouping: compute sections from `lastUsedAt`; store collapses in `localStorage` keyed by section id.
+- Consider accessibility: headings keyboard-focusable; space/enter toggles collapse.
+
+Ready-to-run GitHub issue creation (do not run yet; for later use)
+```bash
+GH_PAGER=cat gh issue create --title 'UI: Steam-like dense sidebar + sort toggle + grouped recents; larger default window' --body-file - <<'EOF'
+Make the default window larger, densify the sidebar to one-line rows (target ~20 visible), simplify filters to search + sort toggle, and add grouped/collapsible recents sections like Steam.
+
+Why
+- Prefer information density over card styling; reduce scroll.
+- Simplify filter UX while keeping powerful recency sorting.
+
+Scope
+1) Default window size: ~1400×900, sensible minimums; preserve remember-last-size behavior.
+2) Sidebar density: single-line rows; remove extra details/padding; keep terminal/browser buttons; aim ≥ 20 items visible.
+3) Filters: search + single icon toggle (Recents ↔ A–Z), persisted.
+4) Recents grouping: RECENT (≤14 days), month buckets for current year, year buckets for older; all collapsible + persisted.
+
+Acceptance Criteria
+- Larger default window; sidebar shows ~20 rows; actions work without changing selection.
+- Only search + sort toggle visible; toggle persists.
+- Recents view grouped with collapsible headings; states persist.
+- TS and cargo checks pass.
+
+Verification
+- [ ] Visual checks for density and grouping
+- [ ] Sort toggle behavior + persistence
+- [ ] `npm run build` passes; `cargo check` passes
+EOF
+```
+
 
 ### ✅ Task 17: Reliable Stop — terminate process tree and free ports (COMPLETED - Commit: 177f1ee)
 Status: Complete ✅ | Committed: 177f1ee | Pushed: ✅ | Issue: #27 (Closed)
