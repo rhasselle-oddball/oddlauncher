@@ -8,6 +8,12 @@ use tauri::{AppHandle, Emitter, State};
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::Command as TokioCommand;
 
+#[cfg(unix)]
+#[allow(unused_imports)]
+use std::os::unix::process::CommandExt;
+#[cfg(unix)]
+use libc;
+
 // Process management module for Oddbox application
 
 /**
@@ -325,6 +331,9 @@ pub struct ProcessManager {
 pub struct ProcessInfo {
     pub pid: u32,
     pub started_at: String,
+    // On Unix, this is the process group id (pgid) that we assign to the child.
+    // On Windows, this will be None.
+    pub pgid: Option<i32>,
 }
 
 /**
@@ -508,6 +517,19 @@ pub async fn start_app_process(
         .stderr(Stdio::piped())
         .stdin(Stdio::null());
 
+    // On Unix, ensure the child starts in its own process group so we can signal the whole tree
+    #[cfg(unix)]
+    unsafe {
+        cmd.pre_exec(|| {
+            // Set child to its own process group (pgid = pid)
+            let ret = libc::setpgid(0, 0);
+            if ret != 0 {
+                // Even if setpgid fails, continue; we'll still attempt to kill by pid.
+            }
+            Ok(())
+        });
+    }
+
     // Set working directory if provided (but only for non-WSL commands on Windows)
     if let Some(ref dir) = normalized_working_dir {
         // Skip directory setting for WSL commands on Windows as wsl.exe handles it
@@ -596,6 +618,10 @@ pub async fn start_app_process(
     };
 
     let pid = child.id().unwrap_or(0);
+    #[cfg(unix)]
+    let pgid: Option<i32> = Some(pid as i32);
+    #[cfg(not(unix))]
+    let pgid: Option<i32> = None;
     let started_at = chrono::Utc::now().to_rfc3339();
 
     log::info!("Process started with PID: {} for app: {}", pid, app_id);
@@ -716,6 +742,14 @@ pub async fn start_app_process(
             Ok(status) => {
                 log::info!("Process {} exited with status: {}", app_id_monitor, status);
 
+                // Also emit a final output line for terminal visibility
+                let _ = app_handle_monitor.emit("process-output", serde_json::json!({
+                    "appId": app_id_monitor,
+                    "type": "stdout",
+                    "content": format!("Oddbox: Process exited with code {:?}", status.code()),
+                    "timestamp": chrono::Utc::now().to_rfc3339()
+                }));
+
                 let _ = app_handle_monitor.emit("process-exit", serde_json::json!({
                     "appId": app_id_monitor,
                     "exitCode": status.code(),
@@ -724,6 +758,13 @@ pub async fn start_app_process(
             }
             Err(e) => {
                 log::error!("Process {} failed: {}", app_id_monitor, e);
+
+                let _ = app_handle_monitor.emit("process-output", serde_json::json!({
+                    "appId": app_id_monitor,
+                    "type": "stderr",
+                    "content": format!("Oddbox: Process wait failed: {}", e),
+                    "timestamp": chrono::Utc::now().to_rfc3339()
+                }));
 
                 let _ = app_handle_monitor.emit("process-error", serde_json::json!({
                     "appId": app_id_monitor,
@@ -738,6 +779,7 @@ pub async fn start_app_process(
     let process_info = ProcessInfo {
         pid,
         started_at: started_at.clone(),
+        pgid,
     };
 
     {
@@ -884,50 +926,157 @@ pub async fn stop_app_process(
         }
     };
 
-    // Try to kill the process using system kill command
-    let kill_result = tokio::process::Command::new("kill")
-        .arg("-TERM")
-        .arg(process_info.pid.to_string())
-        .output()
-        .await;
+    // Cross-platform, reliable termination of the whole process tree
+    let pid_u32 = process_info.pid;
+    #[cfg(unix)]
+    let pgid_i32 = process_info.pgid.unwrap_or(pid_u32 as i32);
 
-    let result = match kill_result {
-        Ok(output) => {
-            if output.status.success() {
-                log::info!("Process {} killed successfully", app_id);
-                ProcessResult {
-                    success: true,
-                    message: "Process stopped successfully".to_string(),
-                    pid: Some(process_info.pid),
-                    error: None,
+    // Helper to wait for process to exit with timeout
+    async fn wait_for_exit(pid: u32, timeout_ms: u64) -> bool {
+        // Portable lightweight check: try sending signal 0 on Unix, or rely on waitpid via ps fallback
+        #[cfg(unix)]
+        {
+            use tokio::time::{sleep, Duration, Instant};
+            let start = Instant::now();
+            loop {
+                // kill(pid, 0) returns 0 if process exists, -1 otherwise
+                let exists = unsafe { libc::kill(pid as i32, 0) == 0 };
+                if !exists {
+                    return true;
                 }
-            } else {
-                let error_msg = format!("Failed to kill process: {}", String::from_utf8_lossy(&output.stderr));
-                log::error!("{}", error_msg);
-                ProcessResult {
-                    success: false,
-                    message: error_msg.clone(),
-                    pid: Some(process_info.pid),
-                    error: Some(error_msg),
+                if start.elapsed() > Duration::from_millis(timeout_ms) {
+                    return false;
                 }
+                sleep(Duration::from_millis(100)).await;
             }
         }
-        Err(e) => {
-            let error_msg = format!("Failed to execute kill command: {}", e);
-            log::error!("{}", error_msg);
-            ProcessResult {
-                success: false,
-                message: error_msg.clone(),
-                pid: Some(process_info.pid),
-                error: Some(error_msg),
+        #[cfg(windows)]
+        {
+            use tokio::time::{sleep, Duration, Instant};
+            // Best-effort check using tasklist filtering by PID
+            let start = Instant::now();
+            loop {
+                let out = tokio::process::Command::new("tasklist")
+                    .arg("/FI").arg(format!("PID eq {}", pid))
+                    .stdout(Stdio::piped())
+                    .stderr(Stdio::null())
+                    .output()
+                    .await;
+                let running = match out {
+                    Ok(o) => {
+                        let s = String::from_utf8_lossy(&o.stdout);
+                        s.contains(&pid.to_string())
+                    }
+                    Err(_) => false,
+                };
+                if !running {
+                    return true;
+                }
+                if start.elapsed() > Duration::from_millis(timeout_ms) {
+                    return false;
+                }
+                sleep(Duration::from_millis(100)).await;
             }
+        }
+    }
+
+    // Termination strategy:
+    // 1) Gentle: SIGINT (or CTRL+C equivalent). 2) SIGTERM. 3) SIGKILL / taskkill force. Each with waits.
+    let mut success = false;
+    let mut last_error: Option<String> = None;
+
+    #[cfg(unix)]
+    {
+        // Send to process group if possible (negative pgid)
+        let targets = [
+            (libc::SIGINT, "SIGINT"),
+            (libc::SIGTERM, "SIGTERM"),
+            (libc::SIGKILL, "SIGKILL"),
+        ];
+        for (sig, name) in targets.iter() {
+            let target = -(pgid_i32);
+            let rc = unsafe { libc::kill(target, *sig) };
+            if rc != 0 {
+                let err = std::io::Error::last_os_error();
+                log::warn!("Failed to send {} to pgid {}: {}", name, pgid_i32, err);
+                last_error = Some(format!("{} to group failed: {}", name, err));
+            } else {
+                log::info!("Sent {} to process group {} (app {})", name, pgid_i32, app_id);
+            }
+            // Wait up to 2s after INT/TERM, 1s after KILL
+            let timeout = if *sig == libc::SIGKILL { 1000 } else { 2000 };
+            if wait_for_exit(pid_u32, timeout).await {
+                success = true;
+                break;
+            }
+        }
+    }
+
+    #[cfg(windows)]
+    {
+        // Use taskkill to terminate tree
+        // First a gentle try without /F, then with /F
+        for (force, label) in [(false, "taskkill"), (true, "taskkill /F")].iter() {
+            let mut cmd = tokio::process::Command::new("taskkill");
+            cmd.arg("/PID").arg(pid_u32.to_string()).arg("/T");
+            if *force {
+                cmd.arg("/F");
+            }
+            match cmd.output().await {
+                Ok(out) => {
+                    if out.status.success() {
+                        log::info!("{} succeeded for PID {}", label, pid_u32);
+                    } else {
+                        log::warn!(
+                            "{} reported failure: {}",
+                            label,
+                            String::from_utf8_lossy(&out.stderr)
+                        );
+                    }
+                }
+                Err(e) => {
+                    log::warn!("Failed to execute {}: {}", label, e);
+                    last_error = Some(format!("{} exec failed: {}", label, e));
+                }
+            }
+            let timeout = if *force { 1000 } else { 2000 };
+            if wait_for_exit(pid_u32, timeout).await {
+                success = true;
+                break;
+            }
+        }
+    }
+
+    let result = if success {
+        log::info!("Process {} stopped successfully", app_id);
+        ProcessResult {
+            success: true,
+            message: "Process stopped successfully".to_string(),
+            pid: Some(pid_u32),
+            error: None,
+        }
+    } else {
+        let error_msg = last_error.unwrap_or_else(|| "Failed to stop process within timeout".to_string());
+        log::error!("{}", error_msg);
+        ProcessResult {
+            success: false,
+            message: error_msg.clone(),
+            pid: Some(pid_u32),
+            error: Some(error_msg),
         }
     };
 
-    // Emit process stopped event
+    // Emit process stopped event and append a terminal line
     let _ = app_handle.emit("process-stopped", serde_json::json!({
         "appId": app_id,
         "pid": process_info.pid,
+        "timestamp": chrono::Utc::now().to_rfc3339()
+    }));
+
+    let _ = app_handle.emit("process-output", serde_json::json!({
+        "appId": app_id,
+        "type": "stdout",
+        "content": "Oddbox: Process stopped",
         "timestamp": chrono::Utc::now().to_rfc3339()
     }));
 
@@ -1065,32 +1214,97 @@ pub async fn kill_all_processes(
     let mut killed_count = 0;
     let mut failed_count = 0;
 
+    // Helper to wait for exit (reuse simplified copy)
+    async fn wait_for_exit_any(pid: u32, timeout_ms: u64) -> bool {
+        #[cfg(unix)]
+        {
+            use tokio::time::{sleep, Duration, Instant};
+            let start = Instant::now();
+            loop {
+                let exists = unsafe { libc::kill(pid as i32, 0) == 0 };
+                if !exists {
+                    return true;
+                }
+                if start.elapsed() > Duration::from_millis(timeout_ms) {
+                    return false;
+                }
+                sleep(Duration::from_millis(100)).await;
+            }
+        }
+        #[cfg(windows)]
+        {
+            use tokio::time::{sleep, Duration, Instant};
+            let start = Instant::now();
+            loop {
+                let out = tokio::process::Command::new("tasklist")
+                    .arg("/FI").arg(format!("PID eq {}", pid))
+                    .stdout(Stdio::piped())
+                    .stderr(Stdio::null())
+                    .output()
+                    .await;
+                let running = match out {
+                    Ok(o) => {
+                        let s = String::from_utf8_lossy(&o.stdout);
+                        s.contains(&pid.to_string())
+                    }
+                    Err(_) => false,
+                };
+                if !running {
+                    return true;
+                }
+                if start.elapsed() > Duration::from_millis(timeout_ms) {
+                    return false;
+                }
+                sleep(Duration::from_millis(100)).await;
+            }
+        }
+    }
+
     for (app_id, process_info) in processes_to_kill {
-        let kill_result = tokio::process::Command::new("kill")
-            .arg("-TERM")
-            .arg(process_info.pid.to_string())
-            .output()
-            .await;
+        let pid = process_info.pid;
+        let mut stopped = false;
 
-        match kill_result {
-            Ok(output) if output.status.success() => {
-                killed_count += 1;
-                log::info!("Killed process for app: {}", app_id);
+        #[cfg(unix)]
+        {
+            let pgid = process_info.pgid.unwrap_or(pid as i32);
+            for (sig, _name) in [(libc::SIGTERM, "SIGTERM"), (libc::SIGKILL, "SIGKILL")].iter() {
+                let _ = unsafe { libc::kill(-pgid, *sig) };
+                let timeout = if *sig == libc::SIGKILL { 1000 } else { 1500 };
+                if wait_for_exit_any(pid, timeout).await {
+                    stopped = true;
+                    break;
+                }
+            }
+        }
 
-                let _ = app_handle.emit("process-stopped", serde_json::json!({
-                    "appId": app_id,
-                    "pid": process_info.pid,
-                    "timestamp": chrono::Utc::now().to_rfc3339()
-                }));
+        #[cfg(windows)]
+        {
+            for force in [false, true] {
+                let mut cmd = tokio::process::Command::new("taskkill");
+                cmd.arg("/PID").arg(pid.to_string()).arg("/T");
+                if force {
+                    cmd.arg("/F");
+                }
+                let _ = cmd.output().await;
+                let timeout = if force { 800 } else { 1500 };
+                if wait_for_exit_any(pid, timeout).await {
+                    stopped = true;
+                    break;
+                }
             }
-            Ok(output) => {
-                failed_count += 1;
-                log::error!("Failed to kill process for app {}: {}", app_id, String::from_utf8_lossy(&output.stderr));
-            }
-            Err(e) => {
-                failed_count += 1;
-                log::error!("Failed to execute kill command for app {}: {}", app_id, e);
-            }
+        }
+
+        if stopped {
+            killed_count += 1;
+            log::info!("Killed process for app: {}", app_id);
+            let _ = app_handle.emit("process-stopped", serde_json::json!({
+                "appId": app_id,
+                "pid": pid,
+                "timestamp": chrono::Utc::now().to_rfc3339()
+            }));
+        } else {
+            failed_count += 1;
+            log::error!("Failed to stop process tree for app {} (pid {})", app_id, pid);
         }
     }
 

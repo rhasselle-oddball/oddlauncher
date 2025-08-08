@@ -155,6 +155,55 @@ Based on the PRD, here are the development tasks organized by priority and depen
 
 ## Phase 4 - Advanced Features & Polish
 
+### Task 17: Reliable Stop — terminate process tree and free ports (READY)
+Status: Ready ⏳ | Issue: (to be created when starting)
+
+Problem summary:
+- Stopping watch/dev servers (e.g., yarn watch/webpack-dev-server) doesn’t free the port; subsequent starts fail with EADDRINUSE. This suggests the spawned child process (or its descendants) keeps running after Stop.
+
+Acceptance criteria:
+- Clicking Stop sends an interrupt and gracefully terminates the full process tree started by the app (shell + node/yarn + grandchildren), not just the immediate parent.
+- The dev server’s port is freed within a reasonable timeout (≤ 5s) on Linux, macOS, and Windows.
+- On Linux/macOS: implement process groups (setpgid) and send SIGINT, then SIGTERM, then SIGKILL to the group if needed.
+- On Windows: terminate the entire tree (e.g., CreateProcess with job object or use taskkill /T /PID fallback) without leaving orphans.
+- UI reflects stopping → stopped; logs remain visible, and an explicit “Process stopped” or exit code line is appended.
+- Starting again after Stop succeeds with no EADDRINUSE for previously used ports.
+- Kill All stops all running apps reliably using the same tree-termination semantics.
+
+Nice-to-have (defer if large):
+- Optional “port guard”: if a previously-used port is still busy when starting, detect whether it’s owned by the previous Oddbox-run process and auto-clean it or show a helpful prompt.
+
+Implementation notes:
+- Backend (Rust/Tauri):
+  - Track process group/session for spawned processes. For Unix, setpgid the child and store the pgid; on Stop, send signals to -pgid.
+  - For Windows, use Job Objects to ensure subtree termination, or fallback to `taskkill /T /PID` with proper escaping.
+  - Ensure stop path waits for process to exit (with timeout), escalating signals if needed (SIGINT → SIGTERM → SIGKILL).
+  - Add robust logging, and ensure process-exit event is always emitted once.
+- Frontend:
+  - Show stopping state; upon exit, mark stopped, keep logs, append final status line.
+  - No change to Start/Stop UI behavior beyond state correctness.
+
+Verification steps:
+- [ ] Start a yarn watch (webpack-dev-server) that binds a known port (e.g., 3001). Confirm it is reachable in the browser.
+- [ ] Click Stop. Verify:
+  - [ ] Terminal shows a stop/exit line.
+  - [ ] Process is no longer present (ps/Task Manager) and no child processes remain.
+  - [ ] The port is freed (curl or lsof/netstat shows it closed) within ≤ 5s.
+- [ ] Click Start again. The server starts cleanly without EADDRINUSE.
+- [ ] Repeat on Linux and macOS. On Windows, verify with tasklist/taskkill behavior; port frees correctly.
+- [ ] Kill All terminates multiple running apps and frees their ports.
+
+Risk/edge cases:
+- Version managers (nvm/rbenv) and shell wrappers spawn extra layers; group termination is required.
+- Detached processes or tools that daemonize; ensure we don’t report stopped until children are gone (or document limits).
+- Windows shell differences (PowerShell vs. cmd) for termination and argument quoting.
+
+Done criteria:
+- [ ] Code compiles without warnings (TS + Rust)
+- [ ] All tests pass (add targeted integration tests for stop behavior if feasible)
+- [ ] Verified manually across OS targets where possible
+- [ ] Docs updated (README + inline) about stop behavior and platform nuances
+
 ### ✅ Task 16: Bugfixes – AppConfig UX + Sidebar Live Refresh (COMPLETED - Commit: 8a76ea8)
 Status: Complete ✅ | Committed: 8a76ea8 | Pushed: ✅ | Issue: #24 (Closed)
 
