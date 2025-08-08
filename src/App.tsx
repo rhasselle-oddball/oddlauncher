@@ -297,6 +297,7 @@ function App() {
             onDelete={handleDelete}
             onOpenUrl={handleOpenUrl}
             onOpenDirectory={handleOpenDirectory}
+            configManager={configManager}
           />
         }
       />
@@ -306,6 +307,7 @@ function App() {
         isOpen={modalState.isOpen}
         mode={modalState.mode}
         appToEdit={modalState.appToEdit}
+  configManager={configManager}
         onClose={handleCloseModal}
         onSubmit={handleModalSubmit}
       />

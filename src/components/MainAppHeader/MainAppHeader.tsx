@@ -12,6 +12,8 @@ interface MainAppHeaderProps {
   onDelete?: (app: AppConfig) => void
   onOpenUrl?: (app: AppConfig) => void
   onOpenDirectory?: (app: AppConfig) => void
+  /** Optional shared config manager instance to avoid duplicate state */
+  configManager?: ReturnType<typeof useConfigManager>
 }
 
 export function MainAppHeader({
@@ -20,6 +22,7 @@ export function MainAppHeader({
   onDelete,
   onOpenUrl,
   onOpenDirectory,
+  configManager: externalManager,
 }: MainAppHeaderProps) {
   // Use process management for the selected app
   const {
@@ -33,7 +36,8 @@ export function MainAppHeader({
 
   // Use browser functionality for manual URL opening
   const { openUrlInBrowser } = useBrowser()
-  const configManager = useConfigManager()
+  const internalManager = useConfigManager()
+  const configManager = externalManager || internalManager
 
   const getStatusDisplay = () => {
     // Check if this is a bookmark app

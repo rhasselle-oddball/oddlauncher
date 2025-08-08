@@ -3,6 +3,7 @@
  */
 
 import type { AppConfig } from '../../types'
+import type { useConfigManager } from '../../hooks/useConfig'
 
 /**
  * Form data structure for the modal
@@ -56,6 +57,8 @@ export interface AppConfigModalProps {
   mode: AppConfigModalMode
   /** App to edit (required when mode is 'edit') */
   appToEdit?: AppConfig
+  /** Optional shared config manager instance to keep state in sync with sidebar */
+  configManager?: ReturnType<typeof useConfigManager>
   /** Callback when modal should close */
   onClose: () => void
   /** Callback when form is submitted successfully */

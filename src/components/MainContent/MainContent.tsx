@@ -1,6 +1,7 @@
 import { MainAppHeader } from '../MainAppHeader'
 import { Terminal } from '../Terminal'
 import { useProcessManager } from '../../hooks/useProcessManager'
+import { useConfigManager } from '../../hooks/useConfig'
 import { getAppType } from '../../types'
 import type { AppConfig } from '../../types'
 import './MainContent.css'
@@ -11,6 +12,8 @@ interface MainContentProps {
   onDelete?: (app: AppConfig) => void
   onOpenUrl?: (app: AppConfig) => void
   onOpenDirectory?: (app: AppConfig) => void
+  /** Optional shared config manager instance to avoid duplicate state */
+  configManager?: ReturnType<typeof useConfigManager>
   // Terminal props
   terminalLines?: Array<{
     id: string
@@ -29,12 +32,15 @@ export function MainContent({
   onDelete,
   onOpenUrl,
   onOpenDirectory,
+  configManager: externalManager,
   terminalLines = [],
   onTerminalClear,
   onTerminalCopy,
   onTerminalSearch
 }: MainContentProps) {
   const { processes, clearProcessOutput } = useProcessManager()
+  const internalManager = useConfigManager()
+  const configManager = externalManager || internalManager
 
   // Get process output for the selected app
   const selectedAppProcess = selectedApp ? processes[selectedApp.id] : null
@@ -72,6 +78,7 @@ export function MainContent({
           onDelete={onDelete}
           onOpenUrl={onOpenUrl}
           onOpenDirectory={onOpenDirectory}
+          configManager={configManager}
         />
       </div>
 

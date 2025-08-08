@@ -70,6 +70,8 @@ export function formDataToAppConfig(
         : undefined,
     createdAt: existingConfig?.createdAt || now,
     updatedAt: now,
+    // Set lastUsedAt for new apps so they appear in the "RECENT" section initially
+    lastUsedAt: existingConfig?.lastUsedAt || now,
   }
 }
 

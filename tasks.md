@@ -2,87 +2,37 @@
 
 Based on the PRD, here are the development tasks organized by priority and dependency. Each task should become a GitHub issue when started.
 
-## ✅ COMPLETED TASKS
 
-### ✅ Task 15: Fix WSL Browser/File Open Fallback (COMPLETED - Commit: ec23066)
-**Status:** Complete ✅ | **Committed:** ec23066 | **Pushed:** ✅ | **Issue:** #23 (Closed)
+## OddLauncher Task List
 
-**What was accomplished:**
-- ✅ Fixed file and URL opening when Oddbox is launched from WSL
-- ✅ Prefer `wslview` in WSL; if unavailable, use `powershell.exe Start-Process`
-- ✅ Converted `/mnt/<drive>/...` paths to proper Windows paths before invoking PowerShell
-- ✅ Kept native Windows/macOS/Linux behaviors unchanged
-- ✅ Applied same WSL fallback for both `file://` and `http(s)://` URLs
-- ✅ Build verified (`cargo check`)
+### Next Task
 
-**Why:**
-- Opening via `cmd.exe /C start` failed in WSL when the current directory resolved to a UNC path (\\\\wsl.localhost\\...). PowerShell `Start-Process` avoids this limitation.
+- [ ] Support optional custom stop terminal command(s) per app
+  - Some apps require a specific stop/teardown command (e.g., Docker), not just Ctrl+C. Allow user to define one or more custom stop commands for each app. If not set, default to Ctrl+C.
+  - Verification:
+    - [ ] User can add/edit/remove stop command(s) in app config
+    - [ ] If stop command is set, it is used when stopping the app
+    - [ ] If not set, Ctrl+C is sent as before
+    - [ ] Works for both single and multiple stop commands
+    - [ ] UI/UX is clear and error handling is robust
 
-**Verification steps:**
-- [x] Launch Oddbox from WSL and select a file under `/mnt/c/...` — opens in default Windows browser/app without UNC errors
-- [x] Open `http(s)` URLs from WSL — opens correctly
-- [x] With `wslview` installed, it remains the first choice; with it missing, PowerShell fallback works
-- [x] `cargo check` passes without errors
 
-**Relevant files:**
-- `src-tauri/src/commands/browser.rs`
+### Recently Completed
 
-**Current State for Next Developer:**
-- WSL opening behavior is robust. No action needed. Proceed with other enhancements.
+- Task 22: Sidebar Filters/Sort, Dense Layout, App Types & Add Modal (COMPLETED - Commit: 16fd04d)
+- Task 19: Add Cross-Platform Build System with GitHub Actions (COMPLETED - Commit: 86b4688)
 
-### ✅ Task 1: Setup Tauri + React Project Structure (COMPLETED - Commit: cce81d5)
-**Status:** Complete ✅ | **Committed:** cce81d5 | **Pushed:** ✅
+---
 
-**What was accomplished:**
-- ✅ Initialized Tauri project with React frontend using `npm create tauri-app`
-- ✅ Set up basic project structure (`/src/`, `/src-tauri/`, `/public/`)
-- ✅ Configured TypeScript with proper tsconfig.json (fixed composite build issues)
-- ✅ Configured ESLint with React and TypeScript rules in eslint.config.js
-- ✅ Configured Prettier for consistent code formatting (.prettierrc)
-- ✅ Installed all required Linux system dependencies:
-  - libgtk-3-dev, libwebkit2gtk-4.0-dev, libayatana-appindicator3-dev, librsvg2-dev
-  - libjavascriptcoregtk-4.1-dev, libsoup-3.0-dev, libwebkit2gtk-4.1-dev
-- ✅ Verified development server starts without errors (`npm run tauri dev`)
-- ✅ Verified Tauri desktop app launches successfully
-- ✅ Verified TypeScript compiles cleanly (`npx tsc --noEmit`)
-- ✅ Verified ESLint runs without errors (`npm run lint`)
 
-**Current State for Next Developer:**
-- Development environment is fully functional and ready
-- Tauri dev server can be started with `npm run tauri dev`
-- Frontend runs on http://localhost:5173/ with hot reloading
-- Desktop app launches automatically during development
-- All build tools (TypeScript, ESLint, Prettier) are configured and working
-- Project follows structure guidelines in `.github/copilot-instructions.md`
+## Task Management Notes
 
-### ✅ Task 2: Create App Data Models & Types (COMPLETED - Commit: 213e37b)
-**Status:** Complete ✅ | **Committed:** 213e37b | **Pushed:** ✅ | **Issue:** #2 (Closed)
-
-**What was accomplished:**
-- ✅ Created comprehensive TypeScript interfaces for all app data structures:
-  - `AppConfig` for individual app configurations
-  - `AppProcess` for runtime process information
-  - `AppState` for combined config and runtime data
-  - `GlobalConfig` for application-wide settings
-  - `AppError` for standardized error handling
-  - `AppResult<T>` for operation results
-  - `AppEvent` union types for event system
-- ✅ Created corresponding Rust structs with serde serialization support
-- ✅ Added proper dependencies (serde, chrono, uuid) to Cargo.toml
-- ✅ Created comprehensive JSON schema validation (oddlauncher-config.schema.json)
-- ✅ Built utility functions for app data management (createDefaultAppConfig, etc.)
-- ✅ Verified TypeScript compiles without errors
-- ✅ Verified Rust compiles without errors
-- ✅ Verified development environment works with new data models
-- ✅ All interfaces properly documented with JSDoc comments
-
-**Current State for Next Developer:**
-- All data models are defined and ready for use
-- TypeScript interfaces in `/src/types/app.ts` exported via `/src/types/index.ts`
-- Rust structs in `/src-tauri/src/models/app.rs` with proper serialization
-- JSON schema at root level validates configuration format
-- Utility functions available in `/src/utils/app-data.ts`
-- Ready for next task: Implement Configuration Storage System
+- Each main task should be broken into a GitHub issue when started
+- Use `gh issue create` when beginning work on a task
+- Include verification steps as acceptance criteria in GitHub issues
+- Update this file with progress (check off completed tasks)
+- Use `gh issue close` when task verification is complete
+- Follow conventional commit messages with issue numbers
 
 ### ✅ Task 3: Implement Configuration Storage System (COMPLETED - Commit: 5495fd8)
 **Status:** Complete ✅ | **Committed:** 5495fd8 | **Pushed:** ✅ | **Issue:** #4 (Closed)

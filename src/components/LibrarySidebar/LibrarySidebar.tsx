@@ -84,13 +84,24 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configMan
     if (configManager.config?.apps) {
       setLocalAppOrder([...configManager.config.apps])
     }
-  }, [configManager.config?.apps])
+  }, [configManager.config])
 
   // Filter + sort apps
   const filteredApps = useMemo(() => {
-    const appsSource = searchQuery.trim() ? (configManager.config?.apps || []) : localAppOrder
-    // const now = new Date()
-
+    // Use configManager.config.apps for search, localAppOrder for non-search (maintains drag order)
+    // But always prioritize the latest config to avoid stale state issues
+    let appsSource: AppConfig[]
+    if (searchQuery.trim()) {
+      appsSource = configManager.config?.apps || []
+    } else {
+      // Use localAppOrder only if it's up-to-date with the config, otherwise fall back to config
+      if (localAppOrder.length === (configManager.config?.apps?.length || 0)) {
+        appsSource = localAppOrder
+      } else {
+        appsSource = configManager.config?.apps || []
+      }
+    }
+    
     const matchesSearch = (app: AppConfig) => {
       if (!searchQuery.trim()) return true
       const q = searchQuery.toLowerCase().trim()
@@ -101,7 +112,7 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configMan
       )
     }
 
-  let list = appsSource.filter(app => matchesSearch(app))
+    let list = appsSource.filter(app => matchesSearch(app))
 
     // Sorting
     list = [...list]
@@ -115,7 +126,7 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configMan
   }, [configManager.config?.apps, localAppOrder, searchQuery, sortBy])
 
   // Group into sections for recent sorting
-  const RECENT_DAYS = 14
+  const RECENT_DAYS = 30 // Increased from 14 to 30 days to be more inclusive
   const groupedApps = useMemo(() => {
     if (sortBy !== 'recent') return null
     const sections: { id: string; title: string; items: AppConfig[] }[] = []
@@ -128,10 +139,16 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configMan
     const recent: AppConfig[] = []
     const byMonth: Record<string, AppConfig[]> = {}
     const byYear: Record<string, AppConfig[]> = {}
+    const neverUsed: AppConfig[] = []
 
     for (const app of byRecent) {
       const ts = app.lastUsedAt ? new Date(app.lastUsedAt) : null
-      if (!ts) continue
+      
+      if (!ts) {
+        // Apps that have never been used go into "never used" section
+        neverUsed.push(app)
+        continue
+      }
       if (ts >= recentCutoff) {
         recent.push(app)
         continue
@@ -149,14 +166,18 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configMan
       }
     }
 
-    if (recent.length) sections.push({ id: 'recent', title: 'RECENT', items: recent })
+    if (recent.length) {
+      sections.push({ id: 'recent', title: 'RECENT', items: recent })
+    }
 
     // Months of current year, in calendar order descending
     const monthOrder = [...Array(12).keys()].map(i => new Date(now.getFullYear(), i, 1).toLocaleString(undefined, { month: 'long' }).toUpperCase())
     for (let i = monthOrder.length - 1; i >= 0; i--) {
       const m = monthOrder[i]
       const key = `${now.getFullYear()}-${m}`
-      if (byMonth[key]?.length) sections.push({ id: key, title: m, items: byMonth[key] })
+      if (byMonth[key]?.length) {
+        sections.push({ id: key, title: m, items: byMonth[key] })
+      }
     }
 
     // Older years descending
@@ -164,6 +185,11 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configMan
     for (const y of years) {
       const key = `${y}`
       sections.push({ id: key, title: `${y}`, items: byYear[key] })
+    }
+
+    // Add never used apps at the bottom
+    if (neverUsed.length) {
+      sections.push({ id: 'never-used', title: 'NEVER USED', items: neverUsed })
     }
 
     return sections

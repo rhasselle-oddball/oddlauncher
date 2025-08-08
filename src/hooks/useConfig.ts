@@ -95,6 +95,7 @@ export function useConfig() {
     loadConfig,
     saveConfig,
     updateSettings,
+    setConfig, // Expose setConfig for direct state updates
   }
 }
 
@@ -320,7 +321,8 @@ export function useConfigManager() {
     async (operation: () => Promise<GlobalConfig | null>): Promise<boolean> => {
       const result = await operation()
       if (result) {
-        await configHook.saveConfig(result)
+        // The backend operation already saved the config, just update local state
+        configHook.setConfig(result)
         return true
       }
       return false

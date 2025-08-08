@@ -16,10 +16,13 @@ export function AppConfigModal({
   isOpen,
   mode,
   appToEdit,
+  configManager: externalManager,
   onClose,
   onSubmit,
 }: AppConfigModalProps) {
-  const configManager = useConfigManager()
+  // Prefer shared instance from parent (e.g., App) to keep sidebar and modal in sync
+  const internalManager = useConfigManager()
+  const configManager = externalManager || internalManager
   const [formData, setFormData] = useState<AppConfigFormData>(getEmptyFormData())
   const [errors, setErrors] = useState<AppConfigFormErrors>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
