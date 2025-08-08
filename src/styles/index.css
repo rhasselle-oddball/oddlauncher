@@ -29,6 +29,12 @@ body {
   height: 100vh;
   margin: 0;
   padding: 0;
+  /* Icon size tokens */
+  --icon-xxs: 12px;
+  --icon-xs: 14px;
+  --icon-sm: 16px;
+  --icon-md: 18px;
+  --icon-lg: 24px;
 }
 
 /* Dark theme base colors for Oddbox */

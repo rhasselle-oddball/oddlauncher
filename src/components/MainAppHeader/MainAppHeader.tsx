@@ -226,14 +226,42 @@ export function MainAppHeader({
 
         <div className="app-controls-section">
           <div className="controls-row">
-            <button
-              className={`start-stop-button ${statusInfo.className}`}
-              onClick={handleStartStopClick}
-              disabled={isStarting || isStopping}
-            >
-              <span className="button-icon">{statusInfo.icon}</span>
-              <span className="button-text">{statusInfo.buttonText}</span>
-            </button>
+            {/* For bookmark-only, show a single primary Open button */}
+            {selectedApp && getAppType(selectedApp) === 'bookmark' ? (
+              <button
+                className={`start-stop-button bookmark`}
+                onClick={handleOpenUrlClick}
+                disabled={!selectedApp.url}
+                title="Open in browser"
+              >
+                <span className="button-icon"><ExternalLink size={16} /></span>
+                <span className="button-text">Open</span>
+              </button>
+            ) : (
+              <>
+                {/* Process Start/Stop */}
+                <button
+                  className={`start-stop-button ${statusInfo.className}`}
+                  onClick={handleStartStopClick}
+                  disabled={isStarting || isStopping}
+                >
+                  <span className="button-icon">{statusInfo.icon}</span>
+                  <span className="button-text">{statusInfo.buttonText}</span>
+                </button>
+
+                {/* If URL exists, show an adjacent Open button */}
+                {selectedApp?.url && (
+                  <button
+                    className={`start-stop-button stopped`}
+                    onClick={handleOpenUrlClick}
+                    title="Open in browser"
+                  >
+                    <span className="button-icon"><ExternalLink size={16} /></span>
+                    <span className="button-text">Open</span>
+                  </button>
+                )}
+              </>
+            )}
 
             <div className="action-buttons">
               <button

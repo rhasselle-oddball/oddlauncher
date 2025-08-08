@@ -139,6 +139,9 @@
   opacity: 0.7;
 }
 
+/* Ensure filters area is always visible in no-results state above */
+.no-results-state { padding-top: 2rem; }
+
 /* Sidebar Actions */
 .sidebar-actions {
   padding: 1rem;

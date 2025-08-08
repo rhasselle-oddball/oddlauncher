@@ -19,7 +19,7 @@ export function appConfigToFormData(config: AppConfig): AppConfigFormData {
   const isFile = url.startsWith('file://')
   return {
     name: config.name || '',
-  appType: config.appType || getAppType(config),
+    appType: config.appType || getAppType(config),
     launchCommands: config.launchCommands || '',
     workingDirectory: config.workingDirectory || '',
     urlMode: isFile ? 'file' : 'url',
@@ -54,7 +54,7 @@ export function formDataToAppConfig(
   return {
     id: existingConfig?.id || crypto.randomUUID(),
     name: formData.name.trim(),
-  appType: formData.appType,
+    appType: formData.appType,
     launchCommands: formData.launchCommands.trim() || undefined,
     workingDirectory: formData.workingDirectory.trim() || undefined,
     url,
@@ -68,7 +68,7 @@ export function formDataToAppConfig(
       formData.tags.filter((tag) => tag.trim()).length > 0
         ? formData.tags.filter((tag) => tag.trim()).map((tag) => tag.trim())
         : undefined,
-  createdAt: existingConfig?.createdAt || now,
+    createdAt: existingConfig?.createdAt || now,
     updatedAt: now,
   }
 }
@@ -122,16 +122,23 @@ export function validateFormData(
     }
   }
   if (formData.appType === 'bookmark') {
-    const hasUrl = formData.urlMode === 'url' ? !!formData.url.trim() : !!formData.filePath.trim()
+    const hasUrl =
+      formData.urlMode === 'url'
+        ? !!formData.url.trim()
+        : !!formData.filePath.trim()
     if (!hasUrl) {
       errors.url = 'A URL or file is required for bookmark apps'
     }
   }
   if (formData.appType === 'both') {
     if (!formData.launchCommands.trim()) {
-      errors.launchCommands = 'Launch commands are required for apps that run and open a site'
+      errors.launchCommands =
+        'Launch commands are required for apps that run and open a site'
     }
-    const hasUrl = formData.urlMode === 'url' ? !!formData.url.trim() : !!formData.filePath.trim()
+    const hasUrl =
+      formData.urlMode === 'url'
+        ? !!formData.url.trim()
+        : !!formData.filePath.trim()
     if (!hasUrl) {
       errors.url = 'A URL or file is required for apps that run and open a site'
     }

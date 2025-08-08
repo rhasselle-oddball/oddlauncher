@@ -156,21 +156,21 @@ export function Terminal({
       <div className="terminal">
         <div className="terminal-header">
           <div className="terminal-title-section">
-            <TerminalIcon size={16} />
+            <TerminalIcon size={18} />
             <span className="terminal-title">Terminal Output</span>
           </div>
-          <div className="terminal-controls">
-            <button className="terminal-control-button" disabled title="Clear">
-              <RotateCcw size={14} />
+            <div className="terminal-controls">
+              <button className="terminal-control-button" disabled title="Clear">
+                <RotateCcw size={16} />
             </button>
             <button className="terminal-control-button" disabled title="Copy">
-              <Copy size={14} />
+                <Copy size={16} />
             </button>
             <button className="terminal-control-button" disabled title="Search">
-              <Search size={14} />
+                <Search size={16} />
             </button>
             <button className="terminal-control-button" disabled title="Settings">
-              <Settings size={14} />
+                <Settings size={16} />
             </button>
           </div>
         </div>
@@ -191,7 +191,7 @@ export function Terminal({
     <div className="terminal">
       <div className="terminal-header">
         <div className="terminal-title-section">
-          <TerminalIcon size={16} />
+          <TerminalIcon size={18} />
           <span className="terminal-title">Terminal Output - {selectedApp.name}</span>
           {displayLines.length > 0 && (
             <span className="terminal-line-count">({filteredLines.length} lines)</span>
@@ -204,35 +204,35 @@ export function Terminal({
             onClick={handleAutoScrollToggle}
             title={`Auto-scroll: ${isAutoScrollEnabled ? 'ON' : 'OFF'}`}
           >
-            <ArrowDown size={14} />
+              <ArrowDown size={16} />
           </button>
           <button
             className="terminal-control-button"
             onClick={handleClearClick}
             title="Clear Terminal"
           >
-            <RotateCcw size={14} />
+              <RotateCcw size={16} />
           </button>
           <button
             className="terminal-control-button"
             onClick={handleCopyClick}
             title="Copy All Output"
           >
-            <Copy size={14} />
+              <Copy size={16} />
           </button>
           <button
             className={`terminal-control-button ${isSearchOpen ? 'active' : ''}`}
             onClick={handleSearchClick}
             title="Search Terminal"
           >
-            <Search size={14} />
+              <Search size={16} />
           </button>
           <button
             className="terminal-control-button"
             disabled
             title="Terminal Settings (Coming Soon)"
           >
-            <Settings size={14} />
+              <Settings size={16} />
           </button>
         </div>
       </div>

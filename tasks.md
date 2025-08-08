@@ -155,6 +155,23 @@ Based on the PRD, here are the development tasks organized by priority and depen
 
 ## Phase 4 - Advanced Features & Polish
 
+### Task 18: Sidebar per-row controls, empty-state UX, icon sizes, header dual actions (IN PROGRESS) — Issue #29
+Status: In Progress | Issue: #29
+
+Scope implemented so far:
+- Sidebar row actions: added start/stop (turns red while running) and open in browser icons that don’t change selection.
+- Filters/no-results UX: filters always visible; context-aware empty states with reset buttons for Running, Search, and Recent.
+- Icon sizing: standardized sizes; sidebar type/action icons at 16px; terminal toolbar icons at 16px; terminal title icon at 18px.
+- Main header: shows Start/Stop and Open side-by-side when URL exists; single Open for bookmark-only.
+
+Verification (ongoing):
+- [x] TypeScript build succeeds (npm run build)
+- [x] cargo check succeeds
+- [ ] Manual UI verification across states
+
+Relevant commits: pending push in this session.
+
+
 ### ✅ Task 17: Reliable Stop — terminate process tree and free ports (COMPLETED - Commit: 177f1ee)
 Status: Complete ✅ | Committed: 177f1ee | Pushed: ✅ | Issue: #27 (Closed)
 

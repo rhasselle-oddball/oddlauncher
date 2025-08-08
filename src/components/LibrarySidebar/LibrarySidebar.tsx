@@ -221,8 +221,9 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configMan
     )
   }
 
-  // Empty state (no apps configured)
-  if (filteredApps.length === 0 && !searchQuery.trim()) {
+  // Empty state (no apps configured at all)
+  const totalApps = configManager.config?.apps?.length || 0
+  if (totalApps === 0) {
     return (
       <div className="library-sidebar">
         <div className="sidebar-search">
@@ -233,6 +234,22 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configMan
             value={searchQuery}
             onChange={handleSearchChange}
           />
+          <div className="sidebar-filters">
+            <label className="filter-chip">
+              <input type="checkbox" checked={showRunningOnly} onChange={(e) => setShowRunningOnly(e.target.checked)} /> Running
+            </label>
+            <select className="filter-select" value={recentWindow} onChange={(e) => setRecentWindow(e.target.value as 'none' | 'thisMonth' | 'lastMonth' | 'last3Months')}>
+              <option value="none">All time</option>
+              <option value="thisMonth">This month</option>
+              <option value="lastMonth">Last month</option>
+              <option value="last3Months">Last 3 months</option>
+            </select>
+            <select className="filter-select" value={sortBy} onChange={(e) => setSortBy(e.target.value as 'recent' | 'az' | 'za')}>
+              <option value="recent">Sort: Recently used</option>
+              <option value="az">Sort: A–Z</option>
+              <option value="za">Sort: Z–A</option>
+            </select>
+          </div>
         </div>
         <div className="empty-state">
           <div className="empty-icon">
@@ -251,8 +268,10 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configMan
     )
   }
 
-  // No search results
-  if (filteredApps.length === 0 && searchQuery.trim()) {
+  // No results for current filters/search
+  if (filteredApps.length === 0) {
+    const isRunningFilter = showRunningOnly
+    const isSearch = !!searchQuery.trim()
     return (
       <div className="library-sidebar">
         <div className="sidebar-search">
@@ -263,20 +282,51 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configMan
             value={searchQuery}
             onChange={handleSearchChange}
           />
-        </div>
-        <div className="no-results-state">
-          <div className="no-results-icon">
-            <Search size={48} />
+          <div className="sidebar-filters">
+            <label className="filter-chip">
+              <input type="checkbox" checked={showRunningOnly} onChange={(e) => setShowRunningOnly(e.target.checked)} /> Running
+            </label>
+            <select className="filter-select" value={recentWindow} onChange={(e) => setRecentWindow(e.target.value as 'none' | 'thisMonth' | 'lastMonth' | 'last3Months')}>
+              <option value="none">All time</option>
+              <option value="thisMonth">This month</option>
+              <option value="lastMonth">Last month</option>
+              <option value="last3Months">Last 3 months</option>
+            </select>
+            <select className="filter-select" value={sortBy} onChange={(e) => setSortBy(e.target.value as 'recent' | 'az' | 'za')}>
+              <option value="recent">Sort: Recently used</option>
+              <option value="az">Sort: A–Z</option>
+              <option value="za">Sort: Z–A</option>
+            </select>
           </div>
-          <h3>No Results Found</h3>
-          <p>Try adjusting your search terms or add a new app.</p>
-          <button
-            className="add-app-button"
-            onClick={handleAddAppClick}
-          >
-            + Add New App
-          </button>
         </div>
+        {isRunningFilter ? (
+          <div className="no-results-state">
+            <div className="no-results-icon">
+              <Search size={48} />
+            </div>
+            <h3>No running apps</h3>
+            <p>Nothing is currently running.</p>
+            <button className="add-app-button" onClick={() => setShowRunningOnly(false)}>Show all</button>
+          </div>
+        ) : isSearch ? (
+          <div className="no-results-state">
+            <div className="no-results-icon">
+              <Search size={48} />
+            </div>
+            <h3>No results for ‘{searchQuery}’</h3>
+            <p>Try adjusting your search or clear it.</p>
+            <button className="add-app-button" onClick={() => setSearchQuery('')}>Clear search</button>
+          </div>
+        ) : (
+          <div className="no-results-state">
+            <div className="no-results-icon">
+              <Search size={48} />
+            </div>
+            <h3>Nothing used in this period</h3>
+            <p>Try expanding the time window.</p>
+            <button className="add-app-button" onClick={() => setRecentWindow('none')}>All time</button>
+          </div>
+        )}
       </div>
     )
   }
