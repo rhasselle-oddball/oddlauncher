@@ -60,6 +60,12 @@ temp/
 src-tauri/target/
 src-tauri/gen/
 
+# Downloaded build artifacts (from GitHub Actions)
+dmg/
+macos/
+*.dmg
+*.app
+
 # Local user data directory for OddLauncher
 .oddlauncher/
 
