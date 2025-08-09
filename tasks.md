@@ -805,7 +805,7 @@ Replace the single "Command" field with a multi-line "Launch Commands" field tha
 
 **Example Use Cases:**
 ```
-Launch Commands for vets-website:
+Launch Commands for React project:
 nvm use 14.15
 yarn watch
 

@@ -6,7 +6,7 @@ A native desktop application that acts like a "Steam Library for dev tools". Lau
 
 ### Get the Latest Release
 
-**📋 [Download from Releases Page](https://github.com/rhasselle-oddball/oddlauncher/releases)**
+**📋 [Download from Releases Page](https://github.com/your-username/oddlauncher/releases)**
 
 Choose the right file for your operating system:
 - **Windows**: `oddlauncher_*_x64_en-US.msi`
@@ -56,7 +56,7 @@ Since these are unsigned applications:
 ### ✅ Verify Your Download
 
 For security, you can verify the files match the official release:
-- Check that download URLs start with `https://github.com/rhasselle-oddball/oddlauncher/releases/`
+- Check that download URLs start with `https://github.com/your-username/oddlauncher/releases/`
 - Compare file sizes with those listed on the releases page
 - Check the release notes for any additional installation steps
 
@@ -120,7 +120,7 @@ xcode-select --install
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/rhasselle-oddball/oddlauncher.git
+   git clone https://github.com/your-username/oddlauncher.git
    cd oddlauncher
    ```
 
