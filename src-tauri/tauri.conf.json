@@ -18,12 +18,15 @@
         "minWidth": 1100,
         "minHeight": 700,
         "resizable": true,
-  "fullscreen": false
+        "fullscreen": false,
+        "devtools": true
       }
     ],
     "security": {
       "csp": null
-    }
+    },
+    "macOSPrivateApi": true,
+    "withGlobalTauri": false
   },
   "bundle": {
     "active": true,
