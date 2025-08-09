@@ -102,17 +102,11 @@ mod platform_utils {
     }
 
     /// Check if command should be executed through WSL
-    fn should_use_wsl(program: &str, working_dir: Option<&str>) -> bool {
-        // Check if working directory suggests WSL usage
-        let wsl_working_dir = working_dir
+    fn should_use_wsl(_program: &str, working_dir: Option<&str>) -> bool {
+        // Only use WSL if working directory explicitly indicates WSL usage
+        working_dir
             .map(|dir| dir.starts_with("/") || dir.contains("wsl.localhost"))
-            .unwrap_or(false);
-
-        // Check if program is typically a Unix command
-        let unix_commands = ["yarn", "npm", "node", "python", "python3", "pip", "git", "bash", "sh"];
-        let is_unix_command = unix_commands.contains(&program);
-
-        wsl_working_dir || is_unix_command
+            .unwrap_or(false)
     }
 
     /// Prepare command for WSL execution on Windows
@@ -197,37 +191,58 @@ fn prepare_multi_command_execution(launch_commands: &str, working_dir: Option<&s
 
 /// Prepare multi-command execution for Windows
 fn prepare_windows_multi_command(commands: &[&str], working_dir: Option<&str>) -> Result<(String, Vec<String>), String> {
-    // Check if we should use WSL
+    // Check if we should use WSL - only if working directory indicates WSL usage
     let use_wsl = working_dir
         .map(|dir| dir.starts_with("/") || dir.contains("wsl.localhost"))
-        .unwrap_or(false) || commands.iter().any(|cmd| {
-            let parts: Vec<&str> = cmd.trim().split_whitespace().collect();
-            if let Some(program) = parts.first() {
-                let unix_commands = ["yarn", "npm", "node", "python", "python3", "pip", "git", "bash", "sh", "nvm", "rbenv"];
-                unix_commands.contains(program)
-            } else {
-                false
-            }
-        });
+        .unwrap_or(false);
 
     if use_wsl {
-        // Create bash script for WSL
-        let mut script_lines = vec!["#!/bin/bash".to_string(), "set -e".to_string()];
+        // Create bash script for WSL with proper environment initialization
+        let mut script_lines = vec![
+            "#!/bin/bash".to_string(),
+            "set -e".to_string(),
+            "".to_string(),
+            "# Initialize shell environment".to_string(),
+            "source /etc/profile 2>/dev/null || true".to_string(),
+            "source ~/.profile 2>/dev/null || true".to_string(),
+            "source ~/.bashrc 2>/dev/null || true".to_string(),
+            "".to_string(),
+            "# Initialize common version managers".to_string(),
+            "# nvm".to_string(),
+            "if [ -f ~/.nvm/nvm.sh ]; then".to_string(),
+            "    source ~/.nvm/nvm.sh".to_string(),
+            "elif [ -f /usr/local/share/nvm/nvm.sh ]; then".to_string(),
+            "    source /usr/local/share/nvm/nvm.sh".to_string(),
+            "fi".to_string(),
+            "".to_string(),
+            "# rbenv".to_string(),
+            "if command -v rbenv >/dev/null 2>&1; then".to_string(),
+            "    eval \"$(rbenv init -)\"".to_string(),
+            "fi".to_string(),
+            "".to_string(),
+        ];
 
         // Add working directory change if specified
         if let Some(dir) = working_dir {
             let normalized_dir = platform_utils::normalize_path(dir)?;
             if normalized_dir.starts_with('/') {
+                script_lines.push(format!("echo \"OddLauncher: Changing to directory: {}\"", normalized_dir));
                 script_lines.push(format!("cd '{}'", normalized_dir));
+                script_lines.push("".to_string());
             }
         }
 
-        // Add all commands
-        for command in commands {
+        // Add all commands with logging
+        for (i, command) in commands.iter().enumerate() {
+            script_lines.push(format!("echo \"OddLauncher: Executing command {}: {}\"", i + 1, command));
             script_lines.push(command.to_string());
+            if i < commands.len() - 1 {
+                script_lines.push("".to_string());
+            }
         }
 
         let script_content = script_lines.join("\n");
+        log::info!("Generated WSL bash script:\n{}", script_content);
 
         // Use WSL to execute bash with the script
         let wsl_args = vec![
