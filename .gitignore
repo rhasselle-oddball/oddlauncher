@@ -50,6 +50,13 @@ coverage/
 .tmp/
 temp/
 
+# Debug and test files
+debug-*.js
+debug-*.sh
+test-*.sh
+*.debug.js
+*.test.sh
+
 # TypeScript cache
 *.tsbuildinfo
 
