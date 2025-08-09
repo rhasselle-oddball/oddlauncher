@@ -4,10 +4,10 @@ use std::fs;
 use std::path::PathBuf;
 use tauri::AppHandle;
 
-/// Get the path to the OddLauncher configuration directory (~/.oddlauncher/)
+/// Get the path to the Oddbox configuration directory (~/.oddbox/)
 fn get_config_dir() -> AppResult<PathBuf> {
     match dirs::home_dir() {
-        Some(home) => Ok(home.join(".oddlauncher")),
+        Some(home) => Ok(home.join(".oddbox")),
         None => Err(AppError::new(
             "HOME_DIR_ERROR",
             "Could not determine user home directory",
@@ -15,7 +15,7 @@ fn get_config_dir() -> AppResult<PathBuf> {
     }
 }
 
-/// Get the path to the main configuration file (~/.oddlauncher/apps.json)
+/// Get the path to the main configuration file (~/.oddbox/apps.json)
 fn get_config_file_path() -> AppResult<PathBuf> {
     Ok(get_config_dir()?.join("apps.json"))
 }
@@ -42,34 +42,7 @@ fn ensure_config_dir_exists() -> AppResult<()> {
 pub async fn load_config(_app: AppHandle) -> AppResult<GlobalConfig> {
     log::info!("Loading configuration from file");
 
-    // Skip filesystem operations during build/CI to prevent hanging
-    if std::env::var("TAURI_BUILD").is_ok() || std::env::var("CI").is_ok() {
-        log::info!("Build environment detected, returning default configuration");
-        return Ok(GlobalConfig::default());
-    }
-
     let config_file = get_config_file_path()?;
-
-    // Migration fallback: if new file doesn't exist, try old Oddbox path
-    if !config_file.exists() {
-        if let Some(home) = dirs::home_dir() {
-            let legacy_dir = home.join(".oddlauncher");
-            let legacy_file = legacy_dir.join("apps.json");
-            if legacy_file.exists() {
-                log::info!(
-                    "Legacy config detected at {:?}; loading for migration",
-                    legacy_file
-                );
-                let content = fs::read_to_string(&legacy_file).map_err(|e| {
-                    AppError::new("FILE_READ_ERROR", &format!("Failed to read legacy config file: {}", e))
-                })?;
-                let config: GlobalConfig = serde_json::from_str(&content).map_err(|e| {
-                    AppError::new("JSON_PARSE_ERROR", &format!("Failed to parse legacy config file: {}", e))
-                })?;
-                return Ok(config);
-            }
-        }
-    }
 
     // If config file doesn't exist, return default config
     if !config_file.exists() {
@@ -100,12 +73,6 @@ pub async fn load_config(_app: AppHandle) -> AppResult<GlobalConfig> {
 #[tauri::command]
 pub async fn save_config(_app: AppHandle, config: GlobalConfig) -> AppResult<()> {
     log::info!("Saving configuration to file");
-
-    // Skip filesystem operations during build/CI to prevent hanging
-    if std::env::var("TAURI_BUILD").is_ok() || std::env::var("CI").is_ok() {
-        log::info!("Build environment detected, skipping config save");
-        return Ok(());
-    }
 
     // Ensure config directory exists
     ensure_config_dir_exists()?;
@@ -211,17 +178,6 @@ pub async fn remove_app_config(app: AppHandle, app_id: String) -> AppResult<Glob
 /// Get information about the configuration directory
 #[tauri::command]
 pub async fn get_config_info(_app: AppHandle) -> AppResult<serde_json::Value> {
-    // Skip filesystem operations during build/CI to prevent hanging
-    if std::env::var("TAURI_BUILD").is_ok() || std::env::var("CI").is_ok() {
-        log::info!("Build environment detected, returning default config info");
-        return Ok(serde_json::json!({
-            "configDir": "~/.oddlauncher",
-            "configFile": "~/.oddlauncher/apps.json",
-            "configDirExists": false,
-            "configFileExists": false
-        }));
-    }
-
     let config_dir = get_config_dir()?;
     let config_file = get_config_file_path()?;
 
