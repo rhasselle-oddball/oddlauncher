@@ -42,6 +42,12 @@ fn ensure_config_dir_exists() -> AppResult<()> {
 pub async fn load_config(_app: AppHandle) -> AppResult<GlobalConfig> {
     log::info!("Loading configuration from file");
 
+    // Skip filesystem operations during build/CI to prevent hanging
+    if std::env::var("TAURI_BUILD").is_ok() || std::env::var("CI").is_ok() {
+        log::info!("Build environment detected, returning default configuration");
+        return Ok(GlobalConfig::default());
+    }
+
     let config_file = get_config_file_path()?;
 
     // Migration fallback: if new file doesn't exist, try old Oddbox path
@@ -94,6 +100,12 @@ pub async fn load_config(_app: AppHandle) -> AppResult<GlobalConfig> {
 #[tauri::command]
 pub async fn save_config(_app: AppHandle, config: GlobalConfig) -> AppResult<()> {
     log::info!("Saving configuration to file");
+
+    // Skip filesystem operations during build/CI to prevent hanging
+    if std::env::var("TAURI_BUILD").is_ok() || std::env::var("CI").is_ok() {
+        log::info!("Build environment detected, skipping config save");
+        return Ok(());
+    }
 
     // Ensure config directory exists
     ensure_config_dir_exists()?;
@@ -199,6 +211,17 @@ pub async fn remove_app_config(app: AppHandle, app_id: String) -> AppResult<Glob
 /// Get information about the configuration directory
 #[tauri::command]
 pub async fn get_config_info(_app: AppHandle) -> AppResult<serde_json::Value> {
+    // Skip filesystem operations during build/CI to prevent hanging
+    if std::env::var("TAURI_BUILD").is_ok() || std::env::var("CI").is_ok() {
+        log::info!("Build environment detected, returning default config info");
+        return Ok(serde_json::json!({
+            "configDir": "~/.oddlauncher",
+            "configFile": "~/.oddlauncher/apps.json",
+            "configDirExists": false,
+            "configFileExists": false
+        }));
+    }
+
     let config_dir = get_config_dir()?;
     let config_file = get_config_file_path()?;
 
