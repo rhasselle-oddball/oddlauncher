@@ -1,4 +1,4 @@
-import { Play, Square, Loader, Edit, Trash2, ExternalLink } from 'lucide-react'
+import { Play, Square, Loader, Trash2, ExternalLink } from 'lucide-react'
 import type { AppConfig } from '../../types'
 import { getAppType, isBookmarkApp } from '../../types'
 import { useAppProcess } from '../../hooks/useProcessManager'
@@ -177,10 +177,35 @@ export function MainAppHeader({
   return (
     <div className="main-app-header">
       <div className="app-header-content">
+        <div className="header-top-row">
+          <div className="app-info-section">
+            <div className="app-details">
+              <div className="title-with-edit">
+                <h2 className="app-title">{selectedApp.name}</h2>
+                <button
+                  className="edit-text-link"
+                  onClick={handleEditClick}
+                  title="Edit App Configuration"
+                >
+                  Edit
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <div className="header-actions">
+            <button
+              className="delete-button"
+              onClick={handleDeleteClick}
+              title="Delete App"
+            >
+              <Trash2 size={16} />
+            </button>
+          </div>
+        </div>
+
         <div className="app-info-section">
           <div className="app-details">
-            <h2 className="app-title">{selectedApp.name}</h2>
-
             <div className="app-meta-primary">
               {getAppType(selectedApp) !== 'bookmark' && (
                 <div className="command-section">
@@ -269,24 +294,6 @@ export function MainAppHeader({
                 )}
               </>
             )}
-
-            <div className="action-buttons">
-              <button
-                className="action-button edit"
-                onClick={handleEditClick}
-                title="Edit App Configuration"
-              >
-                <Edit size={16} />
-              </button>
-
-              <button
-                className="action-button delete"
-                onClick={handleDeleteClick}
-                title="Delete App"
-              >
-                <Trash2 size={16} />
-              </button>
-            </div>
           </div>
         </div>
       </div>

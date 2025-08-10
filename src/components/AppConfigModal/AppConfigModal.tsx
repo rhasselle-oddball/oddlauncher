@@ -50,16 +50,19 @@ export function AppConfigModal({
       setIsSubmitting(false)
       setIsClosing(false)
       setNewTagInput('')
-      // Fetch available terminals when modal opens (only for process/both)
-      if (formData.appType === 'process' || formData.appType === 'both' || mode === 'add') {
-        setIsLoadingTerminals(true)
-        invoke<TerminalInfo[]>('detect_available_terminals')
-          .then((result) => setAvailableTerminals(result))
-          .catch(() => setAvailableTerminals([]))
-          .finally(() => setIsLoadingTerminals(false))
-      }
     }
-  }, [isOpen, mode, appToEdit, formData.appType])
+  }, [isOpen, mode, appToEdit])
+
+  // Separate effect for loading terminals when needed
+  useEffect(() => {
+    if (isOpen && (mode === 'add' || (formData.appType === 'process' || formData.appType === 'both'))) {
+      setIsLoadingTerminals(true)
+      invoke<TerminalInfo[]>('detect_available_terminals')
+        .then((result) => setAvailableTerminals(result))
+        .catch(() => setAvailableTerminals([]))
+        .finally(() => setIsLoadingTerminals(false))
+    }
+  }, [isOpen, mode, formData.appType])
 
   // Handle form field changes
   const handleInputChange = useCallback((field: keyof AppConfigFormData, value: string | number | boolean) => {
@@ -67,14 +70,15 @@ export function AppConfigModal({
 
     // Clear error for this field when user starts typing
     const errorField = field as keyof AppConfigFormErrors
-    if (errors[errorField]) {
-      setErrors(prev => {
+    setErrors(prev => {
+      if (prev[errorField]) {
         const newErrors = { ...prev }
         delete newErrors[errorField]
         return newErrors
-      })
-    }
-  }, [errors])
+      }
+      return prev
+    })
+  }, []) // Empty dependency array since we use functional updates
 
   // Handle directory picker
   const handlePickDirectory = useCallback(async () => {
