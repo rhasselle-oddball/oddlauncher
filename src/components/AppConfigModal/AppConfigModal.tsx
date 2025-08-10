@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import type { TerminalInfo } from '../../types/app'
-import { X, Folder, Plus, AlertCircle, Settings, Link as LinkIcon, File as FileIcon, ChevronDown, ChevronUp, Terminal, Monitor } from 'lucide-react'
+import { X, Folder, Plus, AlertCircle, Settings, Link as LinkIcon, File as FileIcon } from 'lucide-react'
 import { invoke } from '@tauri-apps/api/core'
 import { useConfigManager } from '../../hooks/useConfig'
 import { generateAppId } from '../../utils/app-data'
@@ -282,35 +282,38 @@ export function AppConfigModal({
                     className="section-header"
                     onClick={() => setIsTerminalSectionExpanded(!isTerminalSectionExpanded)}
                   >
-                    <Terminal size={16} />
-                    <span>Terminal Configuration</span>
-                    {isTerminalSectionExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                    <span className="expand-indicator">
+                      {isTerminalSectionExpanded ? '−' : '+'}
+                    </span>
+                    <span>Terminal</span>
                   </button>
                   {isTerminalSectionExpanded && (
-                    <div className="section-content">
-                      {/* Terminal Type Dropdown */}
-                      <div className="form-group">
-                        <label htmlFor="terminalType" className="form-label">
-                          Terminal Type
-                        </label>
-                        <select
-                          id="terminalType"
-                          className="form-input compact-select"
-                          value={formData.terminalType || ''}
-                          onChange={e => handleInputChange('terminalType', e.target.value)}
-                          disabled={isLoadingTerminals}
-                        >
-                          <option value="">System Default</option>
-                          {availableTerminals.filter(t => t.available).map(t => (
-                            <option key={t.id} value={t.id}>
-                              {t.name}
-                            </option>
-                          ))}
-                        </select>
-                        <div className="form-help">
-                          Choose which terminal/shell to use for this app. Options are auto-detected from your system.
+                    <>
+                      <div className="section-divider"></div>
+                      <div className="section-content">
+                        {/* Terminal Type Dropdown */}
+                        <div className="form-group">
+                          <label htmlFor="terminalType" className="form-label">
+                            Terminal Type
+                          </label>
+                          <select
+                            id="terminalType"
+                            className="form-input compact-select"
+                            value={formData.terminalType || ''}
+                            onChange={e => handleInputChange('terminalType', e.target.value)}
+                            disabled={isLoadingTerminals}
+                          >
+                            <option value="">System Default</option>
+                            {availableTerminals.filter(t => t.available).map(t => (
+                              <option key={t.id} value={t.id}>
+                                {t.name}
+                              </option>
+                            ))}
+                          </select>
+                          <div className="form-help">
+                            Choose which terminal/shell to use for this app. Options are auto-detected from your system.
+                          </div>
                         </div>
-                      </div>
                   {/* Launch Commands */}
                   <div className="form-group">
                     <label htmlFor="launchCommands" className="form-label">
@@ -372,7 +375,8 @@ yarn watch`}
                       </div>
                     )}
                   </div>
-                    </div>
+                      </div>
+                    </>
                   )}
                 </div>
               )}
@@ -385,15 +389,18 @@ yarn watch`}
                     className="section-header"
                     onClick={() => setIsBrowserSectionExpanded(!isBrowserSectionExpanded)}
                   >
-                    <Monitor size={16} />
-                    <span>Browser Configuration</span>
-                    {isBrowserSectionExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                    <span className="expand-indicator">
+                      {isBrowserSectionExpanded ? '−' : '+'}
+                    </span>
+                    <span>Browser</span>
                   </button>
                   {isBrowserSectionExpanded && (
-                    <div className="section-content">
-                      {/* URL / File destination */}
-                      <div className="form-group">
-                        <label className="form-label">Destination</label>
+                    <>
+                      <div className="section-divider"></div>
+                      <div className="section-content">
+                        {/* URL / File destination */}
+                        <div className="form-group">
+                          <label className="form-label">Destination</label>
                     <div className="toggle-group" role="tablist" aria-label="Destination Type">
                       <button
                         type="button"
@@ -501,15 +508,14 @@ yarn watch`}
                             {errors.browserDelay}
                           </div>
                         )}
+                        </div>
+                      </>
+                    )}
                       </div>
                     </>
                   )}
-                    </div>
-                  )}
                 </div>
-              )}
-
-              {/* Tags */}
+              )}              {/* Tags */}
               <div className="form-group">
                 <label htmlFor="tags" className="form-label">
                   Tags

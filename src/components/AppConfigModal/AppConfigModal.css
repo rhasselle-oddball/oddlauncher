@@ -478,59 +478,63 @@
   }
 }
 
-/* Collapsible Section Styles */
-.collapsible-section {
-  border: 1px solid var(--border, #333);
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
-  background: var(--bg-tertiary, #131313);
+/* Collapsible Section Styles - Modal specific */
+.modal-content .collapsible-section {
+  margin-bottom: 2rem;
 }
 
-.section-header {
+.modal-content .section-header {
   width: 100%;
   background: none;
   border: none;
-  padding: 1rem 1.25rem;
+  padding: 0;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 0.75rem;
   cursor: pointer;
   color: var(--text-primary, #ffffff);
-  font-size: 1rem;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
+  transition: opacity 0.2s ease;
 }
 
-.section-header:hover {
-  background: var(--bg-hover, rgba(255, 255, 255, 0.05));
+.modal-content .section-header:hover {
+  opacity: 0.8;
 }
 
-.section-header span {
-  flex: 1;
-  text-align: left;
+.modal-content .section-header .expand-indicator {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--text-secondary, #cccccc);
+  width: 1.2rem;
+  text-align: center;
 }
 
-.section-content {
-  padding: 0 1.25rem 1.25rem;
-  border-top: 1px solid var(--border, #333);
+.modal-content .section-divider {
+  height: 1px;
+  background: var(--border, #333);
+  margin-bottom: 1.5rem;
+  opacity: 0.6;
+}
+
+.modal-content .section-content {
   animation: sectionExpand 0.2s ease-out;
 }
 
 @keyframes sectionExpand {
   from {
     opacity: 0;
-    max-height: 0;
   }
   to {
     opacity: 1;
-    max-height: 1000px;
   }
 }
 
-/* Compact Select Styles */
-.compact-select {
+/* Compact Select Styles - Modal specific */
+.modal-content .compact-select {
   height: 2.5rem !important; /* Reduced from default 3rem */
   padding: 0.5rem 0.75rem !important; /* Reduced padding */
   font-size: 0.875rem; /* Slightly smaller text */
@@ -538,10 +542,10 @@
   border: 1px solid var(--border, #333) !important;
 }
 
-.compact-select:focus {
+.modal-content .compact-select:focus {
   background-color: var(--bg-tertiary, #131313) !important; /* Maintain consistent background on focus */
-  border-color: var(--accent, #0066cc) !important;
-  box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.2) !important;
+  border-color: var(--text-secondary, #cccccc) !important; /* Use secondary text color instead of blue */
+  box-shadow: 0 0 0 2px rgba(204, 204, 204, 0.2) !important; /* Match the border color */
 }
 
 /* Terminal Icon Styles */
