@@ -262,11 +262,11 @@ Two UX issues with command execution:
 - Use `#[cfg(windows)]` conditional compilation for Windows-only code
 - Maintain stdout/stderr capture for terminal output
 
-**Phase 2: Show User Commands (COMPLETED ✅)**  
+**Phase 2: Show User Commands (COMPLETED ✅)**
 - Modify all terminal handlers to echo commands before executing them
 - Use appropriate prompt format for each shell type:
   - WSL/Bash/Unix: `$ command`
-  - PowerShell: `PS> command` 
+  - PowerShell: `PS> command`
   - Command Prompt: `> command`
 - Split multi-line commands and show each one separately
 - Apply to both new terminal selection system and legacy multi-command system
@@ -292,7 +292,479 @@ Two UX issues with command execution:
 
 ---
 
-## Sprint 1 Incomplete Tasks
+## Sprint 3 - Major Architecture Refactor: Apps → Launchers with Multi-Component Support
+
+### Task S3-1: Refactor Core Data Model - Apps to Launchers with Component Architecture
+**Priority:** HIGH 🚨 | **Status:** TODO 📝 | **Complexity:** HIGH
+
+**Vision Statement:**
+Transform OddLauncher from a rigid "app with one terminal + one browser" model to a flexible "launcher with multiple components" architecture. Users should be able to create launchers that can have multiple terminal commands and multiple browser tabs running in parallel, with a tabbed interface for managing multiple terminal sessions.
+
+**Current Architecture Problems:**
+1. **Rigid Structure**: Current `AppConfig` forces exactly one terminal + one browser configuration
+2. **Limited Terminal Support**: Only one terminal command per app, no multi-terminal tabs
+3. **Inflexible Browser Support**: Only one URL per app, no multi-tab support  
+4. **Poor UX**: Modal forces users to choose predefined combinations instead of building what they need
+5. **Terminology Confusion**: "App" implies single purpose, but we're building multi-purpose launchers
+
+**New Architecture Vision:**
+
+**Launcher Model:**
+```typescript
+interface LauncherConfig {
+  id: string
+  name: string
+  description?: string
+  tags?: string[]
+  components: LauncherComponent[]  // Multiple components per launcher
+  createdAt: string
+  updatedAt: string
+  lastUsedAt?: string
+  useCount?: number
+}
+
+interface LauncherComponent {
+  id: string
+  type: 'terminal' | 'browser'
+  name: string  // Tab/component display name
+  order: number  // Display order
+  // Component-specific config
+  config: TerminalComponentConfig | BrowserComponentConfig
+}
+
+interface TerminalComponentConfig {
+  launchCommands: string
+  workingDirectory?: string
+  terminalType?: string
+  environmentVariables?: Record<string, string>
+}
+
+interface BrowserComponentConfig {
+  url: string
+  autoLaunch?: boolean
+  delay?: number
+  portToCheck?: number
+  portCheckTimeout?: number
+}
+```
+
+**Runtime State:**
+```typescript
+interface LauncherState {
+  config: LauncherConfig
+  status: LauncherStatus
+  components: ComponentState[]
+}
+
+interface ComponentState {
+  componentId: string
+  type: 'terminal' | 'browser'
+  status: ComponentStatus
+  pid?: number  // For terminal processes
+  output?: string[]  // For terminal components
+  startedAt?: string
+  errorMessage?: string
+}
+```
+
+**UI Architecture:**
+- **Launcher Creation**: Start with name only, dynamically add components
+- **Terminal Tabs**: Each terminal component becomes a tab in terminal panel
+- **Browser Management**: Each browser component can be launched independently
+- **Component Actions**: Start/stop individual components or entire launcher
+
+**Implementation Phases:**
+
+**Phase 1: Data Model Refactor (This Task)**
+- Create new TypeScript interfaces for Launcher architecture
+- Create new Rust structs for Launcher architecture  
+- Design migration strategy from AppConfig → LauncherConfig
+- Update JSON schema and storage format
+- Implement backward compatibility layer
+
+**Acceptance Criteria:**
+- [ ] New LauncherConfig TypeScript interfaces defined
+- [ ] New LauncherConfig Rust structs implemented
+- [ ] Migration utility created (apps.json → launchers.json)
+- [ ] Backward compatibility maintained during transition
+- [ ] All existing functionality preserved with new data model
+- [ ] Unit tests for data model validation
+- [ ] JSON schema updated for new structure
+
+**Technical Considerations:**
+- **Storage Migration**: Automatic conversion of existing apps.json to new format
+- **ID Generation**: Component IDs must be unique within launcher scope
+- **Validation**: Ensure at least one component per launcher
+- **Backward Compatibility**: Support loading old format during transition period
+- **Performance**: Efficient querying of components by type/status
+
+---
+
+### Task S3-2: Refactor Backend Process Management for Multi-Component Architecture  
+**Priority:** HIGH 🚨 | **Status:** TODO 📝 | **Depends On:** S3-1
+
+**Problem Statement:**
+Current process management assumes one process per app. New architecture needs to manage multiple terminal processes per launcher, with independent lifecycle management for each component.
+
+**Technical Changes Required:**
+
+**Process Manager Updates:**
+- Change from `Map<AppId, ProcessInfo>` to `Map<ComponentId, ProcessInfo>`
+- Add launcher-level aggregated status (running if any component running)
+- Support starting/stopping individual components vs entire launcher
+- Handle component dependencies (e.g., start terminal before browser)
+
+**Command Interface Changes:**
+```rust
+// Old
+pub async fn start_app_process(app_id: String, ...) -> ProcessResult
+pub async fn stop_app_process(app_id: String, ...) -> ProcessResult
+
+// New  
+pub async fn start_launcher_component(launcher_id: String, component_id: String, ...) -> ProcessResult
+pub async fn stop_launcher_component(launcher_id: String, component_id: String, ...) -> ProcessResult
+pub async fn start_launcher(launcher_id: String, ...) -> Vec<ProcessResult>  // Start all components
+pub async fn stop_launcher(launcher_id: String, ...) -> Vec<ProcessResult>   // Stop all components
+pub async fn get_launcher_status(launcher_id: String, ...) -> LauncherState
+```
+
+**Event System Updates:**
+- Component-level events: `component-started`, `component-output`, `component-stopped`
+- Launcher-level events: `launcher-started`, `launcher-stopped`, `launcher-status-changed`
+- Terminal output events must include `componentId` for tab routing
+
+**Process Lifecycle Management:**
+- Independent component start/stop
+- Graceful launcher shutdown (stop all components)
+- Component restart without affecting others
+- Process tree management per component
+
+**Acceptance Criteria:**
+- [ ] Process manager supports multi-component architecture
+- [ ] Component-level start/stop commands implemented
+- [ ] Launcher-level orchestration commands implemented
+- [ ] Event system updated for component-level events
+- [ ] Terminal output routing includes component identification
+- [ ] Process cleanup handles component independence
+- [ ] Error handling for partial launcher failures
+
+---
+
+### Task S3-3: Implement Multi-Terminal Tab System
+**Priority:** HIGH 🚨 | **Status:** TODO 📝 | **Depends On:** S3-1, S3-2
+
+**Problem Statement:**
+Current UI has single terminal view. New architecture requires tabbed interface to manage multiple terminal components per launcher, with independent output streams and controls.
+
+**UI Architecture Requirements:**
+
+**Terminal Container Redesign:**
+```
+┌─ Launcher: "MyApp Development"  ─────────────────────────────────┐
+│ Tabs: [Frontend Server*] [Backend API*] [Database] [+ Add Tab]   │
+├─────────────────────────────────────────────────────────────────┤
+│ Terminal Output (Frontend Server):                               │
+│ $ yarn dev                                                       │
+│ Starting development server...                                   │
+│ Server running on http://localhost:3000                         │
+│ │                                                               │
+├─────────────────────────────────────────────────────────────────┤
+│ [Start All] [Stop All] [Settings]  Per-tab: [Start] [Stop] [×]  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Component Features:**
+- **Tab Management**: Add, remove, reorder terminal components
+- **Independent Controls**: Start/stop individual terminals or all at once
+- **Output Routing**: Each terminal component gets its own output stream
+- **Visual Status**: Tab indicators for running/stopped/error states
+- **Context Menus**: Right-click for component-specific actions
+
+**Technical Implementation:**
+- Create `MultiTerminalContainer` component
+- Implement `TerminalTab` component for individual terminals
+- Update terminal output routing to use componentId
+- Add tab management UI (add/remove/reorder)
+- Integrate with new process management commands
+
+**State Management:**
+- Track active terminal tab
+- Manage component-level output buffers
+- Handle terminal component lifecycle
+- Preserve tab state across app restarts
+
+**Acceptance Criteria:**
+- [ ] Tabbed terminal interface implemented
+- [ ] Each terminal component displays in its own tab
+- [ ] Independent start/stop controls per tab
+- [ ] Output correctly routed to appropriate tab
+- [ ] Tab state indicators (running/stopped/error)
+- [ ] Add/remove terminal tabs functionality
+- [ ] Tab reordering support
+- [ ] Context menus for tab-specific actions
+- [ ] Active tab persistence across sessions
+
+---
+
+### Task S3-4: Redesign Launcher Creation Modal - Component-Based Builder
+**Priority:** HIGH 🚨 | **Status:** TODO 📝 | **Depends On:** S3-1
+
+**Problem Statement:**
+Current AppConfigModal forces users into predefined categories (browser+terminal, terminal only, browser only). New design should start minimal and let users build their launcher by adding components as needed.
+
+**New Modal Flow:**
+
+**Initial State:**
+```
+┌─ Create New Launcher ─────────────────────────────────┐
+│ Launcher Name: [                                    ] │
+│ Description:   [                                    ] │
+│                                                       │
+│ Components: (empty)                                   │
+│ ┌─────────────────────────────────────────────────┐   │
+│ │ + Add Terminal Component                        │   │
+│ │ + Add Browser Component                         │   │
+│ └─────────────────────────────────────────────────┘   │
+│                                                       │
+│                              [Cancel] [Create]       │
+└───────────────────────────────────────────────────────┘
+```
+
+**After Adding Components:**
+```
+┌─ Create New Launcher ─────────────────────────────────┐
+│ Launcher Name: [MyApp Development                   ] │
+│ Description:   [Full stack development setup        ] │
+│                                                       │
+│ Components:                                           │
+│ ┌─ Terminal: Frontend Server ─────────────────────┐   │
+│ │ Commands: yarn dev                              │   │
+│ │ Directory: /home/user/frontend                  │   │
+│ │ Terminal: WSL                          [Remove] │   │
+│ └─────────────────────────────────────────────────┘   │
+│                                                       │
+│ ┌─ Terminal: Backend API ──────────────────────────┐   │
+│ │ Commands: npm start                             │   │
+│ │ Directory: /home/user/backend                   │   │
+│ │ Terminal: WSL                          [Remove] │   │
+│ └─────────────────────────────────────────────────┘   │
+│                                                       │
+│ ┌─ Browser: Development Dashboard ─────────────────┐   │
+│ │ URL: http://localhost:3000                      │   │
+│ │ Auto-launch: ✓  Delay: 2 seconds      [Remove] │   │
+│ └─────────────────────────────────────────────────┘   │
+│                                                       │
+│ ┌─────────────────────────────────────────────────┐   │
+│ │ + Add Terminal Component                        │   │
+│ │ + Add Browser Component                         │   │
+│ └─────────────────────────────────────────────────┘   │
+│                                                       │
+│                              [Cancel] [Create]       │
+└───────────────────────────────────────────────────────┘
+```
+
+**Component Configuration:**
+- **Terminal Components**: Name, commands, directory, terminal type, env vars
+- **Browser Components**: Name, URL, auto-launch, delay, port checking
+- **Validation**: At least one component required
+- **Reordering**: Drag & drop to change component order
+
+**Technical Implementation:**
+- Replace rigid AppType selection with dynamic component builder
+- Create `ComponentBuilder` sub-components
+- Implement component add/remove/reorder logic
+- Update validation to ensure at least one component
+- Migrate existing form logic to component-based approach
+
+**Acceptance Criteria:**
+- [ ] Modal starts with minimal name/description form
+- [ ] Dynamic component addition via buttons
+- [ ] Terminal component configuration UI
+- [ ] Browser component configuration UI  
+- [ ] Component removal functionality
+- [ ] Component reordering support
+- [ ] Validation prevents empty launchers
+- [ ] Form state management for dynamic components
+- [ ] Edit mode supports existing launcher modification
+
+---
+
+### Task S3-5: Update Main UI - Launcher Cards and Component Status
+**Priority:** MEDIUM 🔶 | **Status:** TODO 📝 | **Depends On:** S3-1, S3-2, S3-3, S3-4
+
+**Problem Statement:**
+Current main UI shows app cards with single status. New architecture needs to show launcher cards with component-level status and controls.
+
+**Main View Redesign:**
+
+**Launcher Card Layout:**
+```
+┌─ MyApp Development ───────────────────── [⚙] [🗑] ┐
+│ 3 components • 2 running • 1 stopped             │
+│                                                   │
+│ 🖥 Frontend Server     [●] Running   [Stop]     │
+│ 🖥 Backend API         [●] Running   [Stop]     │  
+│ 🌐 Dev Dashboard       [○] Stopped   [Start]    │
+│                                                   │
+│ [Start All] [Stop All] [View Terminal]          │
+└───────────────────────────────────────────────────┘
+```
+
+**Launcher Status Aggregation:**
+- **All Stopped**: Gray launcher header
+- **Partially Running**: Orange launcher header  
+- **All Running**: Green launcher header
+- **Error State**: Red launcher header
+
+**Component Status Indicators:**
+- **Terminal Components**: Terminal icon + status
+- **Browser Components**: Browser icon + status
+- **Individual Controls**: Component-level start/stop buttons
+- **Bulk Controls**: Start all / Stop all launcher buttons
+
+**Technical Implementation:**
+- Update launcher card component design
+- Implement component status aggregation logic
+- Add component-level control buttons
+- Update launcher start/stop to handle all components
+- Integrate with multi-terminal tab system
+
+**Sidebar Integration:**
+- Update sidebar to show launcher names (not app names)
+- Component count indicators
+- Filter by component types
+- Recent launchers based on component usage
+
+**Acceptance Criteria:**
+- [ ] Launcher cards show component breakdown
+- [ ] Component status indicators implemented
+- [ ] Individual component start/stop controls
+- [ ] Bulk launcher start/stop controls  
+- [ ] Status aggregation working correctly
+- [ ] Visual status indicators (colors, icons)
+- [ ] Integration with terminal tab system
+- [ ] Sidebar updated for launcher terminology
+- [ ] Component filtering/searching support
+
+---
+
+### Task S3-6: Implement Migration System and Backward Compatibility
+**Priority:** HIGH 🚨 | **Status:** TODO 📝 | **Depends On:** S3-1
+
+**Problem Statement:**
+Existing users have apps.json configurations that need to seamlessly migrate to the new launcher format without data loss or user intervention.
+
+**Migration Strategy:**
+
+**Automatic Migration:**
+```typescript
+interface Migration {
+  fromVersion: string  // "2.x" (current app format)
+  toVersion: string    // "3.0" (launcher format)  
+  migrate(oldConfig: AppConfig[]): LauncherConfig[]
+}
+
+// Migration Logic:
+// AppConfig → LauncherConfig
+// - App becomes Launcher
+// - launchCommands → Terminal Component (if present)
+// - url → Browser Component (if present)
+// - Preserve all metadata (tags, usage stats, etc.)
+```
+
+**Migration Rules:**
+1. **Process Apps**: Create launcher with single terminal component
+2. **Bookmark Apps**: Create launcher with single browser component  
+3. **Both Apps**: Create launcher with terminal + browser components
+4. **Preserve Metadata**: Keep all tags, usage stats, creation dates
+5. **Generate Component Names**: Auto-generate meaningful component names
+
+**Backward Compatibility:**
+- Detect old format during app startup
+- Automatic migration with backup creation
+- Migration logging and error handling
+- Rollback capability if migration fails
+
+**Technical Implementation:**
+- Create migration utility functions
+- Add version detection to config loading
+- Implement automatic backup system
+- Add migration progress reporting
+- Handle edge cases and validation errors
+
+**Acceptance Criteria:**
+- [ ] Automatic detection of old app format
+- [ ] Migration converts all app types correctly
+- [ ] Component names auto-generated meaningfully
+- [ ] All metadata preserved (tags, stats, dates)
+- [ ] Backup created before migration
+- [ ] Migration logging and error reporting
+- [ ] Rollback functionality for failed migrations
+- [ ] Progress indication for large migrations
+- [ ] Validation of migrated data integrity
+
+---
+
+### Task S3-7: Update Documentation and Terminology Throughout Codebase
+**Priority:** LOW 🟢 | **Status:** TODO 📝 | **Depends On:** All above tasks
+
+**Problem Statement:**
+Codebase uses "app" terminology throughout. Need comprehensive update to "launcher" terminology with updated documentation.
+
+**Terminology Updates:**
+- **"App"** → **"Launcher"**
+- **"App Configuration"** → **"Launcher Configuration"**  
+- **"Start App"** → **"Start Launcher"** or **"Start Components"**
+- **"App Status"** → **"Launcher Status"** / **"Component Status"**
+
+**Files Requiring Updates:**
+- All TypeScript interfaces and types
+- All Rust structs and function names
+- UI text and labels throughout frontend
+- README.md and documentation
+- Code comments and variable names
+- API endpoint names and parameters
+
+**Documentation Updates:**
+- README.md with new architecture explanation
+- API documentation for new launcher endpoints
+- User guide for component-based launcher creation
+- Migration guide for users upgrading from app-based version
+- Developer documentation for new data models
+
+**Acceptance Criteria:**
+- [ ] All user-visible text updated to use "launcher" terminology
+- [ ] Code comments and documentation updated
+- [ ] Variable and function names updated appropriately
+- [ ] README.md reflects new architecture
+- [ ] API documentation updated for new endpoints
+- [ ] User guide created for new component system
+- [ ] Migration documentation for existing users
+
+---
+
+## Implementation Timeline Recommendation
+
+**Phase 1 (Foundation)**: S3-1, S3-6 - Data model and migration (1-2 weeks)
+**Phase 2 (Backend)**: S3-2 - Process management refactor (1 week)  
+**Phase 3 (UI Core)**: S3-3, S3-4 - Terminal tabs and modal redesign (2 weeks)
+**Phase 4 (Integration)**: S3-5 - Main UI updates (1 week)
+**Phase 5 (Polish)**: S3-7 - Documentation and terminology (3-5 days)
+
+**Total Estimated Time**: 5-6 weeks for complete refactor
+
+**Risk Considerations:**
+- **Data Migration**: Critical to get right, extensive testing needed
+- **UI Complexity**: Multi-tab system adds significant complexity
+- **Backend Changes**: Process management changes affect core functionality
+- **User Impact**: Major UX change requires careful introduction
+
+**Success Metrics:**
+- Zero data loss during migration
+- All existing functionality preserved
+- New multi-component functionality working
+- Terminal tab system performing well
+- User confusion minimized through good UX
 
 ### Task: Support Optional Custom Stop Terminal Command(s) Per App
 **Priority:** Medium | **Status:** TODO 📝
@@ -308,98 +780,6 @@ Some apps require a specific stop/teardown command (e.g., Docker), not just Ctrl
 
 ---
 
-### Task 16: Add Multi-Command Dev Server Launch Support
-**Priority:** Medium | **Status:** TODO 📝
-
-**Problem Statement:**
-Currently OddLauncher only supports single-line commands in the "Command" field. Many dev servers require multiple commands to be executed in sequence (e.g., setting Node version, then running the dev server). Users need the ability to specify multi-line command sequences that OddLauncher will execute automatically.
-
-**IMPORTANT CLARIFICATION:**
-- **This is NOT about setup instructions or documentation**
-- **This IS about the actual commands OddLauncher will execute to run the dev server**
-- **Users should NEVER touch a terminal after initial configuration**
-- **OddLauncher executes ALL commands automatically when user clicks "Start"**
-
-**Example Use Cases:**
-```
-Launch Commands for React project:
-nvm use 14.15
-yarn watch
-
-Launch Commands for Python Django:
-source venv/bin/activate
-python manage.py runserver
-
-Launch Commands for Rails with specific Ruby:
-rbenv use 3.0.0
-bundle exec rails server
-
-Launch Commands for Next.js with environment:
-export NODE_ENV=development
-npm run dev
-**Phase 3: Implement Terminal-Specific Command Execution**
-- Modify command preparation logic to route user's launch commands through selected terminal
-- Route commands through appropriate shell:
-  - cmd.exe: `cmd.exe /c "user's launch commands"`
-  - PowerShell: `powershell.exe -Command "user's launch commands"`
-  - Git Bash: `bash.exe -c "user's launch commands"`
-  - WSL: `wsl.exe bash -c "user's launch commands"`
-- Unix systems: route through selected shell (bash, zsh, etc.)
-
-**Phase 4: Add Terminal Display & UX**
-- Terminal header shows selected terminal type
-- Visual indication of which environment commands are running in
-- Help users understand terminal selection impact
-
-**Acceptance Criteria:**
-- [ ] AppConfigModal has multi-line textarea for launch commands instead of single command input
-- [ ] Multiple commands execute sequentially when starting app
-- [ ] Each command's output streams to terminal in real-time
-- [ ] Command execution stops on first failure with clear error message
-- [ ] Single-line commands still work (backwards compatibility)
-- [ ] Existing app configurations migrate automatically
-- [ ] Multi-line commands save/load correctly
-- [ ] Terminal shows output from all executed commands
-
----
-
-### Task 20: Support URL-Only Bookmarks (URL without Terminal Commands)
-**Priority:** Medium | **Status:** TODO 📝
-
-**Problem Statement:**
-Users want to create bookmarks for URLs they frequently access (like development dashboards, documentation, or web apps) without needing to run any terminal commands. Currently, the "Launch Commands" field is required, preventing users from creating URL-only entries that simply open the browser when clicked.
-
-**Use Cases:**
-- Development dashboards (Grafana, Kibana, etc.)
-- Documentation sites (API docs, internal wikis)
-- Web-based development tools (GitHub repos, Figma designs, etc.)
-- Database admin interfaces (phpMyAdmin, MongoDB Compass web, etc.)
-- Local development URLs that are already running (external servers, Docker containers)
-
-**Implementation Plan:**
-
-1. **Data Model Changes**:
-   - Make `launchCommands` optional in TypeScript `AppConfig` interface
-   - Make `launch_commands` optional in Rust `AppConfig` struct
-   - Update JSON schema to allow empty/null launch commands
-   - Add `appType` field to distinguish between "process" and "bookmark" apps
-
-2. **UI/UX Changes**:
-   - Change "Start/Stop" button to "Open" button for URL-only bookmark apps
-   - Show different status indicators (no "running/stopping" status for bookmarks)
-   - Update terminal display for bookmark apps (show "Opening URL..." message instead of process output)
-   - Different visual treatment in sidebar for bookmark vs process apps (maybe bookmark icon)
-
-**Acceptance Criteria:**
-- [ ] Can create apps with only URL field filled (no launch commands required)
-- [ ] URL-only apps show "Open" button instead of "Start/Stop" button
-- [ ] Clicking "Open" on URL-only app opens browser and shows success feedback
-- [ ] Form validation requires either launch commands OR URL (not both empty)
-- [ ] Sidebar visually distinguishes between process apps and bookmark apps
-- [ ] Terminal shows appropriate message for bookmark apps ("Opening [URL]...")
-- [ ] No process status tracking for URL-only bookmark apps
-- [ ] Existing process-based apps continue working unchanged (backward compatibility)
-- [ ] Import/export works with both app t
 ---
 
 ## Task Management Workflow
