@@ -239,7 +239,7 @@ When executing WSL commands, WSL inherits the Windows PATH which includes Window
 ---
 
 ### Task S2-3: Improve Terminal UX - Hide Console Windows & Show User Commands
-**Priority:** MEDIUM 🔶 | **Status:** IN PROGRESS 🚧 | **Issue:** #39
+**Priority:** MEDIUM 🔶 | **Status:** COMPLETED ✅ | **Issue:** #39 (Partial) | **Commit:** 7618a2a
 
 **Problem Statement:**
 Two UX issues with command execution:
@@ -277,16 +277,18 @@ Two UX issues with command execution:
 - [x] Commands are displayed with appropriate shell prompts
 - [x] Multi-line commands are handled properly
 - [x] All terminal types (WSL, cmd, PowerShell, bash, etc.) show commands
-- [ ] Process management (start/stop) continues to work normally
-- [ ] Terminal output capture still functions correctly
+- [x] Process management (start/stop) continues to work normally
+- [x] Terminal output capture still functions correctly
+- [x] Stop button doesn't show visible console windows
 
 **Verification Steps:**
 - [x] Test that WSL commands don't show visible windows on Windows
 - [x] Verify commands appear in terminal output with proper prompts
-- [ ] Test multi-line commands are displayed correctly
-- [ ] Verify all terminal types show commands appropriately
-- [ ] Confirm process management still works (start/stop buttons)
-- [ ] Check that command output still appears after command display
+- [x] Test multi-line commands are displayed correctly
+- [x] Verify all terminal types show commands appropriately
+- [x] Confirm process management still works (start/stop buttons)
+- [x] Check that command output still appears after command display
+- [x] Test that Stop button doesn't spawn visible taskkill/tasklist windows
 
 ---
 
