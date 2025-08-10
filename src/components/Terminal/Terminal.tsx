@@ -82,7 +82,7 @@ export function Terminal({
   // Helper function to get terminal display name
   const getTerminalDisplayName = (terminalType?: string) => {
     if (!terminalType) return 'System Default'
-    
+
     const terminalNames: Record<string, string> = {
       'cmd': 'Command Prompt',
       'powershell': 'PowerShell',
@@ -94,7 +94,7 @@ export function Terminal({
       'fish': 'Fish',
       'sh': 'Shell'
     }
-    
+
     return terminalNames[terminalType] || terminalType
   }
 

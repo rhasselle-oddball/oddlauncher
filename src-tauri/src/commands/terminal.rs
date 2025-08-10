@@ -6,13 +6,13 @@ use crate::models::TerminalInfo;
 #[tauri::command]
 pub async fn detect_available_terminals() -> Result<Vec<TerminalInfo>, String> {
     let mut terminals = Vec::new();
-    
+
     if cfg!(target_os = "windows") {
         terminals.extend(detect_windows_terminals().await);
     } else {
         terminals.extend(detect_unix_terminals().await);
     }
-    
+
     Ok(terminals)
 }
 
@@ -21,7 +21,7 @@ pub async fn detect_available_terminals() -> Result<Vec<TerminalInfo>, String> {
  */
 async fn detect_windows_terminals() -> Vec<TerminalInfo> {
     let mut terminals = Vec::new();
-    
+
     // Command Prompt - always available on Windows
     terminals.push(TerminalInfo {
         id: "cmd".to_string(),
@@ -30,7 +30,7 @@ async fn detect_windows_terminals() -> Vec<TerminalInfo> {
         available: true,
         platform: "windows".to_string(),
     });
-    
+
     // PowerShell - check if available
     let powershell_available = which::which("powershell").is_ok();
     terminals.push(TerminalInfo {
@@ -40,7 +40,7 @@ async fn detect_windows_terminals() -> Vec<TerminalInfo> {
         available: powershell_available,
         platform: "windows".to_string(),
     });
-    
+
     // PowerShell Core (pwsh) - check if available
     let pwsh_available = which::which("pwsh").is_ok();
     terminals.push(TerminalInfo {
@@ -50,7 +50,7 @@ async fn detect_windows_terminals() -> Vec<TerminalInfo> {
         available: pwsh_available,
         platform: "windows".to_string(),
     });
-    
+
     // Git Bash - check if available and verify it's Git Bash
     let git_bash_available = detect_git_bash().await;
     terminals.push(TerminalInfo {
@@ -60,7 +60,7 @@ async fn detect_windows_terminals() -> Vec<TerminalInfo> {
         available: git_bash_available,
         platform: "windows".to_string(),
     });
-    
+
     // WSL - check if available
     let wsl_available = which::which("wsl").is_ok();
     terminals.push(TerminalInfo {
@@ -70,7 +70,7 @@ async fn detect_windows_terminals() -> Vec<TerminalInfo> {
         available: wsl_available,
         platform: "windows".to_string(),
     });
-    
+
     terminals
 }
 
@@ -84,7 +84,7 @@ async fn detect_unix_terminals() -> Vec<TerminalInfo> {
     } else {
         "linux"
     };
-    
+
     // Bash
     let bash_available = which::which("bash").is_ok();
     terminals.push(TerminalInfo {
@@ -94,7 +94,7 @@ async fn detect_unix_terminals() -> Vec<TerminalInfo> {
         available: bash_available,
         platform: platform.to_string(),
     });
-    
+
     // Zsh
     let zsh_available = which::which("zsh").is_ok();
     terminals.push(TerminalInfo {
@@ -104,7 +104,7 @@ async fn detect_unix_terminals() -> Vec<TerminalInfo> {
         available: zsh_available,
         platform: platform.to_string(),
     });
-    
+
     // Fish
     let fish_available = which::which("fish").is_ok();
     terminals.push(TerminalInfo {
@@ -114,7 +114,7 @@ async fn detect_unix_terminals() -> Vec<TerminalInfo> {
         available: fish_available,
         platform: platform.to_string(),
     });
-    
+
     // Sh (standard shell)
     let sh_available = which::which("sh").is_ok();
     terminals.push(TerminalInfo {
@@ -124,7 +124,7 @@ async fn detect_unix_terminals() -> Vec<TerminalInfo> {
         available: sh_available,
         platform: platform.to_string(),
     });
-    
+
     terminals
 }
 
@@ -139,7 +139,7 @@ async fn detect_git_bash() -> bool {
         if path_str.contains("git") {
             return true;
         }
-        
+
         // Try to run bash --version and check if it mentions Git
         if let Ok(output) = tokio::process::Command::new("bash")
             .arg("--version")
@@ -150,7 +150,7 @@ async fn detect_git_bash() -> bool {
             return version_info.contains("git");
         }
     }
-    
+
     false
 }
 
@@ -209,11 +209,11 @@ pub fn get_terminal_command(terminal_type: &str, user_commands: &str, working_di
             // Default Unix shell behavior
             let shell = match terminal_type {
                 "zsh" => "zsh",
-                "fish" => "fish", 
+                "fish" => "fish",
                 "sh" => "sh",
                 _ => "bash", // fallback to bash
             };
-            
+
             let mut script = String::new();
             if let Some(dir) = working_dir {
                 script.push_str(&format!("cd '{}' && ", dir));

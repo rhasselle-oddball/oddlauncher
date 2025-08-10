@@ -6,7 +6,7 @@ Based on the PRD, here are the development tasks organized by priority and depen
 
 ## Current Tasks
 
-### Task S2-1: Add Configurable Terminal/Shell Selection for Windows  
+### Task S2-1: Add Configurable Terminal/Shell Selection for Windows
 **Priority:** HIGH 🚨 | **Status:** COMPLETED ✅ | **Commit:** 7764a8b | **Issue:** #37 (Closed)
 
 **Problem Statement:**

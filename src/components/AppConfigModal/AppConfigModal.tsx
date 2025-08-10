@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import type { TerminalInfo } from '../../types/app'
-import { X, Folder, Plus, AlertCircle, Settings, Link as LinkIcon, File as FileIcon } from 'lucide-react'
+import { X, Folder, Plus, AlertCircle, Settings, Link as LinkIcon, File as FileIcon, ChevronDown, ChevronUp, Terminal, Monitor } from 'lucide-react'
 import { invoke } from '@tauri-apps/api/core'
 import { useConfigManager } from '../../hooks/useConfig'
 import { generateAppId } from '../../utils/app-data'
@@ -33,6 +33,10 @@ export function AppConfigModal({
   // Terminal detection state
   const [availableTerminals, setAvailableTerminals] = useState<TerminalInfo[]>([])
   const [isLoadingTerminals, setIsLoadingTerminals] = useState(false)
+
+  // Collapsible sections state
+  const [isTerminalSectionExpanded, setIsTerminalSectionExpanded] = useState(true)
+  const [isBrowserSectionExpanded, setIsBrowserSectionExpanded] = useState(true)
 
   // Initialize form data when modal opens or mode changes
   useEffect(() => {
@@ -272,30 +276,41 @@ export function AppConfigModal({
 
               {/* Terminal-related fields: only for process or both */}
               {(formData.appType === 'process' || formData.appType === 'both') && (
-                <>
-                  {/* Terminal Type Dropdown */}
-                  <div className="form-group">
-                    <label htmlFor="terminalType" className="form-label">
-                      Terminal Type
-                    </label>
-                    <select
-                      id="terminalType"
-                      className="form-input"
-                      value={formData.terminalType || ''}
-                      onChange={e => handleInputChange('terminalType', e.target.value)}
-                      disabled={isLoadingTerminals}
-                    >
-                      <option value="">System Default</option>
-                      {availableTerminals.filter(t => t.available).map(t => (
-                        <option key={t.id} value={t.id}>
-                          {t.name}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="form-help">
-                      Choose which terminal/shell to use for this app. Options are auto-detected from your system.
-                    </div>
-                  </div>
+                <div className="collapsible-section">
+                  <button
+                    type="button"
+                    className="section-header"
+                    onClick={() => setIsTerminalSectionExpanded(!isTerminalSectionExpanded)}
+                  >
+                    <Terminal size={16} />
+                    <span>Terminal Configuration</span>
+                    {isTerminalSectionExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                  </button>
+                  {isTerminalSectionExpanded && (
+                    <div className="section-content">
+                      {/* Terminal Type Dropdown */}
+                      <div className="form-group">
+                        <label htmlFor="terminalType" className="form-label">
+                          Terminal Type
+                        </label>
+                        <select
+                          id="terminalType"
+                          className="form-input compact-select"
+                          value={formData.terminalType || ''}
+                          onChange={e => handleInputChange('terminalType', e.target.value)}
+                          disabled={isLoadingTerminals}
+                        >
+                          <option value="">System Default</option>
+                          {availableTerminals.filter(t => t.available).map(t => (
+                            <option key={t.id} value={t.id}>
+                              {t.name}
+                            </option>
+                          ))}
+                        </select>
+                        <div className="form-help">
+                          Choose which terminal/shell to use for this app. Options are auto-detected from your system.
+                        </div>
+                      </div>
                   {/* Launch Commands */}
                   <div className="form-group">
                     <label htmlFor="launchCommands" className="form-label">
@@ -357,15 +372,28 @@ yarn watch`}
                       </div>
                     )}
                   </div>
-                </>
+                    </div>
+                  )}
+                </div>
               )}
 
               {/* Browser-related fields: only for bookmark or both */}
               {(formData.appType === 'bookmark' || formData.appType === 'both') && (
-                <>
-                  {/* URL / File destination */}
-                  <div className="form-group">
-                    <label className="form-label">Destination</label>
+                <div className="collapsible-section">
+                  <button
+                    type="button"
+                    className="section-header"
+                    onClick={() => setIsBrowserSectionExpanded(!isBrowserSectionExpanded)}
+                  >
+                    <Monitor size={16} />
+                    <span>Browser Configuration</span>
+                    {isBrowserSectionExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                  </button>
+                  {isBrowserSectionExpanded && (
+                    <div className="section-content">
+                      {/* URL / File destination */}
+                      <div className="form-group">
+                        <label className="form-label">Destination</label>
                     <div className="toggle-group" role="tablist" aria-label="Destination Type">
                       <button
                         type="button"
@@ -476,7 +504,9 @@ yarn watch`}
                       </div>
                     </>
                   )}
-                </>
+                    </div>
+                  )}
+                </div>
               )}
 
               {/* Tags */}
