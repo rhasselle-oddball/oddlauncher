@@ -212,10 +212,21 @@ fn prepare_windows_multi_command(commands: &[&str], working_dir: Option<&str>) -
         .unwrap_or(false);
 
     if use_wsl {
-        // Create bash script for WSL with proper environment initialization
+        // Create bash script for WSL with clean environment to avoid Windows PATH conflicts
         let mut script_lines = vec![
             "#!/bin/bash".to_string(),
             "set -e".to_string(),
+            "".to_string(),
+            "# Clean PATH to avoid Windows executable conflicts".to_string(),
+            "# Remove Windows paths (/mnt/c/...) that cause WSL to use Windows tools instead of Linux versions".to_string(),
+            "export PATH=\"$(echo $PATH | tr ':' '\\n' | grep -v '^/mnt/c' | tr '\\n' ':' | sed 's/:$//')\"".to_string(),
+            "".to_string(),
+            "# Add standard Linux paths to ensure we have essential tools".to_string(),
+            "export PATH=\"/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin:$PATH\"".to_string(),
+            "".to_string(),
+            "# Add user bin directories if they exist".to_string(),
+            "[ -d \"$HOME/.local/bin\" ] && export PATH=\"$HOME/.local/bin:$PATH\"".to_string(),
+            "[ -d \"$HOME/bin\" ] && export PATH=\"$HOME/bin:$PATH\"".to_string(),
             "".to_string(),
             "# Initialize shell environment".to_string(),
             "source /etc/profile 2>/dev/null || true".to_string(),
@@ -234,6 +245,17 @@ fn prepare_windows_multi_command(commands: &[&str], working_dir: Option<&str>) -
             "if command -v rbenv >/dev/null 2>&1; then".to_string(),
             "    eval \"$(rbenv init -)\"".to_string(),
             "fi".to_string(),
+            "".to_string(),
+            "# Debug: Show which executables we'll use".to_string(),
+            "echo \"OddLauncher: Using clean WSL environment\"".to_string(),
+            "echo \"OddLauncher: PATH=$PATH\"".to_string(),
+            "for tool in node npm yarn; do".to_string(),
+            "    if command -v $tool >/dev/null 2>&1; then".to_string(),
+            "        echo \"OddLauncher: Found $tool at $(which $tool)\"".to_string(),
+            "    else".to_string(),
+            "        echo \"OddLauncher: Tool $tool not found in PATH\"".to_string(),
+            "    fi".to_string(),
+            "done".to_string(),
             "".to_string(),
         ];
 
@@ -771,19 +793,31 @@ pub async fn start_app_process(
 
         match exit_status {
             Ok(status) => {
+                let exit_code = status.code();
                 log::info!("Process {} exited with status: {}", app_id_monitor, status);
+
+                // Provide helpful error messages for common exit codes
+                let exit_message = match exit_code {
+                    Some(127) => "OddLauncher: Process exited with code 127 (Command not found - check if executable exists in PATH)".to_string(),
+                    Some(126) => "OddLauncher: Process exited with code 126 (Permission denied - executable not permitted to run)".to_string(),
+                    Some(1) => "OddLauncher: Process exited with code 1 (General error - check command syntax and arguments)".to_string(),
+                    Some(2) => "OddLauncher: Process exited with code 2 (Misuse of shell builtins - check command usage)".to_string(),
+                    Some(130) => "OddLauncher: Process exited with code 130 (Process terminated by Ctrl+C)".to_string(),
+                    Some(code) => format!("OddLauncher: Process exited with code {}", code),
+                    None => "OddLauncher: Process exited (no exit code available)".to_string(),
+                };
 
                 // Also emit a final output line for terminal visibility
                 let _ = app_handle_monitor.emit("process-output", serde_json::json!({
                     "appId": app_id_monitor,
                     "type": "stdout",
-                    "content": format!("OddLauncher: Process exited with code {:?}", status.code()),
+                    "content": exit_message,
                     "timestamp": chrono::Utc::now().to_rfc3339()
                 }));
 
                 let _ = app_handle_monitor.emit("process-exit", serde_json::json!({
                     "appId": app_id_monitor,
-                    "exitCode": status.code(),
+                    "exitCode": exit_code,
                     "timestamp": chrono::Utc::now().to_rfc3339()
                 }));
             }

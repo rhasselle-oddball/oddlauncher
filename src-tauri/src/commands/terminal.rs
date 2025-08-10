@@ -196,14 +196,43 @@ pub fn get_terminal_command(terminal_type: &str, user_commands: &str, working_di
             vec!["bash.exe".to_string(), "-c".to_string(), script]
         },
         "wsl" => {
-            let mut script = String::new();
+            // Create a complete bash script with clean environment to avoid Windows PATH conflicts
+            let mut script_lines = vec![
+                "#!/bin/bash".to_string(),
+                "set -e".to_string(),
+                "".to_string(),
+                "# Clean PATH to avoid Windows executable conflicts".to_string(),
+                "export PATH=\"$(echo $PATH | tr ':' '\\n' | grep -v '^/mnt/c' | tr '\\n' ':' | sed 's/:$//')\"".to_string(),
+                "".to_string(),
+                "# Add standard Linux paths".to_string(),
+                "export PATH=\"/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin:$PATH\"".to_string(),
+                "".to_string(),
+                "# Add user bin directories".to_string(),
+                "[ -d \"$HOME/.local/bin\" ] && export PATH=\"$HOME/.local/bin:$PATH\"".to_string(),
+                "[ -d \"$HOME/bin\" ] && export PATH=\"$HOME/bin:$PATH\"".to_string(),
+                "".to_string(),
+                "# Initialize shell environment".to_string(),
+                "source /etc/profile 2>/dev/null || true".to_string(),
+                "source ~/.profile 2>/dev/null || true".to_string(),
+                "source ~/.bashrc 2>/dev/null || true".to_string(),
+                "".to_string(),
+                "# Initialize version managers".to_string(),
+                "if [ -f ~/.nvm/nvm.sh ]; then source ~/.nvm/nvm.sh; fi".to_string(),
+                "if command -v rbenv >/dev/null 2>&1; then eval \"$(rbenv init -)\"; fi".to_string(),
+                "".to_string(),
+            ];
+
             if let Some(dir) = working_dir {
                 // Convert Windows path to WSL path if needed
                 let wsl_dir = convert_to_wsl_path(dir);
-                script.push_str(&format!("cd '{}' && ", wsl_dir));
+                script_lines.push(format!("cd '{}'", wsl_dir));
+                script_lines.push("".to_string());
             }
-            script.push_str(user_commands);
-            vec!["wsl.exe".to_string(), "bash".to_string(), "-c".to_string(), script]
+
+            script_lines.push(user_commands.to_string());
+
+            let complete_script = script_lines.join("\n");
+            vec!["wsl.exe".to_string(), "bash".to_string(), "-c".to_string(), complete_script]
         },
         "bash" | "zsh" | "fish" | "sh" | _ => {
             // Default Unix shell behavior

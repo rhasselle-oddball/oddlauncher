@@ -170,6 +170,59 @@ App Name: [My Development Server]
 
 ---
 
+### Task S2-2: Fix WSL Command Execution on Windows - PATH Environment Issues 
+**Priority:** HIGH 🚨 | **Status:** TESTING 🧪 | **Issue:** #38
+
+**Problem Statement:**
+WSL commands on Windows are failing because they inherit the Windows PATH environment, causing WSL to try executing Windows versions of tools (like `yarn` from `/mnt/c/Users/.../AppData/Roaming/npm/yarn`) instead of the WSL Linux versions. This results in "node: not found" errors and exit code 127 failures.
+
+**Root Cause:**
+When executing WSL commands, WSL inherits the Windows PATH which includes Windows executable directories mounted at `/mnt/c/...`. When commands like `yarn` are executed, WSL finds the Windows version first in the PATH, but that version depends on Windows Node.js which isn't available in the WSL Linux environment.
+
+**Technical Issues:**
+1. WSL bash scripts inherit Windows PATH causing executable conflicts
+2. Windows tools (yarn.cmd) try to call Windows Node.js from Linux environment  
+3. Subprocess error output not properly displayed in terminal UI
+4. Error handling could be improved for process failures
+
+**Solution Strategy:**
+1. **Clean WSL Environment** - Execute WSL commands with a clean PATH that excludes Windows directories
+2. **Improve Error Handling** - Better capture and display subprocess errors
+3. **Enhanced Logging** - Better debugging information for WSL execution issues
+
+**Implementation Plan:**
+
+**Phase 1: Fix WSL PATH Environment**
+- Modify WSL command execution to use clean environment
+- Add explicit PATH reset in WSL scripts to exclude `/mnt/c/` directories
+- Ensure WSL tools (node, npm, yarn) from Linux are used instead of Windows versions
+
+**Phase 2: Improve Error Display**
+- Enhance terminal output to capture and display subprocess stderr
+- Better error messages for common WSL/PATH issues 
+- Add debugging information for WSL environment setup
+
+**Phase 3: Testing & Validation**
+- Test with various Node.js tools (npm, yarn, pnpm)
+- Test with different WSL distributions
+- Verify commands work across Windows/Linux/macOS consistently
+
+**Acceptance Criteria:**
+- [ ] WSL commands execute using WSL environment tools, not Windows PATH
+- [ ] `yarn watch` and similar Node.js commands work in WSL
+- [ ] Subprocess errors are properly displayed in terminal output  
+- [ ] Commands work consistently across Windows/WSL/Mac/Linux
+- [ ] Error messages are informative for debugging WSL PATH issues
+
+**Verification Steps:**
+- [ ] Test Node.js apps with `yarn watch` commands in WSL - should not get "node: not found" 
+- [ ] Test `npm start` commands in WSL - should use WSL npm, not Windows
+- [ ] Test various JavaScript/TypeScript build tools work correctly
+- [ ] Verify error output shows up in terminal for failed commands
+- [ ] Test that Linux and macOS functionality remains unaffected
+
+---
+
 ## Sprint 1 Incomplete Tasks
 
 ### Task: Support Optional Custom Stop Terminal Command(s) Per App

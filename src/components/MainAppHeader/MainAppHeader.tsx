@@ -192,7 +192,7 @@ export function MainAppHeader({
               </div>
             </div>
           </div>
-          
+
           <div className="header-actions">
             <button
               className="delete-button"
