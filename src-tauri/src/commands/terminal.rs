@@ -161,12 +161,27 @@ pub fn get_terminal_command(terminal_type: &str, user_commands: &str, working_di
     match terminal_type {
         "cmd" => {
             let mut args = vec!["cmd.exe".to_string(), "/c".to_string()];
+            let mut script = String::new();
+            
             if let Some(dir) = working_dir {
-                // Change directory first, then run user commands
-                args.push(format!("cd /d \"{}\" && {}", dir, user_commands));
-            } else {
-                args.push(user_commands.to_string());
+                script.push_str(&format!("cd /d \"{}\" && ", dir));
             }
+            
+            // Split user commands and echo each one before executing
+            let user_command_lines: Vec<&str> = user_commands
+                .lines()
+                .map(|line| line.trim())
+                .filter(|line| !line.is_empty())
+                .collect();
+
+            for (i, command) in user_command_lines.iter().enumerate() {
+                script.push_str(&format!("echo ^> {} && {}", command, command));
+                if i < user_command_lines.len() - 1 {
+                    script.push_str(" && ");
+                }
+            }
+            
+            args.push(script);
             args
         },
         "powershell" => {
@@ -174,7 +189,21 @@ pub fn get_terminal_command(terminal_type: &str, user_commands: &str, working_di
             if let Some(dir) = working_dir {
                 script.push_str(&format!("Set-Location -Path '{}'; ", dir));
             }
-            script.push_str(user_commands);
+            
+            // Split user commands and echo each one before executing
+            let user_command_lines: Vec<&str> = user_commands
+                .lines()
+                .map(|line| line.trim())
+                .filter(|line| !line.is_empty())
+                .collect();
+
+            for (i, command) in user_command_lines.iter().enumerate() {
+                script.push_str(&format!("Write-Host 'PS> {}'; {}", command, command));
+                if i < user_command_lines.len() - 1 {
+                    script.push_str("; ");
+                }
+            }
+            
             vec!["powershell.exe".to_string(), "-Command".to_string(), script]
         },
         "pwsh" => {
@@ -182,7 +211,21 @@ pub fn get_terminal_command(terminal_type: &str, user_commands: &str, working_di
             if let Some(dir) = working_dir {
                 script.push_str(&format!("Set-Location -Path '{}'; ", dir));
             }
-            script.push_str(user_commands);
+            
+            // Split user commands and echo each one before executing
+            let user_command_lines: Vec<&str> = user_commands
+                .lines()
+                .map(|line| line.trim())
+                .filter(|line| !line.is_empty())
+                .collect();
+
+            for (i, command) in user_command_lines.iter().enumerate() {
+                script.push_str(&format!("Write-Host 'PS> {}'; {}", command, command));
+                if i < user_command_lines.len() - 1 {
+                    script.push_str("; ");
+                }
+            }
+            
             vec!["pwsh.exe".to_string(), "-Command".to_string(), script]
         },
         "gitbash" => {
@@ -192,7 +235,21 @@ pub fn get_terminal_command(terminal_type: &str, user_commands: &str, working_di
                 let unix_dir = convert_to_unix_path(dir);
                 script.push_str(&format!("cd '{}' && ", unix_dir));
             }
-            script.push_str(user_commands);
+            
+            // Split user commands and echo each one before executing
+            let user_command_lines: Vec<&str> = user_commands
+                .lines()
+                .map(|line| line.trim())
+                .filter(|line| !line.is_empty())
+                .collect();
+
+            for (i, command) in user_command_lines.iter().enumerate() {
+                script.push_str(&format!("echo '$ {}' && {}", command, command));
+                if i < user_command_lines.len() - 1 {
+                    script.push_str(" && ");
+                }
+            }
+            
             vec!["bash.exe".to_string(), "-c".to_string(), script]
         },
         "wsl" => {
@@ -229,7 +286,21 @@ pub fn get_terminal_command(terminal_type: &str, user_commands: &str, working_di
                 script_lines.push("".to_string());
             }
 
-            script_lines.push(user_commands.to_string());
+            // Split user commands by lines and echo each one before executing (like typing in terminal)
+            let user_command_lines: Vec<&str> = user_commands
+                .lines()
+                .map(|line| line.trim())
+                .filter(|line| !line.is_empty())
+                .collect();
+
+            for (i, command) in user_command_lines.iter().enumerate() {
+                // Show the command being executed (like terminal prompt)
+                script_lines.push(format!("echo '$ {}'", command));
+                script_lines.push(command.to_string());
+                if i < user_command_lines.len() - 1 {
+                    script_lines.push("".to_string());
+                }
+            }
 
             let complete_script = script_lines.join("\n");
             vec!["wsl.exe".to_string(), "bash".to_string(), "-c".to_string(), complete_script]
@@ -238,7 +309,7 @@ pub fn get_terminal_command(terminal_type: &str, user_commands: &str, working_di
             // Default Unix shell behavior
             let shell = match terminal_type {
                 "zsh" => "zsh",
-                "fish" => "fish",
+                "fish" => "fish", 
                 "sh" => "sh",
                 _ => "bash", // fallback to bash
             };
@@ -247,7 +318,21 @@ pub fn get_terminal_command(terminal_type: &str, user_commands: &str, working_di
             if let Some(dir) = working_dir {
                 script.push_str(&format!("cd '{}' && ", dir));
             }
-            script.push_str(user_commands);
+            
+            // Split user commands and echo each one before executing
+            let user_command_lines: Vec<&str> = user_commands
+                .lines()
+                .map(|line| line.trim())
+                .filter(|line| !line.is_empty())
+                .collect();
+
+            for (i, command) in user_command_lines.iter().enumerate() {
+                script.push_str(&format!("echo '$ {}' && {}", command, command));
+                if i < user_command_lines.len() - 1 {
+                    script.push_str(" && ");
+                }
+            }
+            
             vec![shell.to_string(), "-c".to_string(), script]
         }
     }

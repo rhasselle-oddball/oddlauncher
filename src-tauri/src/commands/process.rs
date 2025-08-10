@@ -15,6 +15,9 @@ use std::os::unix::process::CommandExt;
 #[cfg(unix)]
 use libc;
 
+#[cfg(windows)]
+use std::os::windows::process::CommandExt;
+
 // Process management module for OddLauncher application
 
 /**
@@ -269,9 +272,9 @@ fn prepare_windows_multi_command(commands: &[&str], working_dir: Option<&str>) -
             }
         }
 
-        // Add all commands with logging
+        // Add all commands with terminal-like display
         for (i, command) in commands.iter().enumerate() {
-            script_lines.push(format!("echo \"OddLauncher: Executing command {}: {}\"", i + 1, command));
+            script_lines.push(format!("echo '$ {}'", command));
             script_lines.push(command.to_string());
             if i < commands.len() - 1 {
                 script_lines.push("".to_string());
@@ -569,6 +572,13 @@ pub async fn start_app_process(
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .stdin(Stdio::null());
+
+    // On Windows, hide the console window to prevent visible WSL/cmd windows from popping up
+    #[cfg(windows)]
+    {
+        const CREATE_NO_WINDOW: u32 = 0x08000000;
+        cmd.creation_flags(CREATE_NO_WINDOW);
+    }
 
     // On Unix, ensure the child starts in its own process group so we can signal the whole tree
     #[cfg(unix)]

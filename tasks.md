@@ -170,7 +170,7 @@ App Name: [My Development Server]
 
 ---
 
-### Task S2-2: Fix WSL Command Execution on Windows - PATH Environment Issues 
+### Task S2-2: Fix WSL Command Execution on Windows - PATH Environment Issues
 **Priority:** HIGH 🚨 | **Status:** COMPLETED ✅ | **Issue:** #38 (Closed) | **Commit:** ea51ed6
 
 **Problem Statement:**
@@ -181,7 +181,7 @@ When executing WSL commands, WSL inherits the Windows PATH which includes Window
 
 **Technical Issues:**
 1. WSL bash scripts inherit Windows PATH causing executable conflicts
-2. Windows tools (yarn.cmd) try to call Windows Node.js from Linux environment  
+2. Windows tools (yarn.cmd) try to call Windows Node.js from Linux environment
 3. Subprocess error output not properly displayed in terminal UI
 4. Error handling could be improved for process failures
 
@@ -199,7 +199,7 @@ When executing WSL commands, WSL inherits the Windows PATH which includes Window
 
 **Phase 2: Improve Error Display**
 - Enhance terminal output to capture and display subprocess stderr
-- Better error messages for common WSL/PATH issues 
+- Better error messages for common WSL/PATH issues
 - Add debugging information for WSL environment setup
 
 **Phase 3: Testing & Validation**
@@ -210,12 +210,12 @@ When executing WSL commands, WSL inherits the Windows PATH which includes Window
 **Acceptance Criteria:**
 - [x] WSL commands execute using WSL environment tools, not Windows PATH
 - [x] `yarn watch` and similar Node.js commands work in WSL
-- [x] Subprocess errors are properly displayed in terminal output  
+- [x] Subprocess errors are properly displayed in terminal output
 - [x] Commands work consistently across Windows/WSL/Mac/Linux
 - [x] Error messages are informative for debugging WSL PATH issues
 
 **Verification Steps:**
-- [x] Test Node.js apps with `yarn watch` commands in WSL - should not get "node: not found" 
+- [x] Test Node.js apps with `yarn watch` commands in WSL - should not get "node: not found"
 - [x] Test `npm start` commands in WSL - should use WSL npm, not Windows
 - [x] Test various JavaScript/TypeScript build tools work correctly
 - [x] Verify error output shows up in terminal for failed commands
@@ -224,7 +224,7 @@ When executing WSL commands, WSL inherits the Windows PATH which includes Window
 **Implementation Summary:**
 ✅ **COMPLETED** - Successfully resolved WSL PATH conflicts on Windows:
 - **PATH Environment Cleaning**: Modified both legacy multi-command system (`process.rs`) and new terminal selection system (`terminal.rs`) to clean Windows directories from PATH
-- **Environment Isolation**: WSL commands now use isolated Linux PATH excluding `/mnt/c/` directories that cause Windows/Linux executable conflicts  
+- **Environment Isolation**: WSL commands now use isolated Linux PATH excluding `/mnt/c/` directories that cause Windows/Linux executable conflicts
 - **Enhanced Error Messages**: Added informative error messages for common exit codes (127 = command not found, 126 = permission denied, etc.)
 - **Comprehensive Shell Initialization**: Added proper shell environment setup including profile sourcing and version manager initialization (nvm, rbenv)
 - **Debugging Support**: Added logging to show which executables are found and used for troubleshooting
@@ -235,6 +235,58 @@ When executing WSL commands, WSL inherits the Windows PATH which includes Window
 - Both execution paths now apply same fix: `get_terminal_command()` for explicit terminal selection and `prepare_multi_command_execution()` for legacy behavior
 - WSL commands now get clean PATH with standard Linux directories and user bin directories
 - Error handling improved with contextual messages for common failure scenarios
+
+---
+
+### Task S2-3: Improve Terminal UX - Hide Console Windows & Show User Commands
+**Priority:** MEDIUM 🔶 | **Status:** IN PROGRESS 🚧 | **Issue:** #39
+
+**Problem Statement:**
+Two UX issues with command execution:
+1. **Visible Console Windows**: WSL/cmd commands spawn visible terminal windows on Windows that pop up and disappear, which is distracting
+2. **Missing Command Display**: Terminal only shows command output, not the actual commands being executed, making it hard to understand what's running
+
+**User Impact:**
+- Console windows popping up disrupts workflow and looks unprofessional
+- Users can't see what commands are actually being executed, making debugging difficult
+- Terminal output doesn't feel like a real terminal session
+
+**Technical Issues:**
+1. **Windows Process Creation**: By default, console applications on Windows create visible windows
+2. **Command Visibility**: Current implementation only pipes stdout/stderr but doesn't echo the user's commands
+
+**Implementation Plan:**
+
+**Phase 1: Hide Console Windows (COMPLETED ✅)**
+- Add Windows-specific CREATE_NO_WINDOW flag to process creation
+- Use `#[cfg(windows)]` conditional compilation for Windows-only code
+- Maintain stdout/stderr capture for terminal output
+
+**Phase 2: Show User Commands (COMPLETED ✅)**  
+- Modify all terminal handlers to echo commands before executing them
+- Use appropriate prompt format for each shell type:
+  - WSL/Bash/Unix: `$ command`
+  - PowerShell: `PS> command` 
+  - Command Prompt: `> command`
+- Split multi-line commands and show each one separately
+- Apply to both new terminal selection system and legacy multi-command system
+
+**Acceptance Criteria:**
+- [x] No visible console windows appear when running WSL/cmd commands on Windows
+- [x] Terminal output shows commands being executed (like typing them)
+- [x] Commands are displayed with appropriate shell prompts
+- [x] Multi-line commands are handled properly
+- [x] All terminal types (WSL, cmd, PowerShell, bash, etc.) show commands
+- [ ] Process management (start/stop) continues to work normally
+- [ ] Terminal output capture still functions correctly
+
+**Verification Steps:**
+- [x] Test that WSL commands don't show visible windows on Windows
+- [x] Verify commands appear in terminal output with proper prompts
+- [ ] Test multi-line commands are displayed correctly
+- [ ] Verify all terminal types show commands appropriately
+- [ ] Confirm process management still works (start/stop buttons)
+- [ ] Check that command output still appears after command display
 
 ---
 
