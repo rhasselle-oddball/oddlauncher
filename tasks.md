@@ -171,7 +171,7 @@ App Name: [My Development Server]
 ---
 
 ### Task S2-2: Fix WSL Command Execution on Windows - PATH Environment Issues 
-**Priority:** HIGH 🚨 | **Status:** TESTING 🧪 | **Issue:** #38
+**Priority:** HIGH 🚨 | **Status:** COMPLETED ✅ | **Issue:** #38 (Closed) | **Commit:** ea51ed6
 
 **Problem Statement:**
 WSL commands on Windows are failing because they inherit the Windows PATH environment, causing WSL to try executing Windows versions of tools (like `yarn` from `/mnt/c/Users/.../AppData/Roaming/npm/yarn`) instead of the WSL Linux versions. This results in "node: not found" errors and exit code 127 failures.
@@ -208,18 +208,33 @@ When executing WSL commands, WSL inherits the Windows PATH which includes Window
 - Verify commands work across Windows/Linux/macOS consistently
 
 **Acceptance Criteria:**
-- [ ] WSL commands execute using WSL environment tools, not Windows PATH
-- [ ] `yarn watch` and similar Node.js commands work in WSL
-- [ ] Subprocess errors are properly displayed in terminal output  
-- [ ] Commands work consistently across Windows/WSL/Mac/Linux
-- [ ] Error messages are informative for debugging WSL PATH issues
+- [x] WSL commands execute using WSL environment tools, not Windows PATH
+- [x] `yarn watch` and similar Node.js commands work in WSL
+- [x] Subprocess errors are properly displayed in terminal output  
+- [x] Commands work consistently across Windows/WSL/Mac/Linux
+- [x] Error messages are informative for debugging WSL PATH issues
 
 **Verification Steps:**
-- [ ] Test Node.js apps with `yarn watch` commands in WSL - should not get "node: not found" 
-- [ ] Test `npm start` commands in WSL - should use WSL npm, not Windows
-- [ ] Test various JavaScript/TypeScript build tools work correctly
-- [ ] Verify error output shows up in terminal for failed commands
-- [ ] Test that Linux and macOS functionality remains unaffected
+- [x] Test Node.js apps with `yarn watch` commands in WSL - should not get "node: not found" 
+- [x] Test `npm start` commands in WSL - should use WSL npm, not Windows
+- [x] Test various JavaScript/TypeScript build tools work correctly
+- [x] Verify error output shows up in terminal for failed commands
+- [x] Test that Linux and macOS functionality remains unaffected
+
+**Implementation Summary:**
+✅ **COMPLETED** - Successfully resolved WSL PATH conflicts on Windows:
+- **PATH Environment Cleaning**: Modified both legacy multi-command system (`process.rs`) and new terminal selection system (`terminal.rs`) to clean Windows directories from PATH
+- **Environment Isolation**: WSL commands now use isolated Linux PATH excluding `/mnt/c/` directories that cause Windows/Linux executable conflicts  
+- **Enhanced Error Messages**: Added informative error messages for common exit codes (127 = command not found, 126 = permission denied, etc.)
+- **Comprehensive Shell Initialization**: Added proper shell environment setup including profile sourcing and version manager initialization (nvm, rbenv)
+- **Debugging Support**: Added logging to show which executables are found and used for troubleshooting
+- **Cross-Platform Compatibility**: Linux and macOS functionality preserved, only Windows WSL execution improved
+
+**Technical Details:**
+- Fixed core issue where WSL inherited Windows PATH causing `yarn` from `/mnt/c/Users/.../AppData/Roaming/npm/yarn` to be used instead of WSL version
+- Both execution paths now apply same fix: `get_terminal_command()` for explicit terminal selection and `prepare_multi_command_execution()` for legacy behavior
+- WSL commands now get clean PATH with standard Linux directories and user bin directories
+- Error handling improved with contextual messages for common failure scenarios
 
 ---
 
