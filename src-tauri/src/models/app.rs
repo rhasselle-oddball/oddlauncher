@@ -48,6 +48,8 @@ pub struct AppConfig {
     pub port_check_timeout: Option<u32>,
     /// Tags for organization and filtering (optional)
     pub tags: Option<Vec<String>>,
+    /// Terminal/shell type to use for executing commands (optional)
+    pub terminal_type: Option<String>,
     /// Explicit app type (process, bookmark, both) - optional for back-compat
     pub app_type: Option<AppType>,
     /// Last time the app was used (process started or bookmark opened)
@@ -209,6 +211,24 @@ pub enum AppType {
     Process,
     Bookmark,
     Both,
+}
+
+/**
+ * Information about an available terminal/shell
+ */
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TerminalInfo {
+    /// Unique identifier for the terminal type
+    pub id: String,
+    /// Display name for the terminal
+    pub name: String,
+    /// Executable path/command
+    pub executable: String,
+    /// Whether this terminal is available on the system
+    pub available: bool,
+    /// Platform this terminal is associated with
+    pub platform: String,
 }
 
 impl AppConfig {

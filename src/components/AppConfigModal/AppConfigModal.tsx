@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
+import type { TerminalInfo } from '../../types/app'
 import { X, Folder, Plus, AlertCircle, Settings, Link as LinkIcon, File as FileIcon } from 'lucide-react'
 import { invoke } from '@tauri-apps/api/core'
 import { useConfigManager } from '../../hooks/useConfig'
@@ -29,6 +30,10 @@ export function AppConfigModal({
   const [isClosing, setIsClosing] = useState(false)
   const [newTagInput, setNewTagInput] = useState('')
 
+  // Terminal detection state
+  const [availableTerminals, setAvailableTerminals] = useState<TerminalInfo[]>([])
+  const [isLoadingTerminals, setIsLoadingTerminals] = useState(false)
+
   // Initialize form data when modal opens or mode changes
   useEffect(() => {
     if (isOpen) {
@@ -41,8 +46,16 @@ export function AppConfigModal({
       setIsSubmitting(false)
       setIsClosing(false)
       setNewTagInput('')
+      // Fetch available terminals when modal opens (only for process/both)
+      if (formData.appType === 'process' || formData.appType === 'both' || mode === 'add') {
+        setIsLoadingTerminals(true)
+        invoke<TerminalInfo[]>('detect_available_terminals')
+          .then((result) => setAvailableTerminals(result))
+          .catch(() => setAvailableTerminals([]))
+          .finally(() => setIsLoadingTerminals(false))
+      }
     }
-  }, [isOpen, mode, appToEdit])
+  }, [isOpen, mode, appToEdit, formData.appType])
 
   // Handle form field changes
   const handleInputChange = useCallback((field: keyof AppConfigFormData, value: string | number | boolean) => {
@@ -260,6 +273,29 @@ export function AppConfigModal({
               {/* Terminal-related fields: only for process or both */}
               {(formData.appType === 'process' || formData.appType === 'both') && (
                 <>
+                  {/* Terminal Type Dropdown */}
+                  <div className="form-group">
+                    <label htmlFor="terminalType" className="form-label">
+                      Terminal Type
+                    </label>
+                    <select
+                      id="terminalType"
+                      className="form-input"
+                      value={formData.terminalType || ''}
+                      onChange={e => handleInputChange('terminalType', e.target.value)}
+                      disabled={isLoadingTerminals}
+                    >
+                      <option value="">System Default</option>
+                      {availableTerminals.filter(t => t.available).map(t => (
+                        <option key={t.id} value={t.id}>
+                          {t.name}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="form-help">
+                      Choose which terminal/shell to use for this app. Options are auto-detected from your system.
+                    </div>
+                  </div>
                   {/* Launch Commands */}
                   <div className="form-group">
                     <label htmlFor="launchCommands" className="form-label">

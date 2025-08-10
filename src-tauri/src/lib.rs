@@ -45,6 +45,7 @@ pub fn run() {
       commands::check_port_ready,
       commands::wait_for_port_ready,
       commands::get_debug_info,
+      commands::detect_available_terminals,
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

@@ -40,7 +40,8 @@ export function useAppProcess(appId: string) {
       autoLaunchBrowser?: boolean,
       browserDelay?: number,
       portToCheck?: number,
-      portCheckTimeout?: number
+      portCheckTimeout?: number,
+      terminalType?: string
     ) =>
       startProcess(
         appId,
@@ -51,7 +52,8 @@ export function useAppProcess(appId: string) {
         autoLaunchBrowser,
         browserDelay,
         portToCheck,
-        portCheckTimeout
+        portCheckTimeout,
+        terminalType
       ),
     [appId, startProcess]
   )

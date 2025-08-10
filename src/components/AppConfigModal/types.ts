@@ -23,6 +23,8 @@ export interface AppConfigFormData {
   autoLaunchBrowser: boolean
   browserDelay: number
   tags: string[]
+  /** Terminal/shell type to use for executing commands (optional) */
+  terminalType?: string
 }
 
 /**
@@ -40,6 +42,7 @@ export interface AppConfigFormErrors {
   autoLaunchBrowser?: string
   browserDelay?: string
   tags?: string
+  terminalType?: string
 }
 
 /**

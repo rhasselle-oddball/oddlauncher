@@ -48,7 +48,7 @@ Different development workflows require different shell environments:
 - Enhance AppConfigModal with Terminal section organization:
   - **Terminal Section** (for "Just Terminal" and "Terminal + Browser" app types):
     - Terminal Type dropdown (auto-detected options)
-    - Working Directory field (existing)  
+    - Working Directory field (existing)
     - Launch Commands textarea (existing)
   - **Browser Section** (for "Just Browser" and "Terminal + Browser" app types):
     - Destination URL/Local file (existing)
@@ -66,7 +66,7 @@ interface AppConfig {
 interface TerminalInfo {
   id: string;           // "cmd", "powershell", "gitbash", "wsl"
   name: string;         // "Command Prompt", "PowerShell", "Git Bash", "WSL"
-  executable: string;   // "cmd.exe", "powershell.exe", "bash.exe", "wsl.exe"  
+  executable: string;   // "cmd.exe", "powershell.exe", "bash.exe", "wsl.exe"
   available: boolean;   // detected availability
   platform: string;    // "windows", "linux", "macos"
 }
@@ -105,7 +105,7 @@ App Name: [My Development Server]
 ┌─ Terminal Section (when applicable) ────┐
 │ Terminal Type: [PowerShell    ▼]         │
 │ Working Directory: [/path/to/project]    │
-│ Launch Commands:                         │  
+│ Launch Commands:                         │
 │ ┌─────────────────────────────────────┐ │
 │ │ nvm use 14.15                       │ │
 │ │ yarn watch --env entry=mock-form    │ │
@@ -120,7 +120,7 @@ App Name: [My Development Server]
 
 **Terminal Type Dropdown Options:**
 - Windows: "Command Prompt", "PowerShell", "Git Bash", "WSL" (auto-detected)
-- Unix: "Bash", "Zsh", "Fish" (auto-detected) 
+- Unix: "Bash", "Zsh", "Fish" (auto-detected)
 - Default: "System Default" (when no preference set)
 
 **Main View Terminal Header:**

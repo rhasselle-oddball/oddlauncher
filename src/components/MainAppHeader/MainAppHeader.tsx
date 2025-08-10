@@ -98,7 +98,8 @@ export function MainAppHeader({
           selectedApp.autoLaunchBrowser,
           selectedApp.browserDelay,
           selectedApp.portToCheck,
-          selectedApp.portCheckTimeout
+          selectedApp.portCheckTimeout,
+          selectedApp.terminalType
         )
         // If process started successfully, bump usage
         if (result?.success) {

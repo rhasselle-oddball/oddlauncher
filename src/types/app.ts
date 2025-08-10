@@ -18,6 +18,22 @@ export type AppStatus =
 export type AppType = 'process' | 'bookmark' | 'both'
 
 /**
+ * Information about an available terminal/shell
+ */
+export interface TerminalInfo {
+  /** Unique identifier for the terminal type */
+  id: string
+  /** Display name for the terminal */
+  name: string
+  /** Executable path/command */
+  executable: string
+  /** Whether this terminal is available on the system */
+  available: boolean
+  /** Platform this terminal is associated with */
+  platform: string
+}
+
+/**
  * Configuration for an individual app
  */
 export interface AppConfig {
@@ -43,6 +59,8 @@ export interface AppConfig {
   portCheckTimeout?: number
   /** Tags for organization and filtering (optional) */
   tags?: string[]
+  /** Terminal/shell type to use for executing commands (optional) */
+  terminalType?: string
   /** Explicit app type (process, bookmark, or both). If missing, inferred at runtime for back-compat */
   appType?: AppType
   /** Last time the app was used (process started or bookmark opened) */

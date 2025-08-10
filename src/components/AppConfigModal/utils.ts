@@ -30,6 +30,7 @@ export function appConfigToFormData(config: AppConfig): AppConfigFormData {
     autoLaunchBrowser: config.autoLaunchBrowser ?? true,
     browserDelay: config.browserDelay || 0,
     tags: config.tags || [],
+    terminalType: config.terminalType,
   }
 }
 
@@ -68,6 +69,7 @@ export function formDataToAppConfig(
       formData.tags.filter((tag) => tag.trim()).length > 0
         ? formData.tags.filter((tag) => tag.trim()).map((tag) => tag.trim())
         : undefined,
+    terminalType: formData.terminalType,
     createdAt: existingConfig?.createdAt || now,
     updatedAt: now,
     // Set lastUsedAt for new apps so they appear in the "RECENT" section initially
@@ -91,6 +93,7 @@ export const getEmptyFormData = (): AppConfigFormData => ({
   autoLaunchBrowser: true,
   browserDelay: 0,
   tags: [],
+  terminalType: undefined,
 })
 
 /**

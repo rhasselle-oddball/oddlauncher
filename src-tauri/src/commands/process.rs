@@ -1,4 +1,5 @@
 use crate::models::app::{AppProcess, AppStatus};
+use crate::commands::terminal::get_terminal_command;
 use serde::{Deserialize, Serialize};
 use serde_json;
 use std::collections::HashMap;
@@ -155,8 +156,22 @@ mod platform_utils {
 }
 
 /// Prepare multi-command execution using shell script approach
-fn prepare_multi_command_execution(launch_commands: &str, working_dir: Option<&str>) -> Result<(String, Vec<String>), String> {
+fn prepare_multi_command_execution(launch_commands: &str, working_dir: Option<&str>, terminal_type: Option<&str>) -> Result<(String, Vec<String>), String> {
     log::info!("Preparing multi-command execution: '{}'", launch_commands);
+
+    // If terminal_type is specified, use the new terminal command system
+    if let Some(term_type) = terminal_type {
+        log::info!("Using terminal type: {}", term_type);
+        let command_args = get_terminal_command(term_type, launch_commands, working_dir);
+        if command_args.len() >= 2 {
+            let program = command_args[0].clone();
+            let args = command_args[1..].to_vec();
+            return Ok((program, args));
+        }
+    }
+
+    // Fallback to legacy behavior when no terminal type is specified
+    log::info!("No terminal type specified, using legacy shell detection");
 
     // Split commands by lines and filter out empty lines
     let commands: Vec<&str> = launch_commands
@@ -385,6 +400,7 @@ pub async fn start_app_process(
     browser_delay: Option<u32>,
     port_to_check: Option<u16>,
     port_check_timeout: Option<u32>,
+    terminal_type: Option<String>,
     app_handle: AppHandle,
     process_manager: State<'_, ProcessManager>,
 ) -> Result<ProcessResult, String> {
@@ -501,7 +517,7 @@ pub async fn start_app_process(
     };
 
     // Prepare multi-command execution using shell script approach
-    let (program, args) = match prepare_multi_command_execution(&launch_commands, normalized_working_dir.as_deref()) {
+    let (program, args) = match prepare_multi_command_execution(&launch_commands, normalized_working_dir.as_deref(), terminal_type.as_deref()) {
         Ok((prog, args)) => {
             log::info!("Multi-command execution prepared - Program: '{}', Args: {:?}", prog, args);
             (prog, args)

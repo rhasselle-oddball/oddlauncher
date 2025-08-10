@@ -79,6 +79,25 @@ export function Terminal({
     return [...structuredLines, ...convertedRawLines]
   }, [lines, rawOutput])
 
+  // Helper function to get terminal display name
+  const getTerminalDisplayName = (terminalType?: string) => {
+    if (!terminalType) return 'System Default'
+    
+    const terminalNames: Record<string, string> = {
+      'cmd': 'Command Prompt',
+      'powershell': 'PowerShell',
+      'pwsh': 'PowerShell Core',
+      'gitbash': 'Git Bash',
+      'wsl': 'WSL',
+      'bash': 'Bash',
+      'zsh': 'Zsh',
+      'fish': 'Fish',
+      'sh': 'Shell'
+    }
+    
+    return terminalNames[terminalType] || terminalType
+  }
+
   // Auto-scroll to bottom when new lines are added
   useEffect(() => {
   // Debug: observe how many lines will render
@@ -192,7 +211,7 @@ export function Terminal({
       <div className="terminal-header">
         <div className="terminal-title-section">
           <TerminalIcon size={18} />
-          <span className="terminal-title">Terminal Output - {selectedApp.name}</span>
+          <span className="terminal-title">Terminal Output ({getTerminalDisplayName(selectedApp.terminalType)}) - {selectedApp.name}</span>
           {displayLines.length > 0 && (
             <span className="terminal-line-count">({filteredLines.length} lines)</span>
           )}
