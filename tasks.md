@@ -6,8 +6,8 @@ Based on the PRD, here are the development tasks organized by priority and depen
 
 ## Current Tasks
 
-### Task S2-1: Add Configurable Terminal/Shell Selection for Windows
-**Priority:** HIGH 🚨 | **Status:** In Planning 📋
+### Task S2-1: Add Configurable Terminal/Shell Selection for Windows  
+**Priority:** HIGH 🚨 | **Status:** COMPLETED ✅ | **Commit:** 7764a8b | **Issue:** #37 (Closed)
 
 **Problem Statement:**
 Users need the ability to choose which terminal/shell environment their launch commands execute in. Currently, OddLauncher uses a default shell environment, but Windows users often need to choose between Command Prompt, PowerShell, Git Bash, or WSL depending on their development tools and command requirements.
@@ -127,26 +127,39 @@ App Name: [My Development Server]
 - Current: "Terminal Output - Minimal Header Form"
 - Enhanced: "Terminal Output (PowerShell) - Minimal Header Form"
 - Shows selected terminal type for user context**Acceptance Criteria:**
-- [ ] Users can select terminal type in app configuration modal
-- [ ] Terminal header displays selected terminal type ("Terminal (PowerShell)", etc.)
-- [ ] User's launch commands execute in the selected terminal environment
-- [ ] Commands behave as expected in chosen terminal (PowerShell vs cmd.exe vs Git Bash)
-- [ ] Existing functionality works unchanged (backward compatibility)
-- [ ] Per-app terminal selection persists in configuration
-- [ ] Global default terminal setting available
-- [ ] Cross-platform support (Windows primary focus, maintain Unix functionality)
-- [ ] Auto-detection shows available terminals on user's system
+- [x] Users can select terminal type in app configuration modal
+- [x] Terminal header displays selected terminal type ("Terminal (PowerShell)", etc.)
+- [x] User's launch commands execute in the selected terminal environment
+- [x] Commands behave as expected in chosen terminal (PowerShell vs cmd.exe vs Git Bash)
+- [x] Existing functionality works unchanged (backward compatibility)
+- [x] Per-app terminal selection persists in configuration
+- [x] Global default terminal setting available
+- [x] Cross-platform support (Windows primary focus, maintain Unix functionality)
+- [x] Auto-detection shows available terminals on user's system
 
 **Verification Steps:**
-- [ ] Create test app with PowerShell-specific commands - verify they run correctly when PowerShell terminal selected
-- [ ] Create test app with cmd.exe commands - verify they run correctly when Command Prompt selected
-- [ ] Create test app with Unix-style commands - verify they run correctly when Git Bash/WSL selected
-- [ ] Test terminal selection persistence across app restarts
-- [ ] Verify terminal header shows correct terminal type
-- [ ] Test that different apps can use different terminal types
-- [ ] Verify Linux/macOS builds continue working with shell selection
-- [ ] Test import/export preserves terminal type settings
-- [ ] Test that user's existing launch commands work in selected terminal environment
+- [x] Create test app with PowerShell-specific commands - verify they run correctly when PowerShell terminal selected
+- [x] Create test app with cmd.exe commands - verify they run correctly when Command Prompt selected
+- [x] Create test app with Unix-style commands - verify they run correctly when Git Bash/WSL selected
+- [x] Test terminal selection persistence across app restarts
+- [x] Verify terminal header shows correct terminal type
+- [x] Test that different apps can use different terminal types
+- [x] Verify Linux/macOS builds continue working with shell selection
+- [x] Test import/export preserves terminal type settings
+- [x] Test that user's existing launch commands work in selected terminal environment
+
+**Implementation Summary:**
+✅ **COMPLETED** - All features successfully implemented:
+- Terminal detection system with auto-detection of available terminals across platforms
+- Terminal type dropdown in AppConfigModal for process/both app types
+- Process execution using selected terminal type via `get_terminal_command` function
+- Terminal header now displays selected terminal type (e.g., "Terminal Output (PowerShell) - MyApp")
+- Cross-platform support: Windows (cmd, PowerShell, PowerShell Core, Git Bash, WSL), Unix (bash, zsh, fish, sh)
+- Backward compatibility maintained - existing apps default to "System Default"
+- Per-app terminal configuration persists in JSON storage
+- Full integration from UI to backend execution
+
+**Commit:** 7764a8b | **Issue:** #37 (Closed) | **Status:** COMPLETED ✅
 
 **Technical Implementation Notes:**
 - Add `which = "4.4"` dependency to Cargo.toml for executable detection
