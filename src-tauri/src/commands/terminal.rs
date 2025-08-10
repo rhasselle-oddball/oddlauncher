@@ -1,5 +1,9 @@
 use crate::models::TerminalInfo;
 
+#[cfg(windows)]
+#[allow(unused_imports)]
+use std::os::windows::process::CommandExt;
+
 /**
  * Detect available terminals on the current system
  */
@@ -141,11 +145,17 @@ async fn detect_git_bash() -> bool {
         }
 
         // Try to run bash --version and check if it mentions Git
-        if let Ok(output) = tokio::process::Command::new("bash")
-            .arg("--version")
-            .output()
-            .await
+        let mut cmd = tokio::process::Command::new("bash");
+        cmd.arg("--version");
+        
+        // Hide console window on Windows
+        #[cfg(windows)]
         {
+            const CREATE_NO_WINDOW: u32 = 0x08000000;
+            cmd.creation_flags(CREATE_NO_WINDOW);
+        }
+        
+        if let Ok(output) = cmd.output().await {
             let version_info = String::from_utf8_lossy(&output.stdout).to_lowercase();
             return version_info.contains("git");
         }

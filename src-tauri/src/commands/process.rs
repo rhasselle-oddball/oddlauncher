@@ -16,6 +16,7 @@ use std::os::unix::process::CommandExt;
 use libc;
 
 #[cfg(windows)]
+#[allow(unused_imports)]
 use std::os::windows::process::CommandExt;
 
 // Process management module for OddLauncher application
@@ -1031,12 +1032,16 @@ pub async fn stop_app_process(
             // Best-effort check using tasklist filtering by PID
             let start = Instant::now();
             loop {
-                let out = tokio::process::Command::new("tasklist")
-                    .arg("/FI").arg(format!("PID eq {}", pid))
+                let mut cmd = tokio::process::Command::new("tasklist");
+                cmd.arg("/FI").arg(format!("PID eq {}", pid))
                     .stdout(Stdio::piped())
-                    .stderr(Stdio::null())
-                    .output()
-                    .await;
+                    .stderr(Stdio::null());
+                
+                // Hide console window
+                const CREATE_NO_WINDOW: u32 = 0x08000000;
+                cmd.creation_flags(CREATE_NO_WINDOW);
+                
+                let out = cmd.output().await;
                 let running = match out {
                     Ok(o) => {
                         let s = String::from_utf8_lossy(&o.stdout);
@@ -1097,6 +1102,11 @@ pub async fn stop_app_process(
             if *force {
                 cmd.arg("/F");
             }
+            
+            // Hide console window
+            const CREATE_NO_WINDOW: u32 = 0x08000000;
+            cmd.creation_flags(CREATE_NO_WINDOW);
+            
             match cmd.output().await {
                 Ok(out) => {
                     if out.status.success() {
@@ -1311,12 +1321,16 @@ pub async fn kill_all_processes(
             use tokio::time::{sleep, Duration, Instant};
             let start = Instant::now();
             loop {
-                let out = tokio::process::Command::new("tasklist")
-                    .arg("/FI").arg(format!("PID eq {}", pid))
+                let mut cmd = tokio::process::Command::new("tasklist");
+                cmd.arg("/FI").arg(format!("PID eq {}", pid))
                     .stdout(Stdio::piped())
-                    .stderr(Stdio::null())
-                    .output()
-                    .await;
+                    .stderr(Stdio::null());
+                
+                // Hide console window
+                const CREATE_NO_WINDOW: u32 = 0x08000000;
+                cmd.creation_flags(CREATE_NO_WINDOW);
+                
+                let out = cmd.output().await;
                 let running = match out {
                     Ok(o) => {
                         let s = String::from_utf8_lossy(&o.stdout);
@@ -1360,6 +1374,11 @@ pub async fn kill_all_processes(
                 if force {
                     cmd.arg("/F");
                 }
+                
+                // Hide console window
+                const CREATE_NO_WINDOW: u32 = 0x08000000;
+                cmd.creation_flags(CREATE_NO_WINDOW);
+                
                 let _ = cmd.output().await;
                 let timeout = if force { 800 } else { 1500 };
                 if wait_for_exit_any(pid, timeout).await {
