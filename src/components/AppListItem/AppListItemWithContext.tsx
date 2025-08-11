@@ -17,13 +17,13 @@ interface AppListItemWithContextProps {
   onDuplicate: (app: AppConfig) => void
 }
 
-export function AppListItemWithContext({ 
-  app, 
-  isSelected, 
-  onClick, 
-  onEdit, 
-  onDelete, 
-  onDuplicate 
+export function AppListItemWithContext({
+  app,
+  isSelected,
+  onClick,
+  onEdit,
+  onDelete,
+  onDuplicate
 }: AppListItemWithContextProps) {
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; visible: boolean }>({
     x: 0,

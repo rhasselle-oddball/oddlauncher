@@ -11,21 +11,21 @@ export function LandingPage({ onAddLauncher }: LandingPageProps) {
       <div className="landing-content">
         <div className="landing-logo">
           <div className="logo-icon">
-            <img 
-              src="/favicon-96x96.png" 
-              alt="OddLauncher Logo" 
+            <img
+              src="/logo.svg"
+              alt="OddLauncher Logo"
               className="logo-image"
             />
           </div>
           <h1 className="landing-title">OddLauncher</h1>
           <p className="landing-subtitle">Dev Tools Launcher</p>
         </div>
-        
+
         <div className="landing-actions">
           <p className="landing-message">
             Select a launcher from the sidebar or create a new one to get started
           </p>
-          
+
           <button className="landing-add-button" onClick={onAddLauncher}>
             <Plus size={20} />
             Add New Launcher

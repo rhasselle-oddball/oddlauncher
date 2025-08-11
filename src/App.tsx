@@ -20,7 +20,7 @@ function App() {
     const handleContextMenu = (e: MouseEvent) => {
       // Allow context menu when holding Ctrl, Shift, or Cmd (for dev tools)
       const isDevToolsIntent = e.ctrlKey || e.shiftKey || e.metaKey
-      
+
       if (!isDevToolsIntent) {
         e.preventDefault()
       }
