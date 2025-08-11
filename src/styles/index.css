@@ -22,6 +22,21 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  /* Disable native context menu for desktop app experience */
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Prevent text selection and context menu globally */
+* {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Prevent context menu on all elements */
+* {
+  -webkit-context-menu: none;
+  context-menu: none;
 }
 
 #root {

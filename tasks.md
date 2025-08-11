@@ -321,7 +321,7 @@ Several UI inconsistencies and nomenclature issues need to be addressed to impro
 **Phase 3: Smart Delete Modal**
 - Only show relevant sections in delete confirmation:
   - For "Just Browser": Hide Command and Directory sections
-  - For "Just Terminal": Hide URL section  
+  - For "Just Terminal": Hide URL section
   - For "Terminal + Browser": Show all sections
 - Update ConfirmationModal component logic
 
@@ -346,7 +346,7 @@ Several UI inconsistencies and nomenclature issues need to be addressed to impro
 
 **Components:**
 - `LibrarySidebar/LibrarySidebar.tsx` - Search bar layout and terminology
-- `LibrarySidebar/LibrarySidebar.css` - Search bar flexbox styling  
+- `LibrarySidebar/LibrarySidebar.css` - Search bar flexbox styling
 - `ConfirmationModal/ConfirmationModal.tsx` - Smart section display
 - `AppConfigModal/AppConfigModal.tsx` - Flow improvements and terminology
 - `MainContent/MainContent.tsx` - Empty state terminology
@@ -374,7 +374,7 @@ Several UI inconsistencies and nomenclature issues need to be addressed to impro
 
 **Verification Steps:**
 - [ ] Test search bar layout with empty state and with launchers
-- [ ] Verify sort icon visibility and readability in dark theme  
+- [ ] Verify sort icon visibility and readability in dark theme
 - [ ] Test delete modal with each launcher type (Terminal, Browser, Terminal + Browser)
 - [ ] Verify all text changes from "app" to "launcher" are complete
 - [ ] Test new app config modal flow with each launcher type selection
@@ -395,7 +395,7 @@ Transform OddLauncher from a rigid "app with one terminal + one browser" model t
 **Current Architecture Problems:**
 1. **Rigid Structure**: Current `AppConfig` forces exactly one terminal + one browser configuration
 2. **Limited Terminal Support**: Only one terminal command per app, no multi-terminal tabs
-3. **Inflexible Browser Support**: Only one URL per app, no multi-tab support  
+3. **Inflexible Browser Support**: Only one URL per app, no multi-tab support
 4. **Poor UX**: Modal forces users to choose predefined combinations instead of building what they need
 5. **Terminology Confusion**: "App" implies single purpose, but we're building multi-purpose launchers
 
@@ -469,7 +469,7 @@ interface ComponentState {
 
 **Phase 1: Data Model Refactor (This Task)**
 - Create new TypeScript interfaces for Launcher architecture
-- Create new Rust structs for Launcher architecture  
+- Create new Rust structs for Launcher architecture
 - Design migration strategy from AppConfig → LauncherConfig
 - Update JSON schema and storage format
 - Implement backward compatibility layer
@@ -492,7 +492,7 @@ interface ComponentState {
 
 ---
 
-### Task S3-2: Refactor Backend Process Management for Multi-Component Architecture  
+### Task S3-2: Refactor Backend Process Management for Multi-Component Architecture
 **Priority:** HIGH 🚨 | **Status:** TODO 📝 | **Depends On:** S3-1
 
 **Problem Statement:**
@@ -512,7 +512,7 @@ Current process management assumes one process per app. New architecture needs t
 pub async fn start_app_process(app_id: String, ...) -> ProcessResult
 pub async fn stop_app_process(app_id: String, ...) -> ProcessResult
 
-// New  
+// New
 pub async fn start_launcher_component(launcher_id: String, component_id: String, ...) -> ProcessResult
 pub async fn stop_launcher_component(launcher_id: String, component_id: String, ...) -> ProcessResult
 pub async fn start_launcher(launcher_id: String, ...) -> Vec<ProcessResult>  // Start all components
@@ -672,7 +672,7 @@ Current AppConfigModal forces users into predefined categories (browser+terminal
 - [ ] Modal starts with minimal name/description form
 - [ ] Dynamic component addition via buttons
 - [ ] Terminal component configuration UI
-- [ ] Browser component configuration UI  
+- [ ] Browser component configuration UI
 - [ ] Component removal functionality
 - [ ] Component reordering support
 - [ ] Validation prevents empty launchers
@@ -695,7 +695,7 @@ Current main UI shows app cards with single status. New architecture needs to sh
 │ 3 components • 2 running • 1 stopped             │
 │                                                   │
 │ 🖥 Frontend Server     [●] Running   [Stop]     │
-│ 🖥 Backend API         [●] Running   [Stop]     │  
+│ 🖥 Backend API         [●] Running   [Stop]     │
 │ 🌐 Dev Dashboard       [○] Stopped   [Start]    │
 │                                                   │
 │ [Start All] [Stop All] [View Terminal]          │
@@ -704,7 +704,7 @@ Current main UI shows app cards with single status. New architecture needs to sh
 
 **Launcher Status Aggregation:**
 - **All Stopped**: Gray launcher header
-- **Partially Running**: Orange launcher header  
+- **Partially Running**: Orange launcher header
 - **All Running**: Green launcher header
 - **Error State**: Red launcher header
 
@@ -731,7 +731,7 @@ Current main UI shows app cards with single status. New architecture needs to sh
 - [ ] Launcher cards show component breakdown
 - [ ] Component status indicators implemented
 - [ ] Individual component start/stop controls
-- [ ] Bulk launcher start/stop controls  
+- [ ] Bulk launcher start/stop controls
 - [ ] Status aggregation working correctly
 - [ ] Visual status indicators (colors, icons)
 - [ ] Integration with terminal tab system
@@ -752,7 +752,7 @@ Existing users have apps.json configurations that need to seamlessly migrate to 
 ```typescript
 interface Migration {
   fromVersion: string  // "2.x" (current app format)
-  toVersion: string    // "3.0" (launcher format)  
+  toVersion: string    // "3.0" (launcher format)
   migrate(oldConfig: AppConfig[]): LauncherConfig[]
 }
 
@@ -766,7 +766,7 @@ interface Migration {
 
 **Migration Rules:**
 1. **Process Apps**: Create launcher with single terminal component
-2. **Bookmark Apps**: Create launcher with single browser component  
+2. **Bookmark Apps**: Create launcher with single browser component
 3. **Both Apps**: Create launcher with terminal + browser components
 4. **Preserve Metadata**: Keep all tags, usage stats, creation dates
 5. **Generate Component Names**: Auto-generate meaningful component names
@@ -805,7 +805,7 @@ Codebase uses "app" terminology throughout. Need comprehensive update to "launch
 
 **Terminology Updates:**
 - **"App"** → **"Launcher"**
-- **"App Configuration"** → **"Launcher Configuration"**  
+- **"App Configuration"** → **"Launcher Configuration"**
 - **"Start App"** → **"Start Launcher"** or **"Start Components"**
 - **"App Status"** → **"Launcher Status"** / **"Component Status"**
 
@@ -838,7 +838,7 @@ Codebase uses "app" terminology throughout. Need comprehensive update to "launch
 ## Implementation Timeline Recommendation
 
 **Phase 1 (Foundation)**: S3-1, S3-6 - Data model and migration (1-2 weeks)
-**Phase 2 (Backend)**: S3-2 - Process management refactor (1 week)  
+**Phase 2 (Backend)**: S3-2 - Process management refactor (1 week)
 **Phase 3 (UI Core)**: S3-3, S3-4 - Terminal tabs and modal redesign (2 weeks)
 **Phase 4 (Integration)**: S3-5 - Main UI updates (1 week)
 **Phase 5 (Polish)**: S3-7 - Documentation and terminology (3-5 days)

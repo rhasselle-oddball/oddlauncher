@@ -1,6 +1,6 @@
 import { useState, useMemo, ChangeEvent, useEffect } from 'react'
 import { Search, Clock, ArrowDownAZ } from 'lucide-react'
-import { AppListItem } from '../AppListItem'
+import { AppListItemWithContext } from '../AppListItem/AppListItemWithContext'
 import { useConfigManager } from '../../hooks/useConfig'
 import type { AppConfig } from '../../types'
 // import { getAppType } from '../../types'
@@ -18,18 +18,21 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
-import { SortableAppListItem } from './SortableAppListItem'
+import { SortableAppListItemWithContext } from './SortableAppListItemWithContext'
 import './LibrarySidebar.css'
 
 interface LibrarySidebarProps {
   selectedAppId: string | null
   onAppSelect: (app: AppConfig | null) => void
   onAddApp: () => void
+  onEdit: (app: AppConfig) => void
+  onDelete: (app: AppConfig) => void
+  onDuplicate: (app: AppConfig) => void
   /** Optional shared config manager instance to avoid duplicate state */
   configManager?: ReturnType<typeof useConfigManager>
 }
 
-export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configManager: externalManager }: LibrarySidebarProps) {
+export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, onEdit, onDelete, onDuplicate, configManager: externalManager }: LibrarySidebarProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState<'recent' | 'az'>('recent')
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({})
@@ -449,11 +452,14 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configMan
                   {searchQuery.trim() ? (
                     // When searching, no drag and drop
                     section.items.map(app => (
-                      <AppListItem
+                      <AppListItemWithContext
                         key={app.id}
                         app={app}
                         isSelected={selectedAppId === app.id}
                         onClick={handleAppClick}
+                        onEdit={onEdit}
+                        onDelete={onDelete}
+                        onDuplicate={onDuplicate}
                       />
                     ))
                   ) : (
@@ -468,11 +474,14 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configMan
                         strategy={verticalListSortingStrategy}
                       >
                         {section.items.map(app => (
-                          <SortableAppListItem
+                          <SortableAppListItemWithContext
                             key={app.id}
                             app={app}
                             selectedAppId={selectedAppId}
                             onAppSelect={handleAppClick}
+                            onEdit={onEdit}
+                            onDelete={onDelete}
+                            onDuplicate={onDuplicate}
                           />
                         ))}
                       </SortableContext>
@@ -484,11 +493,14 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configMan
           ))
         ) : searchQuery.trim() ? (
           filteredApps.map((app) => (
-            <AppListItem
+            <AppListItemWithContext
               key={app.id}
               app={app}
               isSelected={selectedAppId === app.id}
               onClick={handleAppClick}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              onDuplicate={onDuplicate}
             />
           ))
         ) : (
@@ -503,11 +515,14 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configMan
               strategy={verticalListSortingStrategy}
             >
               {filteredApps.map((app) => (
-                <SortableAppListItem
+                <SortableAppListItemWithContext
                   key={app.id}
                   app={app}
                   selectedAppId={selectedAppId}
                   onAppSelect={handleAppClick}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
+                  onDuplicate={onDuplicate}
                 />
               ))}
             </SortableContext>

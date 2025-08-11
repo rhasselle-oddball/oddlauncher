@@ -7,6 +7,15 @@
   overflow: hidden;
 }
 
+/* Terminal Container (for no-app state) */
+.terminal-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #0d1117;
+  overflow: hidden;
+}
+
 /* Terminal Header */
 .terminal-header {
   display: flex;
@@ -217,36 +226,33 @@
 }
 
 /* No App Selected State */
-.terminal-content.no-app-selected {
+.no-app-selected {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: #0d1117;
+  color: #f0f6fc;
 }
 
-.no-app-terminal-message {
-  text-align: center;
-  color: var(--text-secondary);
-  max-width: 400px;
-}
-
-.no-app-terminal-message svg {
+.no-app-selected .no-app-icon {
   margin-bottom: 1rem;
   opacity: 0.6;
+  text-align: center;
 }
 
-.no-app-terminal-message h3 {
+.no-app-selected h3 {
   margin: 0 0 1rem 0;
-  color: var(--text-primary);
+  color: #f0f6fc;
   font-size: 1.25rem;
+  text-align: center;
 }
 
-.no-app-terminal-message p {
+.no-app-selected p {
   margin: 0.5rem 0;
   line-height: 1.5;
-}
-
-.no-app-terminal-message p:first-of-type {
-  font-weight: 500;
+  text-align: center;
+  color: #8b949e;
 }
 
 /* Terminal Scrollbar Styling */

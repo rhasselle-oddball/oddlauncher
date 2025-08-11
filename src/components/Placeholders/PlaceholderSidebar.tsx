@@ -4,11 +4,11 @@ export function PlaceholderSidebar() {
   return (
     <div className="placeholder-sidebar">
       <div className="placeholder-search">
-                <input 
-          type="text" 
-          className="search-input" 
-          placeholder="Search launchers..." 
-          disabled 
+                <input
+          type="text"
+          className="search-input"
+          placeholder="Search launchers..."
+          disabled
         />
       </div>
 

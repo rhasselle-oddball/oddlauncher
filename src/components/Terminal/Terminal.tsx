@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react'
-import { Search, Copy, RotateCcw, Settings, Terminal as TerminalIcon, ArrowDown } from 'lucide-react'
+import { Search, Copy, RotateCcw, Terminal as TerminalIcon, ArrowDown } from 'lucide-react'
 import type { AppConfig } from '../../types'
 import './Terminal.css'
 
@@ -173,17 +173,6 @@ export function Terminal({
   if (!selectedApp) {
     return (
       <div className="terminal-container">
-        <div className="terminal-header">
-          <div className="terminal-actions">
-            <button
-              className="terminal-action"
-              disabled
-              title="Terminal settings"
-            >
-              <Settings size={16} />
-            </button>
-          </div>
-        </div>
         <div className="terminal-content">
           <div className="no-app-selected">
             <div className="no-app-icon">
@@ -191,7 +180,6 @@ export function Terminal({
             </div>
             <h3>No Launcher Selected</h3>
             <p>Select a launcher to view output here.</p>
-            <p>Once you start a launcher, its output will appear here in real-time.</p>
           </div>
         </div>
       </div>

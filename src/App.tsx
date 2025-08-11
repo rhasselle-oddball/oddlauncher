@@ -15,6 +15,23 @@ import {
 import './styles/App.css'
 
 function App() {
+  // Prevent native context menu globally (but allow with modifier keys for dev tools)
+  useEffect(() => {
+    const handleContextMenu = (e: MouseEvent) => {
+      // Allow context menu when holding Ctrl, Shift, or Cmd (for dev tools)
+      const isDevToolsIntent = e.ctrlKey || e.shiftKey || e.metaKey
+      
+      if (!isDevToolsIntent) {
+        e.preventDefault()
+      }
+    }
+
+    document.addEventListener('contextmenu', handleContextMenu)
+    return () => {
+      document.removeEventListener('contextmenu', handleContextMenu)
+    }
+  }, [])
+
   const [selectedApp, setSelectedApp] = useState<AppConfig | null>(null)
   const [modalState, setModalState] = useState<{
     isOpen: boolean
@@ -287,6 +304,9 @@ function App() {
             selectedAppId={selectedApp?.id || null}
             onAppSelect={handleAppSelect}
             onAddApp={handleAddApp}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onDuplicate={handleDuplicate}
             configManager={configManager}
           />
         }
@@ -297,6 +317,7 @@ function App() {
             onDelete={handleDelete}
             onOpenUrl={handleOpenUrl}
             onOpenDirectory={handleOpenDirectory}
+            onAddLauncher={handleAddApp}
             configManager={configManager}
           />
         }

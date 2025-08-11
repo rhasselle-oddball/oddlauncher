@@ -128,7 +128,8 @@ export function validateFormData(
   // Validate appType-specific requirements
   if (formData.appType === 'process') {
     if (!formData.launchCommands.trim()) {
-      errors.launchCommands = 'Launch commands are required for terminal launchers'
+      errors.launchCommands =
+        'Launch commands are required for terminal launchers'
     }
   }
   if (formData.appType === 'bookmark') {
