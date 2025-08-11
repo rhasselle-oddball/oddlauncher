@@ -2,6 +2,8 @@
 
 A native desktop application that acts like a "Steam Library for dev tools". Launch local development servers with a single click, view terminal output in real-time, and open browser tabs automatically.
 
+![OddLauncher Preview](preview.png)
+
 ## 💾 Download & Installation
 
 ### Get the Latest Release
