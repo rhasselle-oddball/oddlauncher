@@ -6,14 +6,21 @@ A native desktop application that acts like a "Steam Library for dev tools". Lau
 
 ### Get the Latest Release
 
-**📋 [Download from Releases Page](https://github.com/your-username/oddlauncher/releases)**
+**📋 [Download from Releases Page](https://github.com/rhasselle-oddball/oddlauncher/releases)**
 
 Choose the right file for your operating system:
-- **Windows**: `oddlauncher_*_x64_en-US.msi`
-- **macOS Intel**: `oddlauncher_*_x64.dmg`
-- **macOS Apple Silicon**: `oddlauncher_*_aarch64.dmg`
-- **Linux Debian/Ubuntu**: `oddlauncher_*_amd64.deb`
-- **Linux Universal**: `oddlauncher_*_amd64.AppImage`
+
+**Windows:**
+- `OddLauncher_x.x.x_x64-setup.exe` (recommended for all Windows users)
+
+**macOS:**
+- `OddLauncher_x.x.x_aarch64.dmg` (Apple Silicon: M1/M2/M3/M4 Macs)
+- `OddLauncher_x.x.x_x64.dmg` (Intel Macs)
+
+**Linux:**
+- `OddLauncher_x.x.x_amd64.deb` (Ubuntu/Debian/Pop!_OS/Mint)
+- `OddLauncher-x.x.x-1.x86_64.rpm` (Fedora/RHEL/openSUSE)
+- `OddLauncher_x.x.x_amd64.AppImage` (Universal - works on any Linux distro)
 
 ### ⚠️ Security Warnings & Workarounds
 
@@ -22,13 +29,13 @@ Choose the right file for your operating system:
 #### **Windows**
 - **Warning**: "Windows protected your PC" or "Unknown publisher"
 - **Solution**: Click "More info" → "Run anyway"
-- **Alternative**: Right-click the installer → Properties → Check "Unblock" → OK
+- **Alternative**: Right-click the `.exe` installer → Properties → Check "Unblock" → OK
 
 #### **macOS**
 - **Warning**: "App is damaged and can't be opened" or "Developer cannot be verified"
 - **Solution**: Run this command in Terminal:
   ```bash
-  xattr -d com.apple.quarantine ~/Downloads/oddlauncher*.dmg
+  xattr -d com.apple.quarantine ~/Downloads/OddLauncher_*.dmg
   ```
   Then mount the .dmg and drag OddLauncher.app to Applications
 - **Alternative**: System Preferences → Security & Privacy → Allow app to run
@@ -36,13 +43,19 @@ Choose the right file for your operating system:
 #### **Linux**
 - **Debian/Ubuntu (.deb)**:
   ```bash
-  sudo dpkg -i oddlauncher_*_amd64.deb
+  sudo dpkg -i OddLauncher_*_amd64.deb
   sudo apt-get install -f  # Fix any missing dependencies
+  ```
+- **Fedora/RHEL (.rpm)**:
+  ```bash
+  sudo rpm -i OddLauncher-*-1.x86_64.rpm
+  # or
+  sudo dnf install OddLauncher-*-1.x86_64.rpm
   ```
 - **AppImage**:
   ```bash
-  chmod +x oddlauncher_*_amd64.AppImage
-  ./oddlauncher_*_amd64.AppImage
+  chmod +x OddLauncher_*_amd64.AppImage
+  ./OddLauncher_*_amd64.AppImage
   ```
 
 ### 🔒 What to Expect
@@ -56,7 +69,7 @@ Since these are unsigned applications:
 ### ✅ Verify Your Download
 
 For security, you can verify the files match the official release:
-- Check that download URLs start with `https://github.com/your-username/oddlauncher/releases/`
+- Check that download URLs start with `https://github.com/rhasselle-oddball/oddlauncher/releases/`
 - Compare file sizes with those listed on the releases page
 - Check the release notes for any additional installation steps
 
