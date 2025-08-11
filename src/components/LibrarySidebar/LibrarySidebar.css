@@ -29,6 +29,9 @@
   cursor: pointer;
 }
 .sort-toggle:hover { background: var(--bg-tertiary); color: var(--text-primary); border-color: var(--hover-color); }
+.sort-toggle svg {
+  stroke-width: 1;
+}
 .filter-chip { display: none; }
 .filter-select { display: none; }
 

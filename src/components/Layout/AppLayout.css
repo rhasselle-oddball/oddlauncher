@@ -35,10 +35,15 @@
 .sidebar-header {
   display: flex;
   align-items: center;
+  gap: 0.5rem;
   padding: 0.75rem;
   border-bottom: 1px solid var(--border-color);
   background-color: var(--bg-tertiary);
   min-height: 56px;
+}
+
+.sidebar-title {
+  flex: 1; /* Take up remaining space to center between buttons */
 }
 
 .collapse-button {

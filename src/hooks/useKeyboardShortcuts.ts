@@ -150,13 +150,13 @@ export function useKeyboardShortcuts({
 
   return {
     shortcuts: {
-      Space: 'Start/Stop app',
-      Delete: 'Delete app',
-      'Ctrl+D': 'Duplicate app',
-      'Ctrl+E': 'Edit app',
-      'Ctrl+N': 'Add new app',
-      'Ctrl+I': 'Import app',
-      'Ctrl+Shift+E': 'Export app',
+      Space: 'Start/Stop launcher',
+      Delete: 'Delete launcher',
+      'Ctrl+D': 'Duplicate launcher',
+      'Ctrl+E': 'Edit launcher',
+      'Ctrl+N': 'Add new launcher',
+      'Ctrl+I': 'Import launcher',
+      'Ctrl+Shift+E': 'Export launcher',
       Escape: 'Close/Cancel',
     } as const,
   }

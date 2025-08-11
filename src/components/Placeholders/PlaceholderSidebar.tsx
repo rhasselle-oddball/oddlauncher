@@ -4,11 +4,11 @@ export function PlaceholderSidebar() {
   return (
     <div className="placeholder-sidebar">
       <div className="placeholder-search">
-        <input
-          type="text"
-          placeholder="Search apps..."
-          className="search-input"
-          disabled
+                <input 
+          type="text" 
+          className="search-input" 
+          placeholder="Search launchers..." 
+          disabled 
         />
       </div>
 
@@ -36,8 +36,8 @@ export function PlaceholderSidebar() {
       </div>
 
       <div className="placeholder-actions">
-        <button className="add-app-button" disabled>
-          + Add New App
+                <button className="add-app-button" disabled>
+          + Add Your First Launcher
         </button>
       </div>
     </div>

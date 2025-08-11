@@ -84,16 +84,16 @@ export const AppCard: React.FC<AppCardProps> = ({
             <button
               className="app-card__action-btn app-card__edit-btn"
               onClick={handleEdit}
-              title="Edit app configuration"
-              aria-label="Edit app configuration"
+              title="Edit launcher configuration"
+              aria-label="Edit launcher configuration"
             >
               ⚙️
             </button>
             <button
               className="app-card__action-btn app-card__delete-btn"
               onClick={handleDelete}
-              title="Delete app"
-              aria-label="Delete app"
+              title="Delete launcher"
+              aria-label="Delete launcher"
             >
               🗑️
             </button>

@@ -295,14 +295,14 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configMan
   <div className="sidebar-search">
           <input
             type="text"
-            placeholder="Search apps..."
+            placeholder="Search launchers..."
             className="search-input"
             disabled
           />
         </div>
         <div className="loading-state">
           <div className="loading-spinner"></div>
-          <p>Loading apps...</p>
+          <p>Loading launchers...</p>
         </div>
       </div>
     )
@@ -315,7 +315,7 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configMan
   <div className="sidebar-search">
           <input
             type="text"
-            placeholder="Search apps..."
+            placeholder="Search launchers..."
             className="search-input"
             disabled
           />
@@ -338,32 +338,30 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configMan
   if (totalApps === 0) {
     return (
       <div className="library-sidebar">
-        <div className="sidebar-search">
+        <div className="sidebar-search row">
           <input
             type="text"
-            placeholder="Search apps..."
+            placeholder="Search launchers..."
             className="search-input"
             value={searchQuery}
             onChange={handleSearchChange}
           />
-          <div className="sidebar-filters compact">
-            <button
-              className="sort-toggle"
-              onClick={() => setSortBy(prev => prev === 'recent' ? 'az' : 'recent')}
-              title={sortBy === 'recent' ? 'Sorting: Recents (click for A–Z)' : 'Sorting: A–Z (click for Recents)'}
-            >
-              {sortBy === 'recent' ? <Clock size={16} /> : <ArrowDownAZ size={16} />}
-            </button>
-          </div>
+          <button
+            className="sort-toggle"
+            onClick={() => setSortBy(prev => prev === 'recent' ? 'az' : 'recent')}
+            title={sortBy === 'recent' ? 'Sorting: Recents (click for A–Z)' : 'Sorting: A–Z (click for Recents)'}
+          >
+            {sortBy === 'recent' ? <Clock size={16} /> : <ArrowDownAZ size={16} />}
+          </button>
         </div>
         <div className="empty-state">
-          <h3>No Apps Yet</h3>
-          <p>Get started by adding your first development app.</p>
+          <h3>No Launchers Yet</h3>
+          <p>Get started by adding your first development launcher.</p>
           <button
             className="add-app-button primary"
             onClick={handleAddAppClick}
           >
-            + Add Your First App
+            + Add Your First Launcher
           </button>
         </div>
       </div>
@@ -378,7 +376,7 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configMan
         <div className="sidebar-search">
           <input
             type="text"
-            placeholder="Search apps..."
+            placeholder="Search launchers..."
             className="search-input"
             value={searchQuery}
             onChange={handleSearchChange}
@@ -407,8 +405,8 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configMan
             <div className="no-results-icon">
               <Search size={48} />
             </div>
-      <h3>No apps match current view</h3>
-      <p>Try switching sort modes or add a new app.</p>
+      <h3>No launchers match current view</h3>
+      <p>Try switching sort modes or add a new launcher.</p>
           </div>
         )}
       </div>
@@ -421,7 +419,7 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configMan
       <div className="sidebar-search row">
         <input
           type="text"
-          placeholder="Search apps..."
+          placeholder="Search launchers..."
           className="search-input"
           value={searchQuery}
           onChange={handleSearchChange}
@@ -522,7 +520,7 @@ export function LibrarySidebar({ selectedAppId, onAppSelect, onAddApp, configMan
           className="add-app-button"
           onClick={handleAddAppClick}
         >
-          + Add New App
+          + Add New Launcher
         </button>
       </div>
     </div>

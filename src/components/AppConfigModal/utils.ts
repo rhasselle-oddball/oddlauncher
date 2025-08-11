@@ -82,7 +82,7 @@ export function formDataToAppConfig(
  */
 export const getEmptyFormData = (): AppConfigFormData => ({
   name: '',
-  appType: 'both',
+  appType: undefined, // Start with no selection
   launchCommands: '',
   workingDirectory: '',
   urlMode: 'url',
@@ -108,22 +108,27 @@ export function validateFormData(
 
   // Required field validation
   if (!formData.name.trim()) {
-    errors.name = 'App name is required'
+    errors.name = 'Launcher name is required'
   } else if (formData.name.trim().length < 2) {
-    errors.name = 'App name must be at least 2 characters'
+    errors.name = 'Launcher name must be at least 2 characters'
   } else if (formData.name.trim().length > 50) {
-    errors.name = 'App name must be 50 characters or less'
+    errors.name = 'Launcher name must be 50 characters or less'
   } else if (
     isAppNameTaken &&
     isAppNameTaken(formData.name.trim(), excludeId)
   ) {
-    errors.name = 'An app with this name already exists'
+    errors.name = 'A launcher with this name already exists'
+  }
+
+  // App type is required
+  if (!formData.appType) {
+    errors.appType = 'Please select what kind of launcher this is'
   }
 
   // Validate appType-specific requirements
   if (formData.appType === 'process') {
     if (!formData.launchCommands.trim()) {
-      errors.launchCommands = 'Launch commands are required for process apps'
+      errors.launchCommands = 'Launch commands are required for terminal launchers'
     }
   }
   if (formData.appType === 'bookmark') {
@@ -132,7 +137,7 @@ export function validateFormData(
         ? !!formData.url.trim()
         : !!formData.filePath.trim()
     if (!hasUrl) {
-      errors.url = 'A URL or file is required for bookmark apps'
+      errors.url = 'A URL or file is required for browser launchers'
     }
   }
   if (formData.appType === 'both') {

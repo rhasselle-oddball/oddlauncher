@@ -292,6 +292,98 @@ Two UX issues with command execution:
 
 ---
 
+### Task S2-4: UI Improvements and App-to-Launcher Terminology Refactor
+**Priority:** HIGH 🚨 | **Status:** COMPLETED ✅ | **Commit:** [pending] | **Issue:** #49 (Closed)
+
+**Problem Statement:**
+Several UI inconsistencies and nomenclature issues need to be addressed to improve user experience and align with the vision of calling items "launchers" instead of "apps".
+
+**Current Issues:**
+
+1. **Search Bar Layout Issue**: When no apps are present, the recent/alpha sort button wraps to the next line instead of staying inline with the search bar
+2. **Icon Readability**: The down A-Z sort icon is hard to read due to stroke width and styling
+3. **Delete Modal Irrelevant Sections**: Delete confirmation shows all fields (including command sections for browser-only items and URL sections for terminal-only items)
+4. **Inconsistent Terminology**: UI still refers to "apps" instead of "launchers" throughout
+5. **App Config Modal Flow**: The modal could have better UX flow with launcher type selection upfront
+
+**Technical Requirements:**
+
+**Phase 1: Fix Search Bar Layout**
+- Ensure search bar and sort button stay on same line even with no apps
+- Investigate CSS flexbox/grid layout in LibrarySidebar component
+- Test with empty state and populated state
+
+**Phase 2: Improve Sort Icon Readability**
+- Change stroke-width to 1 for the down A-Z icon
+- Remove stroke-linecap and stroke-linejoin properties
+- Ensure icon remains visible in dark theme
+
+**Phase 3: Smart Delete Modal**
+- Only show relevant sections in delete confirmation:
+  - For "Just Browser": Hide Command and Directory sections
+  - For "Just Terminal": Hide URL section  
+  - For "Terminal + Browser": Show all sections
+- Update ConfirmationModal component logic
+
+**Phase 4: Terminology Refactor (App → Launcher)**
+- Update all user-facing text from "app" to "launcher"
+- Change button text: "Add Your First App" → "Add Your First Launcher"
+- Update modal titles: "Add New App" → "Add New Launcher", "Delete App" → "Delete Launcher"
+- Update search placeholder: "Search apps..." → "Search launchers..."
+- Update empty state: "No Apps Yet" → "No Launchers Yet"
+- Update all component prop names and internal references for consistency
+
+**Phase 5: Improve App Config Modal Flow**
+- Move launcher name field to be first in the modal
+- Change "What is this?" to "What kind of launcher is this?"
+- Start with no selection (empty state) instead of defaulting to "Terminal + Browser"
+- Options: "Terminal + Browser", "Just Browser", "Just Terminal"
+- Only show relevant fields after type selection:
+  - Terminal sections only appear for Terminal and Terminal + Browser
+  - Browser sections only appear for Browser and Terminal + Browser
+
+**Files to Update:**
+
+**Components:**
+- `LibrarySidebar/LibrarySidebar.tsx` - Search bar layout and terminology
+- `LibrarySidebar/LibrarySidebar.css` - Search bar flexbox styling  
+- `ConfirmationModal/ConfirmationModal.tsx` - Smart section display
+- `AppConfigModal/AppConfigModal.tsx` - Flow improvements and terminology
+- `MainContent/MainContent.tsx` - Empty state terminology
+- `AppCard.tsx` - Any app terminology in tooltips/labels
+
+**Icons/Styling:**
+- Update sort icon SVG properties (stroke-width, remove cap/join)
+- Review all icon usage for consistency
+
+**Types/Interfaces:**
+- Update TypeScript comments and documentation
+- Consider renaming interfaces (AppConfig → LauncherConfig in future task)
+
+**Acceptance Criteria:**
+- [ ] Search bar and sort button stay inline when no launchers exist
+- [ ] Sort icon (down A-Z) is more readable with thinner stroke and no caps
+- [ ] Delete modal only shows relevant sections based on launcher type
+- [ ] All user-facing text uses "launcher" terminology instead of "app"
+- [ ] App Config modal starts with no launcher type selected
+- [ ] Launcher name field appears first in the modal
+- [ ] Only relevant config sections show after launcher type selection
+- [ ] All existing functionality continues to work normally
+- [ ] UI remains consistent with dark theme design
+- [ ] No console errors or TypeScript errors
+
+**Verification Steps:**
+- [ ] Test search bar layout with empty state and with launchers
+- [ ] Verify sort icon visibility and readability in dark theme  
+- [ ] Test delete modal with each launcher type (Terminal, Browser, Terminal + Browser)
+- [ ] Verify all text changes from "app" to "launcher" are complete
+- [ ] Test new app config modal flow with each launcher type selection
+- [ ] Ensure existing launchers continue to work after terminology changes
+- [ ] Test that all buttons, modals, and interactions work as expected
+- [ ] Verify responsive design still works correctly
+
+---
+
 ## Sprint 3 - Major Architecture Refactor: Apps → Launchers with Multi-Component Support
 
 ### Task S3-1: Refactor Core Data Model - Apps to Launchers with Component Architecture

@@ -10,7 +10,7 @@ import type { useConfigManager } from '../../hooks/useConfig'
  */
 export interface AppConfigFormData {
   name: string
-  appType: 'process' | 'bookmark' | 'both'
+  appType?: 'process' | 'bookmark' | 'both' // Optional to allow empty state
   launchCommands: string
   workingDirectory: string
   /** How the destination is provided */
@@ -56,7 +56,7 @@ export type AppConfigModalMode = 'add' | 'edit'
 export interface AppConfigModalProps {
   /** Whether the modal is open */
   isOpen: boolean
-  /** Mode - add new app or edit existing */
+  /** Mode - add new launcher or edit existing */
   mode: AppConfigModalMode
   /** App to edit (required when mode is 'edit') */
   appToEdit?: AppConfig

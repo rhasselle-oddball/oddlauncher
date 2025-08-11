@@ -169,37 +169,29 @@ export function Terminal({
     }
   }
 
-  // No app selected state
+    // No app selected state
   if (!selectedApp) {
     return (
-      <div className="terminal">
+      <div className="terminal-container">
         <div className="terminal-header">
-          <div className="terminal-title-section">
-            <TerminalIcon size={18} />
-            <span className="terminal-title">Terminal Output</span>
-          </div>
-            <div className="terminal-controls">
-              <button className="terminal-control-button" disabled title="Clear">
-                <RotateCcw size={16} />
-            </button>
-            <button className="terminal-control-button" disabled title="Copy">
-                <Copy size={16} />
-            </button>
-            <button className="terminal-control-button" disabled title="Search">
-                <Search size={16} />
-            </button>
-            <button className="terminal-control-button" disabled title="Settings">
-                <Settings size={16} />
+          <div className="terminal-actions">
+            <button
+              className="terminal-action"
+              disabled
+              title="Terminal settings"
+            >
+              <Settings size={16} />
             </button>
           </div>
         </div>
-
-        <div className="terminal-content no-app-selected">
-          <div className="no-app-terminal-message">
-            <TerminalIcon size={48} />
-            <h3>No App Selected</h3>
-            <p>Select an app from the sidebar to view its terminal output.</p>
-            <p>Once you start an app, its output will appear here in real-time.</p>
+        <div className="terminal-content">
+          <div className="no-app-selected">
+            <div className="no-app-icon">
+              <TerminalIcon size={48} />
+            </div>
+            <h3>No Launcher Selected</h3>
+            <p>Select a launcher to view output here.</p>
+            <p>Once you start a launcher, its output will appear here in real-time.</p>
           </div>
         </div>
       </div>
@@ -245,13 +237,6 @@ export function Terminal({
             title="Search Terminal"
           >
               <Search size={16} />
-          </button>
-          <button
-            className="terminal-control-button"
-            disabled
-            title="Terminal Settings (Coming Soon)"
-          >
-              <Settings size={16} />
           </button>
         </div>
       </div>

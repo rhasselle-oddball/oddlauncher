@@ -1,6 +1,7 @@
 import React from 'react'
 import { X, AlertTriangle } from 'lucide-react'
 import type { AppConfig } from '../../types'
+import { getAppType } from '../../types'
 import './ConfirmationModal.css'
 
 export interface ConfirmationModalProps {
@@ -76,15 +77,27 @@ export function ConfirmationModal({
           {app && variant === 'danger' && (
             <div className="confirmation-modal__app-info">
               <div className="confirmation-modal__app-item">
-                <strong>App Name:</strong> {app.name}
+                <strong>Launcher Name:</strong> {app.name}
               </div>
-              <div className="confirmation-modal__app-item">
-                <strong>Command:</strong>
-                <pre className="confirmation-modal__command-block">{app.launchCommands}</pre>
-              </div>
-              <div className="confirmation-modal__app-item">
-                <strong>Directory:</strong> {app.workingDirectory}
-              </div>
+              {/* Only show command section for process and both types */}
+              {(getAppType(app) === 'process' || getAppType(app) === 'both') && app.launchCommands && (
+                <div className="confirmation-modal__app-item">
+                  <strong>Command:</strong>
+                  <pre className="confirmation-modal__command-block">{app.launchCommands}</pre>
+                </div>
+              )}
+              {/* Only show directory section for process and both types */}
+              {(getAppType(app) === 'process' || getAppType(app) === 'both') && app.workingDirectory && (
+                <div className="confirmation-modal__app-item">
+                  <strong>Directory:</strong> {app.workingDirectory}
+                </div>
+              )}
+              {/* Only show URL section for bookmark and both types */}
+              {(getAppType(app) === 'bookmark' || getAppType(app) === 'both') && app.url && (
+                <div className="confirmation-modal__app-item">
+                  <strong>URL:</strong> {app.url}
+                </div>
+              )}
             </div>
           )}
         </div>

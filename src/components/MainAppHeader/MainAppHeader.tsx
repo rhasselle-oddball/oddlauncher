@@ -165,8 +165,8 @@ export function MainAppHeader({
     return (
       <div className="main-app-header">
         <div className="no-app-selected">
-          <h2>No App Selected</h2>
-          <p>Select an app from the sidebar to view its details and controls.</p>
+          <h2>No Launcher Selected</h2>
+          <p>Select a launcher from the sidebar to view its details and controls.</p>
         </div>
       </div>
     )
@@ -185,7 +185,7 @@ export function MainAppHeader({
                 <button
                   className="edit-text-link"
                   onClick={handleEditClick}
-                  title="Edit App Configuration"
+                  title="Edit Launcher Configuration"
                 >
                   <Edit size={16} />
                   Edit
@@ -198,7 +198,7 @@ export function MainAppHeader({
             <button
               className="delete-button"
               onClick={handleDeleteClick}
-              title="Delete App"
+              title="Delete Launcher"
             >
               <Trash2 size={16} />
             </button>

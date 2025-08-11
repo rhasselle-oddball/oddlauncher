@@ -203,7 +203,7 @@ export function AppConfigModal({
             {mode === 'add' ? (
               <>
                 <Plus size={20} />
-                Add New App
+                Add New Launcher
               </>
             ) : (
               <>
@@ -225,41 +225,10 @@ export function AppConfigModal({
         <form onSubmit={handleSubmit}>
           <div className="modal-body">
             <div className="form-grid">
-              {/* App Type */}
-              <div className="form-group">
-                <label className="form-label">What is this?</label>
-                <div className="toggle-group" role="tablist" aria-label="App Type">
-                  <button
-                    type="button"
-                    className={`toggle-button ${formData.appType === 'both' ? 'active' : ''}`}
-                    onClick={() => handleInputChange('appType', 'both')}
-                    aria-pressed={formData.appType === 'both'}
-                  >
-                    Terminal + Browser
-                  </button>
-                  <button
-                    type="button"
-                    className={`toggle-button ${formData.appType === 'bookmark' ? 'active' : ''}`}
-                    onClick={() => handleInputChange('appType', 'bookmark')}
-                    aria-pressed={formData.appType === 'bookmark'}
-                  >
-                    Just Browser
-                  </button>
-                  <button
-                    type="button"
-                    className={`toggle-button ${formData.appType === 'process' ? 'active' : ''}`}
-                    onClick={() => handleInputChange('appType', 'process')}
-                    aria-pressed={formData.appType === 'process'}
-                  >
-                    Just Terminal
-                  </button>
-                </div>
-              </div>
-
-              {/* App Name */}
+              {/* Launcher Name - now first */}
               <div className="form-group">
                 <label htmlFor="name" className="form-label">
-                  App Name <span className="required">*</span>
+                  Launcher Name <span className="required">*</span>
                 </label>
                 <input
                   id="name"
@@ -278,20 +247,60 @@ export function AppConfigModal({
                 )}
               </div>
 
+              {/* Launcher Type */}
+              <div className="form-group launcher-type-group">
+                <label className="form-label">What kind of launcher is this?</label>
+                <div className="toggle-group" role="tablist" aria-label="Launcher Type">
+                  <button
+                    type="button"
+                    className={`toggle-button ${formData.appType === 'both' ? 'active' : ''}`}
+                    onClick={() => handleInputChange('appType', 'both')}
+                    aria-pressed={formData.appType === 'both'}
+                  >
+                    Terminal + Browser
+                  </button>
+                  <button
+                    type="button"
+                    className={`toggle-button ${formData.appType === 'bookmark' ? 'active' : ''}`}
+                    onClick={() => handleInputChange('appType', 'bookmark')}
+                    aria-pressed={formData.appType === 'bookmark'}
+                  >
+                    Browser
+                  </button>
+                  <button
+                    type="button"
+                    className={`toggle-button ${formData.appType === 'process' ? 'active' : ''}`}
+                    onClick={() => handleInputChange('appType', 'process')}
+                    aria-pressed={formData.appType === 'process'}
+                  >
+                    Terminal
+                  </button>
+                </div>
+                {errors.appType && (
+                  <div className="form-error">
+                    <AlertCircle size={12} />
+                    {errors.appType}
+                  </div>
+                )}
+              </div>
+
               {/* Terminal-related fields: only for process or both */}
               {(formData.appType === 'process' || formData.appType === 'both') && (
                 <div className="collapsible-section">
-                  <button
-                    type="button"
-                    className="section-header"
-                    onClick={() => setIsTerminalSectionExpanded(!isTerminalSectionExpanded)}
-                  >
-                    <span className="expand-indicator">
-                      {isTerminalSectionExpanded ? '−' : '+'}
-                    </span>
-                    <span>Terminal</span>
-                  </button>
-                  {isTerminalSectionExpanded && (
+                  {/* Only show collapsible header for 'both' type */}
+                  {formData.appType === 'both' && (
+                    <button
+                      type="button"
+                      className="section-header"
+                      onClick={() => setIsTerminalSectionExpanded(!isTerminalSectionExpanded)}
+                    >
+                      <span className="expand-indicator">
+                        {isTerminalSectionExpanded ? '−' : '+'}
+                      </span>
+                      <span>Terminal</span>
+                    </button>
+                  )}
+                  {(formData.appType === 'process' || isTerminalSectionExpanded) && (
                     <>
                       <div className="section-divider"></div>
                       <div className="section-content">
@@ -314,9 +323,6 @@ export function AppConfigModal({
                               </option>
                             ))}
                           </select>
-                          <div className="form-help">
-                            Choose which terminal/shell to use for this app. Options are auto-detected from your system.
-                          </div>
                         </div>
                   {/* Launch Commands */}
                   <div className="form-group">
@@ -334,18 +340,12 @@ yarn watch`}
                       maxLength={2000}
                       rows={4}
                     />
-                    <div className="form-help">
-                      Required for terminal apps.
-                    </div>
                     {errors.launchCommands && (
                       <div className="form-error">
                         <AlertCircle size={12} />
                         {errors.launchCommands}
                       </div>
                     )}
-                    <div className="form-help">
-                      Shell commands to execute when starting this app (one command per line)
-                    </div>
                   </div>
 
                   {/* Working Directory */}
@@ -388,17 +388,20 @@ yarn watch`}
               {/* Browser-related fields: only for bookmark or both */}
               {(formData.appType === 'bookmark' || formData.appType === 'both') && (
                 <div className="collapsible-section">
-                  <button
-                    type="button"
-                    className="section-header"
-                    onClick={() => setIsBrowserSectionExpanded(!isBrowserSectionExpanded)}
-                  >
-                    <span className="expand-indicator">
-                      {isBrowserSectionExpanded ? '−' : '+'}
-                    </span>
-                    <span>Browser</span>
-                  </button>
-                  {isBrowserSectionExpanded && (
+                  {/* Only show collapsible header for 'both' type */}
+                  {formData.appType === 'both' && (
+                    <button
+                      type="button"
+                      className="section-header"
+                      onClick={() => setIsBrowserSectionExpanded(!isBrowserSectionExpanded)}
+                    >
+                      <span className="expand-indicator">
+                        {isBrowserSectionExpanded ? '−' : '+'}
+                      </span>
+                      <span>Browser</span>
+                    </button>
+                  )}
+                  {(formData.appType === 'bookmark' || isBrowserSectionExpanded) && (
                     <>
                       <div className="section-divider"></div>
                       <div className="section-content">
@@ -440,7 +443,6 @@ yarn watch`}
                             {errors.url}
                           </div>
                         )}
-                        <div className="form-help">Required for bookmarks and apps that also open a site.</div>
                       </>
                     ) : (
                       <>
@@ -469,7 +471,6 @@ yarn watch`}
                             {errors.filePath}
                           </div>
                         )}
-                        <div className="form-help">Required for bookmarks and apps that also open a site.</div>
                       </>
                     )}
                   </div>
@@ -554,9 +555,6 @@ yarn watch`}
                     {errors.tags}
                   </div>
                 )}
-                <div className="form-help">
-                  Add up to 10 tags for organizing your apps (press Enter or comma to add)
-                </div>
               </div>
             </div>
           </div>
@@ -582,7 +580,7 @@ yarn watch`}
                 </>
               ) : (
                 <>
-                  {mode === 'add' ? 'Add App' : 'Save Changes'}
+                  {mode === 'add' ? 'Add Launcher' : 'Save Changes'}
                 </>
               )}
             </button>

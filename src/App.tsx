@@ -130,7 +130,7 @@ function App() {
           }
         }
       } catch (error) {
-        console.error('Failed to delete app:', error)
+        console.error('Failed to delete launcher:', error)
       }
     }
     setDeleteConfirmation({ isOpen: false })
@@ -315,7 +315,7 @@ function App() {
       {/* Delete Confirmation Modal */}
       <ConfirmationModal
         isOpen={deleteConfirmation.isOpen}
-        title="Delete App"
+        title="Delete Launcher"
         message={`Are you sure you want to delete "${deleteConfirmation.app?.name}"? This action cannot be undone.`}
         confirmText="Delete"
         cancelText="Cancel"
