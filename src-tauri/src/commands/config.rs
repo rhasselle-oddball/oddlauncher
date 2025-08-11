@@ -4,10 +4,10 @@ use std::fs;
 use std::path::PathBuf;
 use tauri::AppHandle;
 
-/// Get the path to the Oddbox configuration directory (~/.oddbox/)
+/// Get the path to the OddLauncher configuration directory (~/.oddlauncher/)
 fn get_config_dir() -> AppResult<PathBuf> {
     match dirs::home_dir() {
-        Some(home) => Ok(home.join(".oddbox")),
+        Some(home) => Ok(home.join(".oddlauncher")),
         None => Err(AppError::new(
             "HOME_DIR_ERROR",
             "Could not determine user home directory",
@@ -15,7 +15,7 @@ fn get_config_dir() -> AppResult<PathBuf> {
     }
 }
 
-/// Get the path to the main configuration file (~/.oddbox/apps.json)
+/// Get the path to the main configuration file (~/.oddlauncher/apps.json)
 fn get_config_file_path() -> AppResult<PathBuf> {
     Ok(get_config_dir()?.join("apps.json"))
 }

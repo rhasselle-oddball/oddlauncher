@@ -1,4 +1,4 @@
-import { Play, Square, Loader, Trash2, ExternalLink } from 'lucide-react'
+import { Play, Square, Loader, Trash2, ExternalLink, Edit } from 'lucide-react'
 import type { AppConfig } from '../../types'
 import { getAppType, isBookmarkApp } from '../../types'
 import { useAppProcess } from '../../hooks/useProcessManager'
@@ -187,6 +187,7 @@ export function MainAppHeader({
                   onClick={handleEditClick}
                   title="Edit App Configuration"
                 >
+                  <Edit size={16} />
                   Edit
                 </button>
               </div>

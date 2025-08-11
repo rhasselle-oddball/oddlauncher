@@ -544,8 +544,8 @@
 
 .modal-content .compact-select:focus {
   background-color: var(--bg-tertiary, #131313) !important; /* Maintain consistent background on focus */
-  border-color: var(--text-secondary, #cccccc) !important; /* Use secondary text color instead of blue */
-  box-shadow: 0 0 0 2px rgba(204, 204, 204, 0.2) !important; /* Match the border color */
+  border-color: var(--accent-blue, #00A187) !important; /* Use green accent color like other form inputs */
+  box-shadow: 0 0 0 3px rgba(0, 161, 135, 0.15) !important; /* Match the green accent color */
 }
 
 /* Terminal Icon Styles */
