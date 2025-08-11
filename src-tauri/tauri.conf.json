@@ -43,7 +43,10 @@
     "longDescription": "A native desktop application that acts like a Steam Library for development tools, providing a GUI-first way to launch local development servers with real-time terminal output.",
     "macOS": {
       "minimumSystemVersion": "10.13",
-      "exceptionDomain": "localhost"
+      "exceptionDomain": "localhost",
+      "signingIdentity": null,
+      "providerShortName": null,
+      "entitlements": null
     }
   }
 }

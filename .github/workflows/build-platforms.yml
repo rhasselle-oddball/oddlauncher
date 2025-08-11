@@ -38,6 +38,9 @@ jobs:
         run: npm ci
 
       - name: Build
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ""
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ""
         run: npm run tauri build -- --target x86_64-apple-darwin
 
       - name: Upload artifacts
@@ -73,6 +76,8 @@ jobs:
         env:
           CI: true
           DISPLAY: ":99"
+          TAURI_SIGNING_PRIVATE_KEY: ""
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ""
         run: |
           # Start virtual display for headless GUI operations
           sudo Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
