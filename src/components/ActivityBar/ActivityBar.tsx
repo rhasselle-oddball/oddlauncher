@@ -20,7 +20,7 @@ export function ActivityBar({ activeView, onViewChange }: ActivityBarProps) {
           <Library size={24} />
         </button>
       </div>
-      
+
       <div className="activity-bar-bottom">
         <button
           className={`activity-bar-icon ${activeView === 'settings' ? 'active' : ''}`}

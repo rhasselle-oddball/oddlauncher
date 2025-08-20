@@ -3,6 +3,12 @@ import { invoke } from '@tauri-apps/api/core'
 import type { GlobalConfig, AppConfig, AppError } from '../types'
 import { createDefaultGlobalConfig } from '../utils/app-data'
 
+// Check if we're running in Tauri
+const isTauri = () => {
+  return typeof window !== 'undefined' && 
+         (window as unknown as { __TAURI__?: unknown }).__TAURI__ !== undefined
+}
+
 /**
  * Hook for managing global configuration
  */
@@ -16,14 +22,18 @@ export function useConfig() {
     try {
       setIsLoading(true)
       setError(null)
+      
+      // Check if Tauri is available
+      if (!isTauri()) {
+        console.warn('Tauri is not available, using default config...')
+        // Use default config if Tauri isn't available (e.g., in development/web mode)
+        const defaultConfig = createDefaultGlobalConfig()
+        setConfig(defaultConfig)
+        setIsLoading(false)
+        return
+      }
 
-      console.log('Loading configuration...')
-      console.log('Window object:', typeof window)
-      console.log(
-        'Tauri available:',
-        typeof window !== 'undefined' &&
-          (window as unknown as { __TAURI__?: unknown }).__TAURI__
-      )
+      console.log('Loading configuration with Tauri invoke...')
       console.log('invoke function type:', typeof invoke)
 
       const result = await invoke<GlobalConfig>('load_config')
@@ -54,6 +64,13 @@ export function useConfig() {
     async (newConfig: GlobalConfig): Promise<boolean> => {
       try {
         setError(null)
+        
+        if (!isTauri()) {
+          console.warn('Tauri is not available, config changes will not persist')
+          setConfig(newConfig)
+          return true
+        }
+        
         await invoke('save_config', { config: newConfig })
         setConfig(newConfig)
         return true

@@ -1,7 +1,7 @@
 # OddLauncher Development Tasks - Sprint: Terminal Environment & UI Enhancements
 
 **Current Branch:** `feature/terminal-environment-ui-enhancements`
-**Base Branch:** `main` 
+**Base Branch:** `main`
 **Working on Issues:** #50, #51, #52
 
 Building on Sprint 2 completion, this sprint focuses on making terminals work like real terminals with proper environment sourcing and adding a modern activity bar UI.
@@ -12,7 +12,7 @@ Building on Sprint 2 completion, this sprint focuses on making terminals work li
 
 All 5 tasks in this sprint have been successfully completed:
 - ✅ TE-1: Activity Bar Implementation (a1a7e45)
-- ✅ TE-2: Settings Modal with Terminal Configuration (ed44575) 
+- ✅ TE-2: Settings Modal with Terminal Configuration (ed44575)
 - ✅ TE-3: Shell Environment Sourcing (db2f923)
 - ✅ TE-4: Per-Launcher Terminal Environment Overrides (8b351b2)
 - ✅ TE-5: Terminal Text Selection and Copy Functionality (1e330bc)
@@ -257,7 +257,7 @@ fn build_sourced_command(
 ) -> Command {
     let shell = &config.default_shell;
     let source_files = &config.default_source_files;
-    
+
     let full_command = if config.use_login_shell {
         format!(
             "cd {} && {} && {}",
@@ -271,19 +271,19 @@ fn build_sourced_command(
     } else {
         user_command.to_string()
     };
-    
+
     let mut cmd = Command::new(shell);
     if config.use_login_shell {
         cmd.args(["-l", "-c", &full_command]);
     } else {
         cmd.args(["-c", &full_command]);
     }
-    
+
     // Add environment variables
     for (key, value) in &config.default_environment_variables {
         cmd.env(key, value);
     }
-    
+
     cmd
 }
 ```
@@ -391,7 +391,7 @@ fn get_effective_terminal_config(
     app_terminal_config: &Option<AppTerminalConfig>
 ) -> EffectiveTerminalConfig {
     let mut config = global_config.clone();
-    
+
     if let Some(app_config) = app_terminal_config {
         if app_config.inherit_global_settings.unwrap_or(true) {
             // Merge with global settings
@@ -405,7 +405,7 @@ fn get_effective_terminal_config(
             config = EffectiveTerminalConfig::from(app_config);
         }
     }
-    
+
     config
 }
 ```

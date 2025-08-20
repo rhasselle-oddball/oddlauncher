@@ -162,11 +162,11 @@
     width: 95vw;
     max-height: 90vh;
   }
-  
+
   .settings-modal-content {
     flex-direction: column;
   }
-  
+
   .settings-tabs {
     width: 100%;
     flex-direction: row;
@@ -174,7 +174,7 @@
     border-right: none;
     border-bottom: 1px solid var(--border-color);
   }
-  
+
   .settings-tab {
     white-space: nowrap;
     margin: 0.25rem;

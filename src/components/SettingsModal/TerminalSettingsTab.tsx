@@ -64,7 +64,7 @@ export function TerminalSettingsTab({ config, configManager, onSettingsChange }:
     if (!newSourceFile.trim()) return
 
     const updatedSourceFiles = [...terminalSettings.defaultSourceFiles, newSourceFile.trim()]
-    
+
     try {
       await configManager.updateSettings({
         terminal: {
@@ -81,7 +81,7 @@ export function TerminalSettingsTab({ config, configManager, onSettingsChange }:
 
   const handleRemoveSourceFile = async (index: number) => {
     const updatedSourceFiles = terminalSettings.defaultSourceFiles.filter((_, i) => i !== index)
-    
+
     try {
       await configManager.updateSettings({
         terminal: {
@@ -102,7 +102,7 @@ export function TerminalSettingsTab({ config, configManager, onSettingsChange }:
       ...terminalSettings.defaultEnvironmentVariables,
       [newEnvVarKey.trim()]: newEnvVarValue.trim()
     }
-    
+
     try {
       await configManager.updateSettings({
         terminal: {
@@ -121,7 +121,7 @@ export function TerminalSettingsTab({ config, configManager, onSettingsChange }:
   const handleRemoveEnvironmentVariable = async (key: string) => {
     const updatedEnvVars = { ...terminalSettings.defaultEnvironmentVariables }
     delete updatedEnvVars[key]
-    
+
     try {
       await configManager.updateSettings({
         terminal: {
@@ -140,7 +140,7 @@ export function TerminalSettingsTab({ config, configManager, onSettingsChange }:
     if (!confirmed) return
 
     const defaultSettings = detectDefaultTerminalSettings()
-    
+
     try {
       await configManager.updateSettings({
         terminal: defaultSettings,
@@ -155,7 +155,7 @@ export function TerminalSettingsTab({ config, configManager, onSettingsChange }:
     <div className="terminal-settings-tab">
       <div className="settings-header">
         <h3 className="settings-section-title">Terminal Settings</h3>
-        <button 
+        <button
           className="reset-button"
           onClick={handleResetToDefaults}
           title="Reset to detected defaults"
@@ -163,11 +163,11 @@ export function TerminalSettingsTab({ config, configManager, onSettingsChange }:
           Reset to Defaults
         </button>
       </div>
-      
+
       <div className="settings-section">
         <div className="setting-item">
           <label className="setting-label">Default Shell</label>
-          <select 
+          <select
             className="setting-input"
             value={terminalSettings.defaultShell}
             onChange={(e) => handleShellChange(e.target.value)}

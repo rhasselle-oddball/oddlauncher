@@ -17,7 +17,7 @@ export function SettingsPanel() {
             <p className="settings-description">
               Configure global application and terminal settings.
             </p>
-            <button 
+            <button
               className="open-settings-button"
               onClick={() => setIsModalOpen(true)}
             >
@@ -25,7 +25,7 @@ export function SettingsPanel() {
               Open Settings
             </button>
           </div>
-          
+
           <div className="settings-quick-info">
             <h3>Quick Access</h3>
             <ul>
@@ -38,7 +38,7 @@ export function SettingsPanel() {
         </div>
       </div>
 
-      <SettingsModal 
+      <SettingsModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       />

@@ -20,8 +20,8 @@ export function GeneralSettingsTab({ config, configManager, onSettingsChange }: 
 
   const handleWorkingDirectoryChange = async (value: string) => {
     try {
-      await configManager.updateSettings({ 
-        defaultWorkingDirectory: value || undefined 
+      await configManager.updateSettings({
+        defaultWorkingDirectory: value || undefined
       })
       onSettingsChange()
     } catch (error) {
@@ -40,8 +40,8 @@ export function GeneralSettingsTab({ config, configManager, onSettingsChange }: 
 
   const handleBrowserChange = async (value: string) => {
     try {
-      await configManager.updateSettings({ 
-        defaultBrowser: value || undefined 
+      await configManager.updateSettings({
+        defaultBrowser: value || undefined
       })
       onSettingsChange()
     } catch (error) {
@@ -61,11 +61,11 @@ export function GeneralSettingsTab({ config, configManager, onSettingsChange }: 
   return (
     <div className="general-settings-tab">
       <h3 className="settings-section-title">General Settings</h3>
-      
+
       <div className="settings-section">
         <div className="setting-item">
           <label className="setting-label">Theme</label>
-          <select 
+          <select
             className="setting-input"
             value={config.settings.theme}
             onChange={(e) => handleThemeChange(e.target.value as 'dark')}

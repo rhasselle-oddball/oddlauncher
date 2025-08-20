@@ -1,6 +1,6 @@
-use crate::models::app::{AppProcess, AppStatus, AppConfig, AppTerminalSettings};
 use crate::commands::config::load_config_sync;
 use crate::commands::terminal::get_terminal_command;
+use crate::models::app::{AppProcess, AppStatus, AppTerminalSettings};
 use serde::{Deserialize, Serialize};
 use serde_json;
 use std::collections::HashMap;
@@ -11,10 +11,10 @@ use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::Command as TokioCommand;
 
 #[cfg(unix)]
+use libc;
+#[cfg(unix)]
 #[allow(unused_imports)]
 use std::os::unix::process::CommandExt;
-#[cfg(unix)]
-use libc;
 
 #[cfg(windows)]
 #[allow(unused_imports)]
@@ -26,8 +26,7 @@ use std::os::windows::process::CommandExt;
  * Cross-platform path and command utilities
  */
 mod platform_utils {
-    use std::collections::HashMap;
-use std::path::Path;
+    use std::path::Path;
 
     /// Convert various path formats to the appropriate format for the current platform
     pub fn normalize_path(path: &str) -> Result<String, String> {
@@ -91,7 +90,10 @@ use std::path::Path;
     }
 
     /// Prepare command for cross-platform execution
-    pub fn prepare_command(command: &str, working_dir: Option<&str>) -> Result<(String, Vec<String>), String> {
+    pub fn prepare_command(
+        command: &str,
+        working_dir: Option<&str>,
+    ) -> Result<(String, Vec<String>), String> {
         let parts: Vec<&str> = command.trim().split_whitespace().collect();
         if parts.is_empty() {
             return Err("Command cannot be empty".to_string());
@@ -117,7 +119,11 @@ use std::path::Path;
     }
 
     /// Prepare command for WSL execution on Windows
-    fn prepare_wsl_command(program: &str, args: &[String], working_dir: Option<&str>) -> Result<(String, Vec<String>), String> {
+    fn prepare_wsl_command(
+        program: &str,
+        args: &[String],
+        working_dir: Option<&str>,
+    ) -> Result<(String, Vec<String>), String> {
         log::info!("Preparing WSL command: {} with args: {:?}", program, args);
 
         let mut wsl_args = vec![];
@@ -145,7 +151,10 @@ use std::path::Path;
         if cfg!(target_os = "windows") && path.starts_with('/') {
             // On Windows, Unix-style paths might be WSL paths
             // We'll validate them differently
-            log::info!("Windows detected with Unix path - assuming WSL path: {}", normalized);
+            log::info!(
+                "Windows detected with Unix path - assuming WSL path: {}",
+                normalized
+            );
             return Ok(normalized);
         }
 
@@ -164,21 +173,22 @@ use std::path::Path;
 /// Create shell command that sources terminal settings from global config with app overrides
 fn prepare_shell_command_with_global_config(
     commands: &str,
-    working_dir: Option<&str>,
+    _working_dir: Option<&str>,
     env_vars: Option<&std::collections::HashMap<String, String>>,
     app_terminal_settings: Option<&AppTerminalSettings>,
 ) -> Result<(String, Vec<String>), String> {
     // Load global config to get terminal settings
-    let config = load_config_sync().map_err(|e| format!("Failed to load global config: {}", e.message))?;
+    let config =
+        load_config_sync().map_err(|e| format!("Failed to load global config: {}", e.message))?;
     let global_terminal_settings = &config.settings.terminal;
-    
+
     let mut setup_commands = Vec::new();
-    
+
     // Determine effective terminal settings by merging global and app-specific settings
     let inherit_global = app_terminal_settings
         .and_then(|s| s.inherit_global_settings)
         .unwrap_or(true);
-    
+
     let effective_shell = if inherit_global {
         app_terminal_settings
             .and_then(|s| s.shell.as_ref())
@@ -188,7 +198,7 @@ fn prepare_shell_command_with_global_config(
             .and_then(|s| s.shell.as_ref())
             .ok_or("App terminal settings must specify shell when not inheriting global settings")?
     };
-    
+
     let effective_use_login_shell = if inherit_global {
         app_terminal_settings
             .and_then(|s| s.use_login_shell)
@@ -198,18 +208,23 @@ fn prepare_shell_command_with_global_config(
             .and_then(|s| s.use_login_shell)
             .unwrap_or(false)
     };
-    
+
     // Source files: start with global if inheriting, then add app-specific
     let mut source_files = Vec::new();
     if inherit_global {
-        source_files.extend(global_terminal_settings.default_source_files.iter().cloned());
+        source_files.extend(
+            global_terminal_settings
+                .default_source_files
+                .iter()
+                .cloned(),
+        );
     }
     if let Some(app_settings) = app_terminal_settings {
         if let Some(additional_files) = &app_settings.additional_source_files {
             source_files.extend(additional_files.iter().cloned());
         }
     }
-    
+
     // Source all configured files
     for source_file in &source_files {
         if !source_file.trim().is_empty() {
@@ -223,18 +238,21 @@ fn prepare_shell_command_with_global_config(
             } else {
                 source_file.clone()
             };
-            
-            setup_commands.push(format!("[ -f {} ] && source {}", expanded_file, expanded_file));
+
+            setup_commands.push(format!(
+                "[ -f {} ] && source {}",
+                expanded_file, expanded_file
+            ));
         }
     }
-    
+
     // Environment variables: start with global if inheriting, then add app-specific
     if inherit_global {
         for (key, value) in &global_terminal_settings.default_environment_variables {
             setup_commands.push(format!("export {}='{}'", key, value));
         }
     }
-    
+
     // Add app-specific environment variables (these override global ones)
     if let Some(app_settings) = app_terminal_settings {
         if let Some(app_env_vars) = &app_settings.environment_variables {
@@ -243,42 +261,49 @@ fn prepare_shell_command_with_global_config(
             }
         }
     }
-    
+
     // Set environment variables from app config if provided (these have highest priority)
     if let Some(env_vars) = env_vars {
         for (key, value) in env_vars {
             setup_commands.push(format!("export {}='{}'", key, value));
         }
     }
-    
+
     // Add the user commands
-    let user_commands: Vec<&str> = commands.lines()
+    let user_commands: Vec<&str> = commands
+        .lines()
         .map(|line| line.trim())
         .filter(|line| !line.is_empty())
         .collect();
-    
+
     // Combine setup and user commands
     let mut all_commands = setup_commands;
     all_commands.extend(user_commands.iter().map(|&s| s.to_string()));
-    
+
     let full_command = all_commands.join(" && ");
-    
+
     // Determine shell to use
     let shell = if effective_use_login_shell {
         format!("{} -l", effective_shell)
     } else {
         effective_shell.clone()
     };
-    
+
     let args = vec!["-c".to_string(), full_command];
-    
+
     log::debug!("Executing with shell: {} {:?}", shell, args);
-    
+
     Ok((shell, args))
 }
 
 /// Prepare multi-command execution using shell script approach
-fn prepare_multi_command_execution(launch_commands: &str, working_dir: Option<&str>, terminal_type: Option<&str>, env_vars: Option<&HashMap<String, String>>, app_terminal_settings: Option<&AppTerminalSettings>) -> Result<(String, Vec<String>), String> {
+fn prepare_multi_command_execution(
+    launch_commands: &str,
+    working_dir: Option<&str>,
+    terminal_type: Option<&str>,
+    env_vars: Option<&HashMap<String, String>>,
+    app_terminal_settings: Option<&AppTerminalSettings>,
+) -> Result<(String, Vec<String>), String> {
     log::info!("Preparing multi-command execution: '{}'", launch_commands);
 
     // If terminal_type is specified, use the new terminal command system
@@ -312,10 +337,18 @@ fn prepare_multi_command_execution(launch_commands: &str, working_dir: Option<&s
     // For single command, try global config first, fall back to platform utils if that fails
     if commands.len() == 1 {
         log::info!("Single command detected, trying global config approach");
-        match prepare_shell_command_with_global_config(launch_commands, working_dir, env_vars, app_terminal_settings) {
+        match prepare_shell_command_with_global_config(
+            launch_commands,
+            working_dir,
+            env_vars,
+            app_terminal_settings,
+        ) {
             Ok(result) => return Ok(result),
             Err(e) => {
-                log::warn!("Global config approach failed ({}), falling back to legacy approach", e);
+                log::warn!(
+                    "Global config approach failed ({}), falling back to legacy approach",
+                    e
+                );
                 return platform_utils::prepare_command(commands[0], working_dir);
             }
         }
@@ -323,10 +356,18 @@ fn prepare_multi_command_execution(launch_commands: &str, working_dir: Option<&s
 
     // For multiple commands, try global config first
     log::info!("Multiple commands detected, trying global config approach");
-    match prepare_shell_command_with_global_config(launch_commands, working_dir, env_vars, app_terminal_settings) {
+    match prepare_shell_command_with_global_config(
+        launch_commands,
+        working_dir,
+        env_vars,
+        app_terminal_settings,
+    ) {
         Ok(result) => return Ok(result),
         Err(e) => {
-            log::warn!("Global config approach failed ({}), falling back to legacy multi-command approach", e);
+            log::warn!(
+                "Global config approach failed ({}), falling back to legacy multi-command approach",
+                e
+            );
             // Fall back to the existing multi-command shell script logic
         }
     }
@@ -363,7 +404,10 @@ fn prepare_multi_command_execution(launch_commands: &str, working_dir: Option<&s
 }
 
 /// Prepare multi-command execution for Windows
-fn prepare_windows_multi_command(commands: &[&str], working_dir: Option<&str>) -> Result<(String, Vec<String>), String> {
+fn prepare_windows_multi_command(
+    commands: &[&str],
+    working_dir: Option<&str>,
+) -> Result<(String, Vec<String>), String> {
     // Check if we should use WSL - only if working directory indicates WSL usage
     let use_wsl = working_dir
         .map(|dir| dir.starts_with("/") || dir.contains("wsl.localhost"))
@@ -421,7 +465,10 @@ fn prepare_windows_multi_command(commands: &[&str], working_dir: Option<&str>) -
         if let Some(dir) = working_dir {
             let normalized_dir = platform_utils::normalize_path(dir)?;
             if normalized_dir.starts_with('/') {
-                script_lines.push(format!("echo \"OddLauncher: Changing to directory: {}\"", normalized_dir));
+                script_lines.push(format!(
+                    "echo \"OddLauncher: Changing to directory: {}\"",
+                    normalized_dir
+                ));
                 script_lines.push(format!("cd '{}'", normalized_dir));
                 script_lines.push("".to_string());
             }
@@ -440,16 +487,15 @@ fn prepare_windows_multi_command(commands: &[&str], working_dir: Option<&str>) -
         log::info!("Generated WSL bash script:\n{}", script_content);
 
         // Use WSL to execute bash with the script
-        let wsl_args = vec![
-            "bash".to_string(),
-            "-c".to_string(),
-            script_content,
-        ];
+        let wsl_args = vec!["bash".to_string(), "-c".to_string(), script_content];
 
         Ok(("wsl.exe".to_string(), wsl_args))
     } else {
         // Create batch script for Windows
-        let mut script_lines = vec!["@echo off".to_string(), "setlocal enabledelayedexpansion".to_string()];
+        let mut script_lines = vec![
+            "@echo off".to_string(),
+            "setlocal enabledelayedexpansion".to_string(),
+        ];
 
         // Add working directory change if specified
         if let Some(dir) = working_dir {
@@ -465,12 +511,18 @@ fn prepare_windows_multi_command(commands: &[&str], working_dir: Option<&str>) -
 
         let script_content = script_lines.join("\n");
 
-        Ok(("cmd.exe".to_string(), vec!["/c".to_string(), script_content]))
+        Ok((
+            "cmd.exe".to_string(),
+            vec!["/c".to_string(), script_content],
+        ))
     }
 }
 
 /// Prepare multi-command execution for Unix systems
-fn prepare_unix_multi_command(commands: &[&str], working_dir: Option<&str>) -> Result<(String, Vec<String>), String> {
+fn prepare_unix_multi_command(
+    commands: &[&str],
+    working_dir: Option<&str>,
+) -> Result<(String, Vec<String>), String> {
     let mut script_lines = vec!["#!/bin/bash".to_string(), "set -e".to_string()];
 
     // Add initial logging to show what we're executing
@@ -511,13 +563,20 @@ fn prepare_unix_multi_command(commands: &[&str], working_dir: Option<&str>) -> R
     // Add working directory change if specified
     if let Some(dir) = working_dir {
         let normalized_dir = platform_utils::normalize_path(dir)?;
-    script_lines.push(format!("echo \"OddLauncher: Changing to working directory: {}\"", normalized_dir));
+        script_lines.push(format!(
+            "echo \"OddLauncher: Changing to working directory: {}\"",
+            normalized_dir
+        ));
         script_lines.push(format!("cd '{}'", normalized_dir));
     }
 
     // Add command execution with logging
     for (i, command) in commands.iter().enumerate() {
-    script_lines.push(format!("echo \"OddLauncher: Executing command {}: {}\"", i + 1, command));
+        script_lines.push(format!(
+            "echo \"OddLauncher: Executing command {}: {}\"",
+            i + 1,
+            command
+        ));
         script_lines.push(command.to_string());
     }
 
@@ -588,7 +647,9 @@ pub async fn start_app_process(
     log::info!("Starting process for app: {}", app_id);
 
     // Check if this is a bookmark app (no launch commands)
-    let is_bookmark = launch_commands.as_ref().map_or(true, |cmd| cmd.trim().is_empty());
+    let is_bookmark = launch_commands
+        .as_ref()
+        .map_or(true, |cmd| cmd.trim().is_empty());
 
     if is_bookmark {
         log::info!("Bookmark app detected - opening URL only");
@@ -599,10 +660,13 @@ pub async fn start_app_process(
             match crate::commands::browser::open_url_in_browser(url.clone()).await {
                 Ok(_message) => {
                     // Emit success event for bookmark opening
-                    let _ = app_handle.emit("process-started", serde_json::json!({
-                        "appId": app_id,
-                        "message": format!("Opened URL: {}", url)
-                    }));
+                    let _ = app_handle.emit(
+                        "process-started",
+                        serde_json::json!({
+                            "appId": app_id,
+                            "message": format!("Opened URL: {}", url)
+                        }),
+                    );
 
                     return Ok(ProcessResult {
                         success: true,
@@ -610,12 +674,15 @@ pub async fn start_app_process(
                         pid: None,
                         error: None,
                     });
-                },
+                }
                 Err(error_msg) => {
-                    let _ = app_handle.emit("process-error", serde_json::json!({
-                        "appId": app_id,
-                        "message": error_msg.clone()
-                    }));
+                    let _ = app_handle.emit(
+                        "process-error",
+                        serde_json::json!({
+                            "appId": app_id,
+                            "message": error_msg.clone()
+                        }),
+                    );
 
                     return Ok(ProcessResult {
                         success: false,
@@ -662,26 +729,37 @@ pub async fn start_app_process(
     let normalized_working_dir = if let Some(ref dir) = working_directory {
         match platform_utils::validate_directory(dir) {
             Ok(normalized) => {
-                log::info!("Working directory normalized: '{}' -> '{}'", dir, normalized);
+                log::info!(
+                    "Working directory normalized: '{}' -> '{}'",
+                    dir,
+                    normalized
+                );
                 Some(normalized)
-            },
+            }
             Err(e) => {
                 log::warn!("Working directory validation warning: {} (proceeding anyway for WSL compatibility)", e);
                 // For WSL paths, we'll proceed even if validation fails on Windows
                 match platform_utils::normalize_path(dir) {
                     Ok(normalized) => {
-                        log::info!("Working directory normalized (WSL mode): '{}' -> '{}'", dir, normalized);
+                        log::info!(
+                            "Working directory normalized (WSL mode): '{}' -> '{}'",
+                            dir,
+                            normalized
+                        );
                         Some(normalized)
-                    },
+                    }
                     Err(e) => {
                         let error_msg = format!("Failed to normalize working directory: {}", e);
                         log::error!("{}", error_msg);
 
                         // Emit process error event
-                        let _ = app_handle.emit("process-error", serde_json::json!({
-                            "appId": app_id,
-                            "error": error_msg
-                        }));
+                        let _ = app_handle.emit(
+                            "process-error",
+                            serde_json::json!({
+                                "appId": app_id,
+                                "error": error_msg
+                            }),
+                        );
 
                         return Ok(ProcessResult {
                             success: false,
@@ -698,20 +776,33 @@ pub async fn start_app_process(
     };
 
     // Prepare multi-command execution using shell script approach
-    let (program, args) = match prepare_multi_command_execution(&launch_commands, normalized_working_dir.as_deref(), terminal_type.as_deref(), environment_variables.as_ref(), terminal_settings.as_ref()) {
+    let (program, args) = match prepare_multi_command_execution(
+        &launch_commands,
+        normalized_working_dir.as_deref(),
+        terminal_type.as_deref(),
+        environment_variables.as_ref(),
+        terminal_settings.as_ref(),
+    ) {
         Ok((prog, args)) => {
-            log::info!("Multi-command execution prepared - Program: '{}', Args: {:?}", prog, args);
+            log::info!(
+                "Multi-command execution prepared - Program: '{}', Args: {:?}",
+                prog,
+                args
+            );
             (prog, args)
-        },
+        }
         Err(e) => {
             let error_msg = format!("Failed to prepare launch commands: {}", e);
             log::error!("{}", error_msg);
 
             // Emit process error event
-            let _ = app_handle.emit("process-error", serde_json::json!({
-                "appId": app_id,
-                "error": error_msg
-            }));
+            let _ = app_handle.emit(
+                "process-error",
+                serde_json::json!({
+                    "appId": app_id,
+                    "error": error_msg
+                }),
+            );
 
             return Ok(ProcessResult {
                 success: false,
@@ -757,7 +848,10 @@ pub async fn start_app_process(
 
             // For WSL paths on Windows, we might not be able to validate existence
             let path_exists = if cfg!(target_os = "windows") && dir.starts_with('/') {
-                log::info!("Skipping directory existence check for WSL path on Windows: {}", dir);
+                log::info!(
+                    "Skipping directory existence check for WSL path on Windows: {}",
+                    dir
+                );
                 true // Assume WSL path exists
             } else {
                 std::path::Path::new(dir).exists()
@@ -768,10 +862,13 @@ pub async fn start_app_process(
                 log::error!("{}", error_msg);
 
                 // Emit process error event
-                let _ = app_handle.emit("process-error", serde_json::json!({
-                    "appId": app_id,
-                    "error": error_msg
-                }));
+                let _ = app_handle.emit(
+                    "process-error",
+                    serde_json::json!({
+                        "appId": app_id,
+                        "error": error_msg
+                    }),
+                );
 
                 return Ok(ProcessResult {
                     success: false,
@@ -783,7 +880,9 @@ pub async fn start_app_process(
 
             cmd.current_dir(dir);
         } else {
-            log::info!("Skipping working directory setting for WSL command (handled by wsl.exe --cd)");
+            log::info!(
+                "Skipping working directory setting for WSL command (handled by wsl.exe --cd)"
+            );
         }
     }
 
@@ -795,37 +894,46 @@ pub async fn start_app_process(
         }
     }
 
-    log::info!("About to spawn process with command: {} {:?}", program, args);
+    log::info!(
+        "About to spawn process with command: {} {:?}",
+        program,
+        args
+    );
 
     // Spawn the process
     let mut child = match cmd.spawn() {
         Ok(child) => {
             log::info!("Process spawned successfully");
             child
-        },
+        }
         Err(e) => {
-            let error_msg = format!("Failed to start process: {} (launch_commands: '{}', working_dir: '{:?}')",
-                e, launch_commands, working_directory);
+            let error_msg = format!(
+                "Failed to start process: {} (launch_commands: '{}', working_dir: '{:?}')",
+                e, launch_commands, working_directory
+            );
             log::error!("{}", error_msg);
 
             // Provide more specific error information
             let detailed_error = match e.kind() {
                 std::io::ErrorKind::NotFound => {
                     format!("Command not found: '{}'. Make sure the command exists and is in your PATH.", program)
-                },
+                }
                 std::io::ErrorKind::PermissionDenied => {
                     format!("Permission denied when trying to execute: '{}'", program)
-                },
+                }
                 _ => {
                     format!("Failed to start process: {}", e)
                 }
             };
 
             // Emit process error event
-            let _ = app_handle.emit("process-error", serde_json::json!({
-                "appId": app_id,
-                "error": detailed_error
-            }));
+            let _ = app_handle.emit(
+                "process-error",
+                serde_json::json!({
+                    "appId": app_id,
+                    "error": detailed_error
+                }),
+            );
 
             return Ok(ProcessResult {
                 success: false,
@@ -864,12 +972,15 @@ pub async fn start_app_process(
                         // EOF: if there's leftover data without a trailing newline, emit it
                         if !line.is_empty() {
                             let output_line = line.trim_end().to_string();
-                            let _ = app_handle_stdout.emit("process-output", serde_json::json!({
-                                "appId": app_id_stdout,
-                                "type": "stdout",
-                                "content": output_line,
-                                "timestamp": chrono::Utc::now().to_rfc3339()
-                            }));
+                            let _ = app_handle_stdout.emit(
+                                "process-output",
+                                serde_json::json!({
+                                    "appId": app_id_stdout,
+                                    "type": "stdout",
+                                    "content": output_line,
+                                    "timestamp": chrono::Utc::now().to_rfc3339()
+                                }),
+                            );
                             line.clear();
                         }
                         break;
@@ -878,12 +989,15 @@ pub async fn start_app_process(
                         let output_line = line.trim_end().to_string();
 
                         // Emit to frontend
-                        let _ = app_handle_stdout.emit("process-output", serde_json::json!({
-                            "appId": app_id_stdout,
-                            "type": "stdout",
-                            "content": output_line,
-                            "timestamp": chrono::Utc::now().to_rfc3339()
-                        }));
+                        let _ = app_handle_stdout.emit(
+                            "process-output",
+                            serde_json::json!({
+                                "appId": app_id_stdout,
+                                "type": "stdout",
+                                "content": output_line,
+                                "timestamp": chrono::Utc::now().to_rfc3339()
+                            }),
+                        );
 
                         line.clear();
                     }
@@ -911,12 +1025,15 @@ pub async fn start_app_process(
                         // EOF: emit any leftover data without trailing newline
                         if !line.is_empty() {
                             let output_line = line.trim_end().to_string();
-                            let _ = app_handle_stderr.emit("process-output", serde_json::json!({
-                                "appId": app_id_stderr,
-                                "type": "stderr",
-                                "content": output_line,
-                                "timestamp": chrono::Utc::now().to_rfc3339()
-                            }));
+                            let _ = app_handle_stderr.emit(
+                                "process-output",
+                                serde_json::json!({
+                                    "appId": app_id_stderr,
+                                    "type": "stderr",
+                                    "content": output_line,
+                                    "timestamp": chrono::Utc::now().to_rfc3339()
+                                }),
+                            );
                             line.clear();
                         }
                         break;
@@ -925,12 +1042,15 @@ pub async fn start_app_process(
                         let output_line = line.trim_end().to_string();
 
                         // Emit to frontend
-                        let _ = app_handle_stderr.emit("process-output", serde_json::json!({
-                            "appId": app_id_stderr,
-                            "type": "stderr",
-                            "content": output_line,
-                            "timestamp": chrono::Utc::now().to_rfc3339()
-                        }));
+                        let _ = app_handle_stderr.emit(
+                            "process-output",
+                            serde_json::json!({
+                                "appId": app_id_stderr,
+                                "type": "stderr",
+                                "content": output_line,
+                                "timestamp": chrono::Utc::now().to_rfc3339()
+                            }),
+                        );
 
                         line.clear();
                     }
@@ -974,34 +1094,46 @@ pub async fn start_app_process(
                 };
 
                 // Also emit a final output line for terminal visibility
-                let _ = app_handle_monitor.emit("process-output", serde_json::json!({
-                    "appId": app_id_monitor,
-                    "type": "stdout",
-                    "content": exit_message,
-                    "timestamp": chrono::Utc::now().to_rfc3339()
-                }));
+                let _ = app_handle_monitor.emit(
+                    "process-output",
+                    serde_json::json!({
+                        "appId": app_id_monitor,
+                        "type": "stdout",
+                        "content": exit_message,
+                        "timestamp": chrono::Utc::now().to_rfc3339()
+                    }),
+                );
 
-                let _ = app_handle_monitor.emit("process-exit", serde_json::json!({
-                    "appId": app_id_monitor,
-                    "exitCode": exit_code,
-                    "timestamp": chrono::Utc::now().to_rfc3339()
-                }));
+                let _ = app_handle_monitor.emit(
+                    "process-exit",
+                    serde_json::json!({
+                        "appId": app_id_monitor,
+                        "exitCode": exit_code,
+                        "timestamp": chrono::Utc::now().to_rfc3339()
+                    }),
+                );
             }
             Err(e) => {
                 log::error!("Process {} failed: {}", app_id_monitor, e);
 
-                let _ = app_handle_monitor.emit("process-output", serde_json::json!({
-                    "appId": app_id_monitor,
-                    "type": "stderr",
-                    "content": format!("OddLauncher: Process wait failed: {}", e),
-                    "timestamp": chrono::Utc::now().to_rfc3339()
-                }));
+                let _ = app_handle_monitor.emit(
+                    "process-output",
+                    serde_json::json!({
+                        "appId": app_id_monitor,
+                        "type": "stderr",
+                        "content": format!("OddLauncher: Process wait failed: {}", e),
+                        "timestamp": chrono::Utc::now().to_rfc3339()
+                    }),
+                );
 
-                let _ = app_handle_monitor.emit("process-error", serde_json::json!({
-                    "appId": app_id_monitor,
-                    "error": format!("Process failed: {}", e),
-                    "timestamp": chrono::Utc::now().to_rfc3339()
-                }));
+                let _ = app_handle_monitor.emit(
+                    "process-error",
+                    serde_json::json!({
+                        "appId": app_id_monitor,
+                        "error": format!("Process failed: {}", e),
+                        "timestamp": chrono::Utc::now().to_rfc3339()
+                    }),
+                );
             }
         }
     });
@@ -1019,11 +1151,14 @@ pub async fn start_app_process(
     }
 
     // Emit process started event
-    let _ = app_handle.emit("process-started", serde_json::json!({
-        "appId": app_id,
-        "pid": pid,
-        "startedAt": started_at
-    }));
+    let _ = app_handle.emit(
+        "process-started",
+        serde_json::json!({
+            "appId": app_id,
+            "pid": pid,
+            "startedAt": started_at
+        }),
+    );
 
     // Handle browser auto-launch if configured
     if let Some(url) = url {
@@ -1039,7 +1174,11 @@ pub async fn start_app_process(
             tokio::spawn(async move {
                 // Wait for the specified delay
                 if browser_delay > 0 {
-                    log::info!("Waiting {}s before launching browser for app: {}", browser_delay, app_id_browser);
+                    log::info!(
+                        "Waiting {}s before launching browser for app: {}",
+                        browser_delay,
+                        app_id_browser
+                    );
                     tokio::time::sleep(std::time::Duration::from_secs(browser_delay as u64)).await;
                 }
 
@@ -1051,36 +1190,55 @@ pub async fn start_app_process(
                         format!("http://localhost:{}", port)
                     };
 
-                    log::info!("Checking if port {} is ready for app: {}", port, app_id_browser);
+                    log::info!(
+                        "Checking if port {} is ready for app: {}",
+                        port,
+                        app_id_browser
+                    );
 
-                    match crate::commands::wait_for_port_ready(check_url.clone(), port_check_timeout as u64).await {
+                    match crate::commands::wait_for_port_ready(
+                        check_url.clone(),
+                        port_check_timeout as u64,
+                    )
+                    .await
+                    {
                         Ok(true) => {
                             log::info!("Port {} is ready for app: {}", port, app_id_browser);
                             Some(url)
-                        },
+                        }
                         Ok(false) => {
                             log::warn!("Port {} was not ready within {}s for app: {}, skipping browser launch", port, port_check_timeout, app_id_browser);
 
                             // Emit browser launch failure event
-                            let _ = app_handle_browser.emit("browser-launch-failed", serde_json::json!({
-                                "appId": app_id_browser,
-                                "reason": "Port not ready within timeout",
-                                "url": url,
-                                "timestamp": chrono::Utc::now().to_rfc3339()
-                            }));
+                            let _ = app_handle_browser.emit(
+                                "browser-launch-failed",
+                                serde_json::json!({
+                                    "appId": app_id_browser,
+                                    "reason": "Port not ready within timeout",
+                                    "url": url,
+                                    "timestamp": chrono::Utc::now().to_rfc3339()
+                                }),
+                            );
 
                             None
-                        },
+                        }
                         Err(e) => {
-                            log::error!("Error checking port readiness for app {}: {}", app_id_browser, e);
+                            log::error!(
+                                "Error checking port readiness for app {}: {}",
+                                app_id_browser,
+                                e
+                            );
 
                             // Emit browser launch failure event
-                            let _ = app_handle_browser.emit("browser-launch-failed", serde_json::json!({
-                                "appId": app_id_browser,
-                                "reason": format!("Error checking port: {}", e),
-                                "url": url,
-                                "timestamp": chrono::Utc::now().to_rfc3339()
-                            }));
+                            let _ = app_handle_browser.emit(
+                                "browser-launch-failed",
+                                serde_json::json!({
+                                    "appId": app_id_browser,
+                                    "reason": format!("Error checking port: {}", e),
+                                    "url": url,
+                                    "timestamp": chrono::Utc::now().to_rfc3339()
+                                }),
+                            );
 
                             None
                         }
@@ -1091,29 +1249,43 @@ pub async fn start_app_process(
                 };
 
                 if let Some(launch_url) = launch_url {
-                    log::info!("Launching browser for app: {} with URL: {}", app_id_browser, launch_url);
+                    log::info!(
+                        "Launching browser for app: {} with URL: {}",
+                        app_id_browser,
+                        launch_url
+                    );
 
                     match crate::commands::open_url_in_browser(launch_url.clone()).await {
                         Ok(_) => {
                             log::info!("Successfully launched browser for app: {}", app_id_browser);
 
                             // Emit browser launch success event
-                            let _ = app_handle_browser.emit("browser-launched", serde_json::json!({
-                                "appId": app_id_browser,
-                                "url": launch_url,
-                                "timestamp": chrono::Utc::now().to_rfc3339()
-                            }));
-                        },
+                            let _ = app_handle_browser.emit(
+                                "browser-launched",
+                                serde_json::json!({
+                                    "appId": app_id_browser,
+                                    "url": launch_url,
+                                    "timestamp": chrono::Utc::now().to_rfc3339()
+                                }),
+                            );
+                        }
                         Err(e) => {
-                            log::error!("Failed to launch browser for app {}: {}", app_id_browser, e);
+                            log::error!(
+                                "Failed to launch browser for app {}: {}",
+                                app_id_browser,
+                                e
+                            );
 
                             // Emit browser launch failure event
-                            let _ = app_handle_browser.emit("browser-launch-failed", serde_json::json!({
-                                "appId": app_id_browser,
-                                "reason": e,
-                                "url": launch_url,
-                                "timestamp": chrono::Utc::now().to_rfc3339()
-                            }));
+                            let _ = app_handle_browser.emit(
+                                "browser-launch-failed",
+                                serde_json::json!({
+                                    "appId": app_id_browser,
+                                    "reason": e,
+                                    "url": launch_url,
+                                    "timestamp": chrono::Utc::now().to_rfc3339()
+                                }),
+                            );
                         }
                     }
                 }
@@ -1188,14 +1360,15 @@ pub async fn stop_app_process(
             let start = Instant::now();
             loop {
                 let mut cmd = tokio::process::Command::new("tasklist");
-                cmd.arg("/FI").arg(format!("PID eq {}", pid))
+                cmd.arg("/FI")
+                    .arg(format!("PID eq {}", pid))
                     .stdout(Stdio::piped())
                     .stderr(Stdio::null());
-                
+
                 // Hide console window
                 const CREATE_NO_WINDOW: u32 = 0x08000000;
                 cmd.creation_flags(CREATE_NO_WINDOW);
-                
+
                 let out = cmd.output().await;
                 let running = match out {
                     Ok(o) => {
@@ -1236,7 +1409,12 @@ pub async fn stop_app_process(
                 log::warn!("Failed to send {} to pgid {}: {}", name, pgid_i32, err);
                 last_error = Some(format!("{} to group failed: {}", name, err));
             } else {
-                log::info!("Sent {} to process group {} (app {})", name, pgid_i32, app_id);
+                log::info!(
+                    "Sent {} to process group {} (app {})",
+                    name,
+                    pgid_i32,
+                    app_id
+                );
             }
             // Wait up to 2s after INT/TERM, 1s after KILL
             let timeout = if *sig == libc::SIGKILL { 1000 } else { 2000 };
@@ -1257,11 +1435,11 @@ pub async fn stop_app_process(
             if *force {
                 cmd.arg("/F");
             }
-            
+
             // Hide console window
             const CREATE_NO_WINDOW: u32 = 0x08000000;
             cmd.creation_flags(CREATE_NO_WINDOW);
-            
+
             match cmd.output().await {
                 Ok(out) => {
                     if out.status.success() {
@@ -1296,7 +1474,8 @@ pub async fn stop_app_process(
             error: None,
         }
     } else {
-        let error_msg = last_error.unwrap_or_else(|| "Failed to stop process within timeout".to_string());
+        let error_msg =
+            last_error.unwrap_or_else(|| "Failed to stop process within timeout".to_string());
         log::error!("{}", error_msg);
         ProcessResult {
             success: false,
@@ -1307,18 +1486,24 @@ pub async fn stop_app_process(
     };
 
     // Emit process stopped event and append a terminal line
-    let _ = app_handle.emit("process-stopped", serde_json::json!({
-        "appId": app_id,
-        "pid": process_info.pid,
-        "timestamp": chrono::Utc::now().to_rfc3339()
-    }));
+    let _ = app_handle.emit(
+        "process-stopped",
+        serde_json::json!({
+            "appId": app_id,
+            "pid": process_info.pid,
+            "timestamp": chrono::Utc::now().to_rfc3339()
+        }),
+    );
 
-    let _ = app_handle.emit("process-output", serde_json::json!({
-        "appId": app_id,
-        "type": "stdout",
-    "content": "OddLauncher: Process stopped",
-        "timestamp": chrono::Utc::now().to_rfc3339()
-    }));
+    let _ = app_handle.emit(
+        "process-output",
+        serde_json::json!({
+            "appId": app_id,
+            "type": "stdout",
+        "content": "OddLauncher: Process stopped",
+            "timestamp": chrono::Utc::now().to_rfc3339()
+        }),
+    );
 
     Ok(result)
 }
@@ -1359,15 +1544,18 @@ pub async fn get_all_process_status(
     let mut result = HashMap::new();
 
     for (app_id, process_info) in processes.iter() {
-        result.insert(app_id.clone(), AppProcess {
-            app_id: app_id.clone(),
-            pid: Some(process_info.pid),
-            status: AppStatus::Running,
-            started_at: Some(process_info.started_at.clone()),
-            error_message: None,
-            output: vec![], // Output is streamed via events
-            is_background: Some(false),
-        });
+        result.insert(
+            app_id.clone(),
+            AppProcess {
+                app_id: app_id.clone(),
+                pid: Some(process_info.pid),
+                status: AppStatus::Running,
+                started_at: Some(process_info.started_at.clone()),
+                error_message: None,
+                output: vec![], // Output is streamed via events
+                is_background: Some(false),
+            },
+        );
     }
 
     Ok(result)
@@ -1420,7 +1608,8 @@ pub async fn get_debug_info(
     });
 
     if let Ok(program_path) = which::which(program) {
-        debug_info["program_status"]["full_path"] = serde_json::json!(program_path.to_string_lossy());
+        debug_info["program_status"]["full_path"] =
+            serde_json::json!(program_path.to_string_lossy());
     }
 
     // Get environment variables related to PATH
@@ -1477,14 +1666,15 @@ pub async fn kill_all_processes(
             let start = Instant::now();
             loop {
                 let mut cmd = tokio::process::Command::new("tasklist");
-                cmd.arg("/FI").arg(format!("PID eq {}", pid))
+                cmd.arg("/FI")
+                    .arg(format!("PID eq {}", pid))
                     .stdout(Stdio::piped())
                     .stderr(Stdio::null());
-                
+
                 // Hide console window
                 const CREATE_NO_WINDOW: u32 = 0x08000000;
                 cmd.creation_flags(CREATE_NO_WINDOW);
-                
+
                 let out = cmd.output().await;
                 let running = match out {
                     Ok(o) => {
@@ -1529,11 +1719,11 @@ pub async fn kill_all_processes(
                 if force {
                     cmd.arg("/F");
                 }
-                
+
                 // Hide console window
                 const CREATE_NO_WINDOW: u32 = 0x08000000;
                 cmd.creation_flags(CREATE_NO_WINDOW);
-                
+
                 let _ = cmd.output().await;
                 let timeout = if force { 800 } else { 1500 };
                 if wait_for_exit_any(pid, timeout).await {
@@ -1546,14 +1736,21 @@ pub async fn kill_all_processes(
         if stopped {
             killed_count += 1;
             log::info!("Killed process for app: {}", app_id);
-            let _ = app_handle.emit("process-stopped", serde_json::json!({
-                "appId": app_id,
-                "pid": pid,
-                "timestamp": chrono::Utc::now().to_rfc3339()
-            }));
+            let _ = app_handle.emit(
+                "process-stopped",
+                serde_json::json!({
+                    "appId": app_id,
+                    "pid": pid,
+                    "timestamp": chrono::Utc::now().to_rfc3339()
+                }),
+            );
         } else {
             failed_count += 1;
-            log::error!("Failed to stop process tree for app {} (pid {})", app_id, pid);
+            log::error!(
+                "Failed to stop process tree for app {} (pid {})",
+                app_id,
+                pid
+            );
         }
     }
 
@@ -1561,6 +1758,10 @@ pub async fn kill_all_processes(
         success: failed_count == 0,
         message: format!("Killed {} processes, {} failed", killed_count, failed_count),
         pid: None,
-        error: if failed_count > 0 { Some(format!("{} processes failed to stop", failed_count)) } else { None },
+        error: if failed_count > 0 {
+            Some(format!("{} processes failed to stop", failed_count))
+        } else {
+            None
+        },
     })
 }

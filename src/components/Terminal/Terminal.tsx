@@ -176,13 +176,13 @@ export function Terminal({
       if (textToCopy) {
         await navigator.clipboard.writeText(textToCopy)
         console.log('Terminal content copied to clipboard')
-        
+
         // Optional: Show a brief feedback (you could add a toast notification here)
         // For now, just log it
       }
     } catch (err) {
       console.error('Failed to copy to clipboard:', err)
-      
+
       // Fallback for older browsers
       try {
         const textArea = document.createElement('textarea')
@@ -379,7 +379,7 @@ export function Terminal({
 
       {/* Context Menu */}
       {contextMenu.show && (
-        <div 
+        <div
           className="terminal-context-menu"
           style={{ left: contextMenu.x, top: contextMenu.y }}
         >
