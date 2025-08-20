@@ -61,6 +61,19 @@ export interface AppConfig {
   tags?: string[]
   /** Terminal/shell type to use for executing commands (optional) */
   terminalType?: string
+  /** Advanced terminal configuration overrides (optional) */
+  terminal?: {
+    /** Override default shell for this app */
+    shell?: string
+    /** Override login shell setting */
+    useLoginShell?: boolean
+    /** Additional source files specific to this app */
+    additionalSourceFiles?: string[]
+    /** Override/add environment variables */
+    environmentVariables?: Record<string, string>
+    /** Whether to inherit global terminal settings (default: true) */
+    inheritGlobalSettings?: boolean
+  }
   /** Explicit app type (process, bookmark, or both). If missing, inferred at runtime for back-compat */
   appType?: AppType
   /** Last time the app was used (process started or bookmark opened) */
@@ -123,6 +136,19 @@ export interface GlobalConfig {
     defaultBrowser?: string
     /** Auto-save configuration changes */
     autoSave: boolean
+    /** Terminal configuration settings */
+    terminal: {
+      /** Default shell to use (e.g., 'zsh', 'bash', 'fish') */
+      defaultShell: string
+      /** Whether to run as login shell by default */
+      useLoginShell: boolean
+      /** Whether to inherit current environment */
+      inheritEnvironment: boolean
+      /** Default source files to load for all apps */
+      defaultSourceFiles: string[]
+      /** Default environment variables for all apps */
+      defaultEnvironmentVariables: Record<string, string>
+    }
   }
   /** Last modified timestamp */
   lastModified: string

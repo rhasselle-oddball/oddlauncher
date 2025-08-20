@@ -27,15 +27,65 @@
   flex: 1;
   padding: 1rem;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
-.settings-placeholder {
+.settings-overview {
   text-align: center;
-  color: var(--text-secondary);
-  padding: 2rem;
+  padding: 2rem 1rem;
 }
 
-.settings-placeholder p {
-  margin: 0.5rem 0;
+.settings-description {
+  color: var(--text-secondary);
+  margin: 0 0 1.5rem 0;
   line-height: 1.5;
+}
+
+.open-settings-button {
+  background-color: var(--accent-color);
+  border: none;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+  transition: all 0.2s ease;
+  margin: 0 auto;
+}
+
+.open-settings-button:hover {
+  background-color: var(--accent-color-hover);
+  transform: translateY(-1px);
+}
+
+.settings-quick-info {
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 1rem;
+}
+
+.settings-quick-info h3 {
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.75rem 0;
+}
+
+.settings-quick-info ul {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.settings-quick-info li {
+  margin-bottom: 0.25rem;
 }

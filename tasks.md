@@ -9,7 +9,7 @@ Based on the PRD, here are the development tasks organized by priority and depen
 ## Current Sprint Tasks
 
 ### Task TE-1: Implement Activity Bar - Far Left Sidebar with Library and Settings
-**Priority:** HIGH 🚨 | **Status:** COMPLETED ✅ | **Issue:** #50 (Closed) | **Commit:** TBD
+**Priority:** HIGH 🚨 | **Status:** COMPLETED ✅ | **Issue:** #50 (Closed) | **Commit:** a1a7e45
 
 **Problem Statement:**
 Current layout has Library as the main sidebar, but we need a more scalable design for future features like library groups, workspaces, and easy access to settings. Need to implement a VS Code-style activity bar on the far left.
@@ -117,7 +117,7 @@ AppLayout
 ---
 
 ### Task TE-2: Create Settings Modal with Terminal Configuration Section
-**Priority:** HIGH 🚨 | **Status:** TODO 📝 | **Depends On:** TE-1
+**Priority:** HIGH 🚨 | **Status:** COMPLETED ✅ | **Issue:** #51 (Closed) | **Commit:** TBD
 
 **Problem Statement:**
 Need a comprehensive settings system for global configuration, particularly for terminal environment settings that will fix the rbenv/command not found issues. Settings should be accessible via the activity bar.

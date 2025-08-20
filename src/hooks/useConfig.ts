@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { invoke } from '@tauri-apps/api/core'
 import type { GlobalConfig, AppConfig, AppError } from '../types'
+import { createDefaultGlobalConfig } from '../utils/app-data'
 
 /**
  * Hook for managing global configuration
@@ -27,21 +28,22 @@ export function useConfig() {
 
       const result = await invoke<GlobalConfig>('load_config')
       console.log('Configuration loaded:', result)
+      
+      // Ensure terminal settings exist for backward compatibility
+      if (!result.settings.terminal) {
+        console.log('Migrating config: Adding missing terminal settings')
+        const { terminal: terminalSettings } = createDefaultGlobalConfig().settings
+        result.settings.terminal = terminalSettings
+        // Save the migrated config
+        await invoke('save_config', { config: result })
+      }
+      
       setConfig(result)
     } catch (err) {
       console.error('Failed to load config:', err)
       setError(err as AppError)
       // Set default config if load fails
-      setConfig({
-        version: '1.0.0',
-        apps: [],
-        settings: {
-          theme: 'dark' as const,
-          maxTerminalLines: 1000,
-          autoSave: true,
-        },
-        lastModified: new Date().toISOString(),
-      })
+      setConfig(createDefaultGlobalConfig())
     } finally {
       setIsLoading(false)
     }
@@ -86,7 +88,7 @@ export function useConfig() {
   // Initialize by loading config
   useEffect(() => {
     loadConfig()
-  }, []) // Remove loadConfig from dependencies since it's stable with empty deps
+  }, [loadConfig])
 
   return {
     config,
