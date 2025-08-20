@@ -1,5 +1,9 @@
 # OddLauncher Development Tasks - Sprint: Terminal Environment & UI Enhancements
 
+**Current Branch:** `feature/terminal-environment-ui-enhancements`
+**Base Branch:** `main` 
+**Working on Issues:** #50, #51, #52
+
 Building on Sprint 2 completion, this sprint focuses on making terminals work like real terminals with proper environment sourcing and adding a modern activity bar UI.
 
 **Sprint Goal:** Fix terminal environment issues (rbenv, command not found) and add settings UI with activity bar.
@@ -216,7 +220,7 @@ interface GlobalConfig {
 ---
 
 ### Task TE-3: Implement Shell Environment Sourcing in Command Execution
-**Priority:** HIGH 🚨 | **Status:** TODO 📝 | **Depends On:** TE-2
+**Priority:** HIGH 🚨 | **Status:** COMPLETED ✅ | **Issue:** #52 (Closed) | **Commit:** db2f923
 
 **Problem Statement:**
 Commands fail with "command not found" errors (like rbenv) because spawned processes don't get the full shell environment that includes PATH modifications from source files like ~/.zshrc.

@@ -14,18 +14,22 @@ OddLauncher is a native desktop application built with Tauri + React that acts l
 
 1. **Task Creation**: Create tasks in `tasks.md` with checkboxes based on the PRD
 2. **Issue Creation**: When starting a task, create a GitHub issue using `gh issue create`
-3. **Development**: Work on the task following the verification steps
+3. **Development**: Work on the task following the verification steps on a feature branch
 4. **Completion**: When task is complete:
    - Commit all changes with conventional commit message including "Closes #<issue-number>"
-   - Push code to repository with `git push`
-   - Verify issue is automatically closed (or close manually if needed)
+   - Push feature branch to repository with `git push`
+   - Create pull request for review and merging
+   - Verify issue is automatically closed when PR is merged
    - Update `tasks.md` to mark task as completed with commit hash and status
 
-**CRITICAL**: Every completed task must be committed, pushed, and have its GitHub issue closed before moving to the next task.
+**CRITICAL**: Every completed task must be committed, pushed to feature branch, and have a pull request created before moving to the next task.
 
 Note on branching/PRs:
 
-- For this project, unless explicitly requested otherwise, do NOT create branches or pull requests. Work directly on main, using GitHub issues for tracking. Commits must reference and close the related issue.
+- For this project, create feature branches for all development work
+- Work on feature branches and create pull requests for review
+- Do not work directly on main branch
+- Use descriptive branch names like `feature/terminal-environment-fixes`
 
 ### Task File Management
 
@@ -41,11 +45,19 @@ Note on branching/PRs:
 # Create issue when starting a task
 gh issue create --title 'Task Title' --body 'Task description with acceptance criteria'
 
+# Create feature branch for development
+git checkout -b feature/descriptive-name
+
 # Commit and push with issue closure (preferred method)
 git commit -m 'feat: implement feature
 
 Closes #<issue-number>'
-git push
+git push -u origin feature/descriptive-name
+
+# Create pull request
+gh pr create --title 'Feature Title' --body 'Description of changes
+
+Closes #<issue-number>'
 
 # Close issue manually if auto-close didn't work
 gh issue close <issue-number> --comment 'Task completed and code deployed'
@@ -144,12 +156,13 @@ Quoting and shell notes (zsh):
 
 ### Git Workflow
 
-// Project-specific override: prefer direct commits to main
-
-- Work directly on `main` (no branches/PRs unless requested)
+- Create feature branches for all development work: `feature/descriptive-name`
+- Work on feature branches, not directly on `main`
 - Use conventional commits: `feat:`, `fix:`, `docs:`, `refactor:`
 - Always run tests/typechecks before pushing
 - Include issue number in commit messages (e.g., `Closes #24`)
+- Create pull requests when features are complete
+- Merge to main only through pull requests after review
 
 ### Error Handling Patterns
 
