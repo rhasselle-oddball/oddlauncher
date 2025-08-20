@@ -1,12 +1,493 @@
-# OddLauncher Development Tasks - Sprint 2
+# OddLauncher Development Tasks - Sprint: Terminal Environment & UI Enhancements
 
-Building on the solid foundation from Sprint 1, Sprint 2 focuses on advanced features and platform compatibility improvements.
+Building on Sprint 2 completion, this sprint focuses on making terminals work like real terminals with proper environment sourcing and adding a modern activity bar UI.
+
+**Sprint Goal:** Fix terminal environment issues (rbenv, command not found) and add settings UI with activity bar.
 
 Based on the PRD, here are the development tasks organized by priority and dependency. Each task should become a GitHub issue when started.
 
-## Current Tasks
+## Current Sprint Tasks
 
-### Task S2-1: Add Configurable Terminal/Shell Selection for Windows
+### Task TE-1: Implement Activity Bar - Far Left Sidebar with Library and Settings
+**Priority:** HIGH 🚨 | **Status:** COMPLETED ✅ | **Issue:** #50 (Closed) | **Commit:** TBD
+
+**Problem Statement:**
+Current layout has Library as the main sidebar, but we need a more scalable design for future features like library groups, workspaces, and easy access to settings. Need to implement a VS Code-style activity bar on the far left.
+
+**User Need:**
+- Easy access to global settings without cluttering main workspace
+- Future-proof design for multiple library groups/workspaces
+- Settings always accessible regardless of selected launcher
+- Clean separation between navigation and content
+
+**Current Layout:**
+```
+┌─────────────────────────────────────┐
+│ Library              Main Content   │
+│ Search...            Area           │
+│ App 1                               │
+│ App 2                               │
+└─────────────────────────────────────┘
+```
+
+**Target Layout:**
+```
+┌─┬─────────────────────────────────────┐
+│📚│ Library              Main Content   │
+│ │ Search...            Area           │
+│ │ App 1                               │
+│ │ App 2                               │
+│ │                                     │
+│ │                                     │
+│⚙️│                                     │
+└─┴─────────────────────────────────────┘
+```
+
+**Technical Implementation:**
+
+**Phase 1: Create ActivityBar Component**
+- Create new `ActivityBar` component with vertical icon layout
+- Add Library icon (current default view)
+- Add Settings icon at bottom
+- Implement active state styling
+- Handle icon click navigation
+
+**Phase 2: Restructure AppLayout**
+- Modify `AppLayout` to include three sections: ActivityBar, CurrentView, MainContent
+- Update CSS grid/flexbox layout for new structure
+- Ensure resizing behavior works with activity bar
+- Add narrow fixed-width activity bar (48px)
+
+**Phase 3: Add View Management**
+- Create view management state (Library, Settings)
+- Connect activity bar icons to view switching
+- Ensure Library remains default view
+- Add smooth transitions between views
+
+**Data Model Changes:**
+```typescript
+interface AppLayoutState {
+  activeView: 'library' | 'settings'
+  sidebarWidth: number
+  isCollapsed: boolean
+}
+```
+
+**Component Structure:**
+```
+AppLayout
+├── ActivityBar (48px fixed width)
+│   ├── LibraryIcon (active by default)
+│   └── SettingsIcon (bottom)
+├── CurrentView (resizable)
+│   ├── LibrarySidebar (when library active)
+│   └── SettingsPanel (when settings active)
+└── MainContent
+```
+
+**UI/UX Design:**
+- **Activity Bar**: 48px wide, dark background, icons centered vertically
+- **Library Icon**: Book/folder icon, active by default
+- **Settings Icon**: Gear icon, positioned at bottom
+- **Active State**: Highlight active icon with accent color
+- **Hover State**: Subtle hover feedback on icons
+- **Responsive**: Activity bar always visible, current view collapsible
+
+**Acceptance Criteria:**
+- [ ] Activity bar component implemented with library and settings icons
+- [ ] Clicking library icon shows current library sidebar
+- [ ] Clicking settings icon shows settings panel (placeholder for now)
+- [ ] Layout restructured to accommodate activity bar
+- [ ] Resizing behavior works with new layout
+- [ ] Active view state persists across app restarts
+- [ ] Hover and active states work correctly
+- [ ] No layout shift or flickering during view changes
+- [ ] Existing functionality remains unchanged
+
+**Verification Steps:**
+- [ ] Activity bar appears on far left with proper styling
+- [ ] Library icon is active by default and shows current sidebar
+- [ ] Settings icon shows placeholder settings panel
+- [ ] Icon states (hover, active) work correctly
+- [ ] Layout resizing works with activity bar
+- [ ] All existing library functionality works unchanged
+- [ ] No console errors or TypeScript errors
+- [ ] Layout is responsive and handles window resizing
+
+---
+
+### Task TE-2: Create Settings Modal with Terminal Configuration Section
+**Priority:** HIGH 🚨 | **Status:** TODO 📝 | **Depends On:** TE-1
+
+**Problem Statement:**
+Need a comprehensive settings system for global configuration, particularly for terminal environment settings that will fix the rbenv/command not found issues. Settings should be accessible via the activity bar.
+
+**User Need:**
+- Configure default shell and source files globally
+- Override terminal settings per launcher when needed
+- Fix command not found issues by properly sourcing shell environment
+- Easy access to all global application settings
+
+**Settings Structure:**
+
+**Global Settings Modal:**
+```
+┌─ Settings ──────────────────────────────┐
+│ 📁 General    🖥️ Terminal               │
+│                                         │
+│ ┌─ Default Terminal Settings ─────────┐ │
+│ │ Shell: [zsh ▼]                      │ │
+│ │ ☑ Use Login Shell                   │ │
+│ │ ☑ Inherit Current Environment       │ │
+│ │                                     │ │
+│ │ Default Source Files:               │ │
+│ │ • ~/.zshrc                    [×]   │ │
+│ │ • ~/.profile                  [×]   │ │
+│ │ • [+ Add Source File]               │ │
+│ │                                     │ │
+│ │ Default Environment Variables:      │ │
+│ │ • NODE_ENV=development        [×]   │ │
+│ │ • [+ Add Variable]                  │ │
+│ └─────────────────────────────────────┘ │
+│                                         │
+│ [Reset to Defaults] [Apply] [Cancel]    │
+└─────────────────────────────────────────┘
+```
+
+**Technical Implementation:**
+
+**Phase 1: Extend GlobalConfig Type**
+```typescript
+interface GlobalConfig {
+  settings: {
+    // ... existing settings
+    terminal: {
+      defaultShell: string                    // 'zsh', 'bash', 'fish', etc.
+      useLoginShell: boolean                  // Use -l flag
+      inheritEnvironment: boolean             // Include current process env
+      defaultSourceFiles: string[]            // ['~/.zshrc', '~/.profile']
+      defaultEnvironmentVariables: Record<string, string>
+    }
+  }
+}
+```
+
+**Phase 2: Create Settings Components**
+- `SettingsModal` - Main modal container with tab navigation
+- `GeneralSettingsTab` - General app settings (existing)
+- `TerminalSettingsTab` - Terminal configuration interface
+- `SourceFileManager` - Add/remove source files
+- `EnvironmentVariableManager` - Add/remove environment variables
+
+**Phase 3: Auto-Detection & Smart Defaults**
+- Detect user's default shell from `$SHELL` environment variable
+- Auto-detect common source files based on shell type:
+  - zsh: `~/.zshrc`, `~/.zprofile`
+  - bash: `~/.bashrc`, `~/.bash_profile`, `~/.profile`
+  - fish: `~/.config/fish/config.fish`
+- Scan for common project source files when creating launchers
+
+**Phase 4: Settings Persistence**
+- Save terminal settings to global config
+- Load settings on app startup
+- Apply settings to new launcher creation
+- Validate source file paths exist
+
+**Acceptance Criteria:**
+- [ ] Settings modal accessible via activity bar settings icon
+- [ ] Terminal tab shows all configuration options
+- [ ] Shell auto-detection works correctly
+- [ ] Source file management (add/remove) functional
+- [ ] Environment variable management functional
+- [ ] Settings persist across app restarts
+- [ ] Smart defaults based on user's shell
+- [ ] Validation for source file paths
+- [ ] Reset to defaults functionality
+
+**Verification Steps:**
+- [ ] Settings modal opens from activity bar settings icon
+- [ ] Terminal tab shows current shell and detected source files
+- [ ] Can add/remove source files and environment variables
+- [ ] Settings save and load correctly
+- [ ] Default detection works for different shells
+- [ ] Reset to defaults restores smart defaults
+- [ ] No console errors during settings operations
+
+---
+
+### Task TE-3: Implement Shell Environment Sourcing in Command Execution
+**Priority:** HIGH 🚨 | **Status:** TODO 📝 | **Depends On:** TE-2
+
+**Problem Statement:**
+Commands fail with "command not found" errors (like rbenv) because spawned processes don't get the full shell environment that includes PATH modifications from source files like ~/.zshrc.
+
+**Root Cause:**
+When OddLauncher spawns processes, they get a bare environment without:
+- Shell configuration files (~/.*rc, ~/.profile)
+- PATH modifications from tools (rbenv, nvm, pyenv)
+- Environment variables set by development tools
+- Shell functions and aliases
+
+**Technical Solution:**
+
+**Phase 1: Modify Rust Command Execution**
+Update command execution in `src-tauri/src/commands/` to source shell files:
+
+```rust
+// Instead of: Command::new("bundle").args(["exec", "rails", "s"])
+// Use: Command::new("zsh").args(["-l", "-c", "source ~/.zshrc && bundle exec rails s"])
+
+fn build_sourced_command(
+    user_command: &str,
+    config: &TerminalConfig,
+    working_dir: &Path
+) -> Command {
+    let shell = &config.default_shell;
+    let source_files = &config.default_source_files;
+    
+    let full_command = if config.use_login_shell {
+        format!(
+            "cd {} && {} && {}",
+            working_dir.display(),
+            source_files.iter()
+                .map(|f| format!("source {}", f))
+                .collect::<Vec<_>>()
+                .join(" && "),
+            user_command
+        )
+    } else {
+        user_command.to_string()
+    };
+    
+    let mut cmd = Command::new(shell);
+    if config.use_login_shell {
+        cmd.args(["-l", "-c", &full_command]);
+    } else {
+        cmd.args(["-c", &full_command]);
+    }
+    
+    // Add environment variables
+    for (key, value) in &config.default_environment_variables {
+        cmd.env(key, value);
+    }
+    
+    cmd
+}
+```
+
+**Phase 2: Update Process Management**
+- Modify `start_app_process` command to use sourced execution
+- Apply to both existing process system and terminal selection system
+- Ensure all command execution paths use environment sourcing
+- Handle errors when source files don't exist
+
+**Phase 3: Platform-Specific Implementation**
+- Linux/macOS: Use shell with -c/-l flags
+- Windows: Handle cmd.exe, PowerShell, WSL differently
+- Windows WSL: Clean PATH to avoid Windows/Linux conflicts (existing fix)
+
+**Phase 4: Integration with Settings**
+- Read terminal settings from global config
+- Apply user-configured shell and source files
+- Use per-launcher overrides when specified
+- Fallback to system defaults if settings not configured
+
+**Acceptance Criteria:**
+- [ ] Commands execute in properly sourced shell environment
+- [ ] rbenv, nvm, pyenv and other tools work correctly
+- [ ] Source files are loaded before command execution
+- [ ] Environment variables are properly set
+- [ ] Works across all supported platforms
+- [ ] Per-launcher terminal overrides work
+- [ ] Error handling for missing source files
+- [ ] No regression in existing functionality
+
+**Verification Steps:**
+- [ ] Test rbenv commands work without "command not found" errors
+- [ ] Test nvm/node commands work correctly
+- [ ] Test environment variables are accessible in commands
+- [ ] Test with different shells (bash, zsh, fish)
+- [ ] Test per-launcher source file overrides
+- [ ] Verify Windows WSL continues working
+- [ ] Test command execution on macOS and Linux
+- [ ] Ensure stop functionality still works correctly
+
+---
+
+### Task TE-4: Add Per-Launcher Terminal Environment Overrides
+**Priority:** MEDIUM 🔶 | **Status:** TODO 📝 | **Depends On:** TE-2, TE-3
+
+**Problem Statement:**
+While global terminal settings solve most issues, some launchers need project-specific environment setup (like .env files, project setup scripts, or specific environment variables).
+
+**User Need:**
+- Load project-specific .env files
+- Run project setup scripts before main commands
+- Override environment variables per project
+- Use different shell for specific projects
+
+**Technical Implementation:**
+
+**Phase 1: Extend AppConfig Type**
+```typescript
+interface AppConfig {
+  // ... existing fields
+  terminal?: {
+    shell?: string                           // Override global shell
+    useLoginShell?: boolean                  // Override global login shell
+    additionalSourceFiles?: string[]         // Project-specific files to source
+    environmentVariables?: Record<string, string>  // Project env vars
+    inheritGlobalSettings?: boolean          // Default: true
+  }
+}
+```
+
+**Phase 2: Update App Configuration Modal**
+Add collapsible "Advanced Terminal Settings" section:
+
+```
+┌─ Terminal Section ──────────────────────┐
+│ Terminal Type: [zsh ▼]                  │
+│ Working Directory: [/path/to/project]   │
+│ Launch Commands: [...]                  │
+│                                         │
+│ ▼ Advanced Terminal Settings            │
+│ ┌─────────────────────────────────────┐ │
+│ │ ☐ Override Global Settings          │ │
+│ │                                     │ │
+│ │ Shell: [Use Global ▼]               │ │
+│ │ ☐ Use Login Shell                   │ │
+│ │                                     │ │
+│ │ Additional Source Files:            │ │
+│ │ • ./.env                      [×]   │ │
+│ │ • ./scripts/setup.sh          [×]   │ │
+│ │ • [+ Add File]                      │ │
+│ │                                     │ │
+│ │ Environment Variables:              │ │
+│ │ • RAILS_ENV=development       [×]   │ │
+│ │ • PORT=3000                   [×]   │ │
+│ │ • [+ Add Variable]                  │ │
+│ └─────────────────────────────────────┘ │
+└─────────────────────────────────────────┘
+```
+
+**Phase 3: Merge Settings in Command Execution**
+```rust
+fn get_effective_terminal_config(
+    global_config: &GlobalTerminalConfig,
+    app_terminal_config: &Option<AppTerminalConfig>
+) -> EffectiveTerminalConfig {
+    let mut config = global_config.clone();
+    
+    if let Some(app_config) = app_terminal_config {
+        if app_config.inherit_global_settings.unwrap_or(true) {
+            // Merge with global settings
+            if let Some(shell) = &app_config.shell {
+                config.shell = shell.clone();
+            }
+            config.source_files.extend(app_config.additional_source_files.clone());
+            config.environment_variables.extend(app_config.environment_variables.clone());
+        } else {
+            // Use only app-specific settings
+            config = EffectiveTerminalConfig::from(app_config);
+        }
+    }
+    
+    config
+}
+```
+
+**Phase 4: Smart Project Detection**
+- Auto-detect .env files in project directory
+- Suggest common setup scripts (package.json scripts, Makefile targets)
+- Auto-detect language-specific files (.nvmrc, .ruby-version, pyproject.toml)
+
+**Acceptance Criteria:**
+- [ ] Advanced terminal settings section in app config modal
+- [ ] Per-launcher terminal overrides work correctly
+- [ ] Settings merge properly (global + app-specific)
+- [ ] Additional source files are loaded before commands
+- [ ] Environment variables are properly set per launcher
+- [ ] Auto-detection suggests relevant project files
+- [ ] Override toggle works correctly
+- [ ] Settings persist in app configuration
+
+**Verification Steps:**
+- [ ] Create launcher with .env file - verify variables are available
+- [ ] Test per-launcher shell override
+- [ ] Test additional source files are loaded
+- [ ] Test environment variable overrides
+- [ ] Verify global settings still apply when not overridden
+- [ ] Test auto-detection of project files
+- [ ] Ensure export/import preserves terminal settings
+
+---
+
+### Task TE-5: Enable Terminal Text Selection and Copy Functionality
+**Priority:** MEDIUM 🔶 | **Status:** TODO 📝 | **Independent Task**
+
+**Problem Statement:**
+Terminal output currently doesn't allow text selection, making it impossible to copy error messages, URLs, or other important information from the terminal output.
+
+**User Need:**
+- Select text in terminal output like a real terminal
+- Copy selected text to clipboard
+- Standard keyboard shortcuts (Ctrl+C for copy)
+- Mouse selection with click and drag
+
+**Current Limitation:**
+Terminal output is likely using CSS that disables text selection (`user-select: none`) or the component doesn't support selection.
+
+**Technical Implementation:**
+
+**Phase 1: Enable Text Selection in Terminal Component**
+- Review Terminal component CSS and remove `user-select: none`
+- Ensure terminal output elements allow text selection
+- Test text selection works with mouse drag
+
+**Phase 2: Add Copy Functionality**
+- Add copy button to terminal header
+- Implement copy selected text functionality
+- Add keyboard shortcut (Ctrl+C when text is selected)
+- Add context menu with copy option
+
+**Phase 3: Enhanced Selection Features**
+- Select all functionality (Ctrl+A)
+- Double-click to select word
+- Triple-click to select line
+- Clear selection when new output arrives (optional)
+
+**Terminal Header Update:**
+```
+┌─ Terminal Output (zsh) - MyApp ─── [📋] [🗑️] [🔍] ┐
+│ $ rbenv install 3.0.0                              │
+│ Installing ruby-3.0.0...                          │
+│ Success! Ruby 3.0.0 installed                     │ ← Selectable text
+│ $ bundle exec rails server                        │
+└────────────────────────────────────────────────────┘
+```
+
+**Acceptance Criteria:**
+- [ ] Text selection works in terminal output
+- [ ] Copy button in terminal header works
+- [ ] Keyboard shortcuts work (Ctrl+C, Ctrl+A)
+- [ ] Mouse selection with click and drag
+- [ ] Context menu with copy option
+- [ ] Selected text copies to system clipboard
+- [ ] Selection works across multiple lines
+- [ ] No interference with existing terminal functionality
+
+**Verification Steps:**
+- [ ] Click and drag to select text in terminal
+- [ ] Copy button copies selected text
+- [ ] Ctrl+C copies selected text (when text is selected)
+- [ ] Ctrl+A selects all terminal text
+- [ ] Right-click shows context menu with copy option
+- [ ] Double-click selects word, triple-click selects line
+- [ ] Copied text can be pasted in other applications
+- [ ] Terminal scrolling and output streaming still work
+
+---
 **Priority:** HIGH 🚨 | **Status:** COMPLETED ✅ | **Commit:** 7764a8b | **Issue:** #37 (Closed)
 
 **Problem Statement:**

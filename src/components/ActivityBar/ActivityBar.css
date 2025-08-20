@@ -1,0 +1,70 @@
+/* ActivityBar Component Styles */
+.activity-bar {
+  width: 48px;
+  background-color: var(--bg-primary);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  z-index: 20;
+}
+
+.activity-bar-icons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.activity-bar-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.activity-bar-icon {
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.activity-bar-icon:hover {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.activity-bar-icon.active {
+  color: var(--accent-color);
+  background-color: var(--bg-secondary);
+}
+
+.activity-bar-icon.active::before {
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: var(--accent-color);
+  border-radius: 0 1px 1px 0;
+}
+
+/* Focus styles for accessibility */
+.activity-bar-icon:focus {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+.activity-bar-icon:focus:not(:focus-visible) {
+  outline: none;
+}
