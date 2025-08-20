@@ -117,7 +117,7 @@ AppLayout
 ---
 
 ### Task TE-2: Create Settings Modal with Terminal Configuration Section
-**Priority:** HIGH 🚨 | **Status:** COMPLETED ✅ | **Issue:** #51 (Closed) | **Commit:** TBD
+**Priority:** HIGH 🚨 | **Status:** COMPLETED ✅ | **Issue:** #51 (Closed) | **Commit:** ed44575
 
 **Problem Statement:**
 Need a comprehensive settings system for global configuration, particularly for terminal environment settings that will fix the rbenv/command not found issues. Settings should be accessible via the activity bar.

@@ -1,4 +1,5 @@
 use crate::models::app::{AppProcess, AppStatus};
+use crate::commands::config::load_config_sync;
 use crate::commands::terminal::get_terminal_command;
 use serde::{Deserialize, Serialize};
 use serde_json;
@@ -25,7 +26,8 @@ use std::os::windows::process::CommandExt;
  * Cross-platform path and command utilities
  */
 mod platform_utils {
-    use std::path::Path;
+    use std::collections::HashMap;
+use std::path::Path;
 
     /// Convert various path formats to the appropriate format for the current platform
     pub fn normalize_path(path: &str) -> Result<String, String> {
@@ -159,8 +161,76 @@ mod platform_utils {
     }
 }
 
+/// Create shell command that sources terminal settings from global config
+fn prepare_shell_command_with_global_config(
+    commands: &str,
+    working_dir: Option<&str>,
+    env_vars: Option<&std::collections::HashMap<String, String>>,
+) -> Result<(String, Vec<String>), String> {
+    // Load global config to get terminal settings
+    let config = load_config_sync().map_err(|e| format!("Failed to load global config: {}", e.message))?;
+    let terminal_settings = &config.settings.terminal;
+    
+    let mut setup_commands = Vec::new();
+    
+    // Source default files if configured
+    for source_file in &terminal_settings.default_source_files {
+        if !source_file.trim().is_empty() {
+            // Expand ~ to home directory
+            let expanded_file = if source_file.starts_with("~/") {
+                if let Some(home) = std::env::var_os("HOME") {
+                    format!("{}{}", home.to_string_lossy(), &source_file[1..])
+                } else {
+                    source_file.clone()
+                }
+            } else {
+                source_file.clone()
+            };
+            
+            setup_commands.push(format!("[ -f {} ] && source {}", expanded_file, expanded_file));
+        }
+    }
+    
+    // Set default environment variables from global config
+    for (key, value) in &terminal_settings.default_environment_variables {
+        setup_commands.push(format!("export {}='{}'", key, value));
+    }
+    
+    // Set environment variables from app config if provided
+    if let Some(env_vars) = env_vars {
+        for (key, value) in env_vars {
+            setup_commands.push(format!("export {}='{}'", key, value));
+        }
+    }
+    
+    // Add the user commands
+    let user_commands: Vec<&str> = commands.lines()
+        .map(|line| line.trim())
+        .filter(|line| !line.is_empty())
+        .collect();
+    
+    // Combine setup and user commands
+    let mut all_commands = setup_commands;
+    all_commands.extend(user_commands.iter().map(|&s| s.to_string()));
+    
+    let full_command = all_commands.join(" && ");
+    
+    // Determine shell to use
+    let shell = if terminal_settings.use_login_shell {
+        format!("{} -l", terminal_settings.default_shell)
+    } else {
+        terminal_settings.default_shell.clone()
+    };
+    
+    let args = vec!["-c".to_string(), full_command];
+    
+    log::debug!("Executing with shell: {} {:?}", shell, args);
+    
+    Ok((shell, args))
+}
+
 /// Prepare multi-command execution using shell script approach
-fn prepare_multi_command_execution(launch_commands: &str, working_dir: Option<&str>, terminal_type: Option<&str>) -> Result<(String, Vec<String>), String> {
+fn prepare_multi_command_execution(launch_commands: &str, working_dir: Option<&str>, terminal_type: Option<&str>, env_vars: Option<&HashMap<String, String>>) -> Result<(String, Vec<String>), String> {
     log::info!("Preparing multi-command execution: '{}'", launch_commands);
 
     // If terminal_type is specified, use the new terminal command system
@@ -174,10 +244,46 @@ fn prepare_multi_command_execution(launch_commands: &str, working_dir: Option<&s
         }
     }
 
-    // Fallback to legacy behavior when no terminal type is specified
-    log::info!("No terminal type specified, using legacy shell detection");
+    // Fallback to global config based shell setup when no terminal type is specified
+    log::info!("No terminal type specified, using global config shell setup");
 
     // Split commands by lines and filter out empty lines
+    let commands: Vec<&str> = launch_commands
+        .lines()
+        .map(|line| line.trim())
+        .filter(|line| !line.is_empty())
+        .collect();
+
+    if commands.is_empty() {
+        return Err("No valid commands found".to_string());
+    }
+
+    // Log all commands that will be executed
+    log::info!("Commands to execute: {:?}", commands);
+
+    // For single command, try global config first, fall back to platform utils if that fails
+    if commands.len() == 1 {
+        log::info!("Single command detected, trying global config approach");
+        match prepare_shell_command_with_global_config(launch_commands, working_dir, env_vars) {
+            Ok(result) => return Ok(result),
+            Err(e) => {
+                log::warn!("Global config approach failed ({}), falling back to legacy approach", e);
+                return platform_utils::prepare_command(commands[0], working_dir);
+            }
+        }
+    }
+
+    // For multiple commands, try global config first
+    log::info!("Multiple commands detected, trying global config approach");
+    match prepare_shell_command_with_global_config(launch_commands, working_dir, env_vars) {
+        Ok(result) => return Ok(result),
+        Err(e) => {
+            log::warn!("Global config approach failed ({}), falling back to legacy multi-command approach", e);
+            // Fall back to the existing multi-command shell script logic
+        }
+    }
+
+    // Legacy fallback: recreate the commands list for the existing logic
     let commands: Vec<&str> = launch_commands
         .lines()
         .map(|line| line.trim())
@@ -543,7 +649,7 @@ pub async fn start_app_process(
     };
 
     // Prepare multi-command execution using shell script approach
-    let (program, args) = match prepare_multi_command_execution(&launch_commands, normalized_working_dir.as_deref(), terminal_type.as_deref()) {
+    let (program, args) = match prepare_multi_command_execution(&launch_commands, normalized_working_dir.as_deref(), terminal_type.as_deref(), environment_variables.as_ref()) {
         Ok((prog, args)) => {
             log::info!("Multi-command execution prepared - Program: '{}', Args: {:?}", prog, args);
             (prog, args)

@@ -37,6 +37,37 @@ fn ensure_config_dir_exists() -> AppResult<()> {
     Ok(())
 }
 
+/// Load the global configuration from file (synchronous version for internal use)
+pub fn load_config_sync() -> AppResult<GlobalConfig> {
+    log::debug!("Loading configuration from file (sync)");
+
+    let config_file = get_config_file_path()?;
+
+    // If config file doesn't exist, return default config
+    if !config_file.exists() {
+        log::debug!("Config file doesn't exist, returning default configuration");
+        return Ok(GlobalConfig::default());
+    }
+
+    // Read and parse the config file
+    let config_content = fs::read_to_string(&config_file).map_err(|e| {
+        AppError::new(
+            "FILE_READ_ERROR",
+            &format!("Failed to read config file: {}", e),
+        )
+    })?;
+
+    let config: GlobalConfig = serde_json::from_str(&config_content).map_err(|e| {
+        AppError::new(
+            "JSON_PARSE_ERROR",
+            &format!("Failed to parse config file: {}", e),
+        )
+    })?;
+
+    log::debug!("Successfully loaded configuration with {} apps", config.apps.len());
+    Ok(config)
+}
+
 /// Load the global configuration from file
 #[tauri::command]
 pub async fn load_config(_app: AppHandle) -> AppResult<GlobalConfig> {

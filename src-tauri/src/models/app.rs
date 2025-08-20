@@ -96,6 +96,39 @@ pub struct AppState {
 }
 
 /**
+ * Terminal configuration settings
+ */
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TerminalSettings {
+    /// Default shell to use (e.g., 'zsh', 'bash', 'fish')
+    pub default_shell: String,
+    /// Whether to run as login shell by default
+    pub use_login_shell: bool,
+    /// Whether to inherit current environment
+    pub inherit_environment: bool,
+    /// Default source files to load for all apps
+    pub default_source_files: Vec<String>,
+    /// Default environment variables for all apps
+    pub default_environment_variables: HashMap<String, String>,
+}
+
+impl Default for TerminalSettings {
+    fn default() -> Self {
+        Self {
+            default_shell: "zsh".to_string(),
+            use_login_shell: true,
+            inherit_environment: true,
+            default_source_files: vec![
+                "~/.zshrc".to_string(),
+                "~/.profile".to_string(),
+            ],
+            default_environment_variables: HashMap::new(),
+        }
+    }
+}
+
+/**
  * Global application settings
  */
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -111,6 +144,8 @@ pub struct GlobalSettings {
     pub default_browser: Option<String>,
     /// Auto-save configuration changes
     pub auto_save: bool,
+    /// Terminal configuration settings
+    pub terminal: TerminalSettings,
 }
 
 impl Default for GlobalSettings {
@@ -121,6 +156,7 @@ impl Default for GlobalSettings {
             max_terminal_lines: 1000,
             default_browser: None,
             auto_save: true,
+            terminal: TerminalSettings::default(),
         }
     }
 }
