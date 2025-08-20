@@ -8,6 +8,15 @@ Building on Sprint 2 completion, this sprint focuses on making terminals work li
 
 **Sprint Goal:** Fix terminal environment issues (rbenv, command not found) and add settings UI with activity bar.
 
+**SPRINT STATUS: COMPLETED ✅**
+
+All 5 tasks in this sprint have been successfully completed:
+- ✅ TE-1: Activity Bar Implementation (a1a7e45)
+- ✅ TE-2: Settings Modal with Terminal Configuration (ed44575) 
+- ✅ TE-3: Shell Environment Sourcing (db2f923)
+- ✅ TE-4: Per-Launcher Terminal Environment Overrides (8b351b2)
+- ✅ TE-5: Terminal Text Selection and Copy Functionality (1e330bc)
+
 Based on the PRD, here are the development tasks organized by priority and dependency. Each task should become a GitHub issue when started.
 
 ## Current Sprint Tasks
@@ -428,7 +437,7 @@ fn get_effective_terminal_config(
 ---
 
 ### Task TE-5: Enable Terminal Text Selection and Copy Functionality
-**Priority:** MEDIUM 🔶 | **Status:** TODO 📝 | **Independent Task**
+**Priority:** MEDIUM 🔶 | **Status:** COMPLETED ✅ | **Issue:** TBD | **Commit:** 1e330bc
 
 **Problem Statement:**
 Terminal output currently doesn't allow text selection, making it impossible to copy error messages, URLs, or other important information from the terminal output.
@@ -444,18 +453,18 @@ Terminal output is likely using CSS that disables text selection (`user-select: 
 
 **Technical Implementation:**
 
-**Phase 1: Enable Text Selection in Terminal Component**
+**Phase 1: Enable Text Selection in Terminal Component ✅ DONE**
 - Review Terminal component CSS and remove `user-select: none`
 - Ensure terminal output elements allow text selection
 - Test text selection works with mouse drag
 
-**Phase 2: Add Copy Functionality**
+**Phase 2: Add Copy Functionality ✅ DONE**
 - Add copy button to terminal header
 - Implement copy selected text functionality
 - Add keyboard shortcut (Ctrl+C when text is selected)
 - Add context menu with copy option
 
-**Phase 3: Enhanced Selection Features**
+**Phase 3: Enhanced Selection Features ✅ DONE**
 - Select all functionality (Ctrl+A)
 - Double-click to select word
 - Triple-click to select line
