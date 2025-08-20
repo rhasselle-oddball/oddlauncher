@@ -1,4 +1,4 @@
-use crate::models::app::{AppProcess, AppStatus};
+use crate::models::app::{AppProcess, AppStatus, AppConfig, AppTerminalSettings};
 use crate::commands::config::load_config_sync;
 use crate::commands::terminal::get_terminal_command;
 use serde::{Deserialize, Serialize};
@@ -161,20 +161,57 @@ use std::path::Path;
     }
 }
 
-/// Create shell command that sources terminal settings from global config
+/// Create shell command that sources terminal settings from global config with app overrides
 fn prepare_shell_command_with_global_config(
     commands: &str,
     working_dir: Option<&str>,
     env_vars: Option<&std::collections::HashMap<String, String>>,
+    app_terminal_settings: Option<&AppTerminalSettings>,
 ) -> Result<(String, Vec<String>), String> {
     // Load global config to get terminal settings
     let config = load_config_sync().map_err(|e| format!("Failed to load global config: {}", e.message))?;
-    let terminal_settings = &config.settings.terminal;
+    let global_terminal_settings = &config.settings.terminal;
     
     let mut setup_commands = Vec::new();
     
-    // Source default files if configured
-    for source_file in &terminal_settings.default_source_files {
+    // Determine effective terminal settings by merging global and app-specific settings
+    let inherit_global = app_terminal_settings
+        .and_then(|s| s.inherit_global_settings)
+        .unwrap_or(true);
+    
+    let effective_shell = if inherit_global {
+        app_terminal_settings
+            .and_then(|s| s.shell.as_ref())
+            .unwrap_or(&global_terminal_settings.default_shell)
+    } else {
+        app_terminal_settings
+            .and_then(|s| s.shell.as_ref())
+            .ok_or("App terminal settings must specify shell when not inheriting global settings")?
+    };
+    
+    let effective_use_login_shell = if inherit_global {
+        app_terminal_settings
+            .and_then(|s| s.use_login_shell)
+            .unwrap_or(global_terminal_settings.use_login_shell)
+    } else {
+        app_terminal_settings
+            .and_then(|s| s.use_login_shell)
+            .unwrap_or(false)
+    };
+    
+    // Source files: start with global if inheriting, then add app-specific
+    let mut source_files = Vec::new();
+    if inherit_global {
+        source_files.extend(global_terminal_settings.default_source_files.iter().cloned());
+    }
+    if let Some(app_settings) = app_terminal_settings {
+        if let Some(additional_files) = &app_settings.additional_source_files {
+            source_files.extend(additional_files.iter().cloned());
+        }
+    }
+    
+    // Source all configured files
+    for source_file in &source_files {
         if !source_file.trim().is_empty() {
             // Expand ~ to home directory
             let expanded_file = if source_file.starts_with("~/") {
@@ -191,12 +228,23 @@ fn prepare_shell_command_with_global_config(
         }
     }
     
-    // Set default environment variables from global config
-    for (key, value) in &terminal_settings.default_environment_variables {
-        setup_commands.push(format!("export {}='{}'", key, value));
+    // Environment variables: start with global if inheriting, then add app-specific
+    if inherit_global {
+        for (key, value) in &global_terminal_settings.default_environment_variables {
+            setup_commands.push(format!("export {}='{}'", key, value));
+        }
     }
     
-    // Set environment variables from app config if provided
+    // Add app-specific environment variables (these override global ones)
+    if let Some(app_settings) = app_terminal_settings {
+        if let Some(app_env_vars) = &app_settings.environment_variables {
+            for (key, value) in app_env_vars {
+                setup_commands.push(format!("export {}='{}'", key, value));
+            }
+        }
+    }
+    
+    // Set environment variables from app config if provided (these have highest priority)
     if let Some(env_vars) = env_vars {
         for (key, value) in env_vars {
             setup_commands.push(format!("export {}='{}'", key, value));
@@ -216,10 +264,10 @@ fn prepare_shell_command_with_global_config(
     let full_command = all_commands.join(" && ");
     
     // Determine shell to use
-    let shell = if terminal_settings.use_login_shell {
-        format!("{} -l", terminal_settings.default_shell)
+    let shell = if effective_use_login_shell {
+        format!("{} -l", effective_shell)
     } else {
-        terminal_settings.default_shell.clone()
+        effective_shell.clone()
     };
     
     let args = vec!["-c".to_string(), full_command];
@@ -230,7 +278,7 @@ fn prepare_shell_command_with_global_config(
 }
 
 /// Prepare multi-command execution using shell script approach
-fn prepare_multi_command_execution(launch_commands: &str, working_dir: Option<&str>, terminal_type: Option<&str>, env_vars: Option<&HashMap<String, String>>) -> Result<(String, Vec<String>), String> {
+fn prepare_multi_command_execution(launch_commands: &str, working_dir: Option<&str>, terminal_type: Option<&str>, env_vars: Option<&HashMap<String, String>>, app_terminal_settings: Option<&AppTerminalSettings>) -> Result<(String, Vec<String>), String> {
     log::info!("Preparing multi-command execution: '{}'", launch_commands);
 
     // If terminal_type is specified, use the new terminal command system
@@ -264,7 +312,7 @@ fn prepare_multi_command_execution(launch_commands: &str, working_dir: Option<&s
     // For single command, try global config first, fall back to platform utils if that fails
     if commands.len() == 1 {
         log::info!("Single command detected, trying global config approach");
-        match prepare_shell_command_with_global_config(launch_commands, working_dir, env_vars) {
+        match prepare_shell_command_with_global_config(launch_commands, working_dir, env_vars, app_terminal_settings) {
             Ok(result) => return Ok(result),
             Err(e) => {
                 log::warn!("Global config approach failed ({}), falling back to legacy approach", e);
@@ -275,7 +323,7 @@ fn prepare_multi_command_execution(launch_commands: &str, working_dir: Option<&s
 
     // For multiple commands, try global config first
     log::info!("Multiple commands detected, trying global config approach");
-    match prepare_shell_command_with_global_config(launch_commands, working_dir, env_vars) {
+    match prepare_shell_command_with_global_config(launch_commands, working_dir, env_vars, app_terminal_settings) {
         Ok(result) => return Ok(result),
         Err(e) => {
             log::warn!("Global config approach failed ({}), falling back to legacy multi-command approach", e);
@@ -533,6 +581,7 @@ pub async fn start_app_process(
     port_to_check: Option<u16>,
     port_check_timeout: Option<u32>,
     terminal_type: Option<String>,
+    terminal_settings: Option<AppTerminalSettings>,
     app_handle: AppHandle,
     process_manager: State<'_, ProcessManager>,
 ) -> Result<ProcessResult, String> {
@@ -649,7 +698,7 @@ pub async fn start_app_process(
     };
 
     // Prepare multi-command execution using shell script approach
-    let (program, args) = match prepare_multi_command_execution(&launch_commands, normalized_working_dir.as_deref(), terminal_type.as_deref(), environment_variables.as_ref()) {
+    let (program, args) = match prepare_multi_command_execution(&launch_commands, normalized_working_dir.as_deref(), terminal_type.as_deref(), environment_variables.as_ref(), terminal_settings.as_ref()) {
         Ok((prog, args)) => {
             log::info!("Multi-command execution prepared - Program: '{}', Args: {:?}", prog, args);
             (prog, args)

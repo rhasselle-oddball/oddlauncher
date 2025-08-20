@@ -79,6 +79,13 @@ export function AppListItemWithContext({
           app.launchCommands || '',
           app.workingDirectory,
           app.environmentVariables,
+          app.url,
+          app.autoLaunchBrowser,
+          app.browserDelay,
+          app.portToCheck,
+          app.portCheckTimeout,
+          app.terminalType,
+          app.terminal
         )
         console.log('Process started:', res)
         if (res?.success && app.url && app.autoLaunchBrowser !== false) {
@@ -129,6 +136,13 @@ export function AppListItemWithContext({
                         app.launchCommands || '',
                         app.workingDirectory,
                         app.environmentVariables,
+                        app.url,
+                        app.autoLaunchBrowser,
+                        app.browserDelay,
+                        app.portToCheck,
+                        app.portCheckTimeout,
+                        app.terminalType,
+                        app.terminal
                       )
                       console.log('Process started:', res)
                       if (res?.success && app.url && app.autoLaunchBrowser !== false) {

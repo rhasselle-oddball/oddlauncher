@@ -55,7 +55,8 @@ export function AppListItem({ app, isSelected, onClick }: AppListItemProps) {
                       app.browserDelay,
                       app.portToCheck,
                       app.portCheckTimeout,
-                      app.terminalType
+                      app.terminalType,
+                      app.terminal
                     )
                     if (res?.success) {
                       const now = new Date().toISOString()

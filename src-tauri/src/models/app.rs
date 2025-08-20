@@ -21,6 +21,24 @@ impl Default for AppStatus {
 }
 
 /**
+ * Per-app terminal configuration overrides
+ */
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AppTerminalSettings {
+    /// Override default shell for this app
+    pub shell: Option<String>,
+    /// Override login shell setting
+    pub use_login_shell: Option<bool>,
+    /// Additional source files specific to this app
+    pub additional_source_files: Option<Vec<String>>,
+    /// Override/add environment variables
+    pub environment_variables: Option<HashMap<String, String>>,
+    /// Whether to inherit global terminal settings (default: true)
+    pub inherit_global_settings: Option<bool>,
+}
+
+/**
  * Configuration for an individual app
  */
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -50,6 +68,8 @@ pub struct AppConfig {
     pub tags: Option<Vec<String>>,
     /// Terminal/shell type to use for executing commands (optional)
     pub terminal_type: Option<String>,
+    /// Advanced terminal configuration overrides (optional)
+    pub terminal: Option<AppTerminalSettings>,
     /// Explicit app type (process, bookmark, both) - optional for back-compat
     pub app_type: Option<AppType>,
     /// Last time the app was used (process started or bookmark opened)

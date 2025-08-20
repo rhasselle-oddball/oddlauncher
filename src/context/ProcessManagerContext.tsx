@@ -39,7 +39,14 @@ export interface ProcessManagerAPI {
     browserDelay?: number,
     portToCheck?: number,
     portCheckTimeout?: number,
-    terminalType?: string
+    terminalType?: string,
+    terminalSettings?: {
+      shell?: string
+      useLoginShell?: boolean
+      additionalSourceFiles?: string[]
+      environmentVariables?: Record<string, string>
+      inheritGlobalSettings?: boolean
+    }
   ) => Promise<ProcessResult>
   stopProcess: (appId: string) => Promise<ProcessResult>
   getProcessStatus: (appId: string) => Promise<AppProcess | null>
@@ -120,7 +127,14 @@ export function ProcessManagerProvider({ children }: { children: React.ReactNode
     browserDelay?: number,
     portToCheck?: number,
     portCheckTimeout?: number,
-    terminalType?: string
+    terminalType?: string,
+    terminalSettings?: {
+      shell?: string
+      useLoginShell?: boolean
+      additionalSourceFiles?: string[]
+      environmentVariables?: Record<string, string>
+      inheritGlobalSettings?: boolean
+    }
   ): Promise<ProcessResult> => {
     try {
       debugLogger.info('ProcessManager', `Starting process for app: ${appId}`, {
@@ -133,6 +147,7 @@ export function ProcessManagerProvider({ children }: { children: React.ReactNode
         portToCheck,
         portCheckTimeout,
         terminalType,
+        terminalSettings,
       })
 
       setIsLoading(true)
@@ -163,6 +178,7 @@ export function ProcessManagerProvider({ children }: { children: React.ReactNode
         portToCheck,
         portCheckTimeout,
         terminalType,
+        terminalSettings,
       })
 
       debugLogger.info('ProcessManager', `Process start result for ${appId}:`, result)

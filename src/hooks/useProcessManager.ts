@@ -41,7 +41,14 @@ export function useAppProcess(appId: string) {
       browserDelay?: number,
       portToCheck?: number,
       portCheckTimeout?: number,
-      terminalType?: string
+      terminalType?: string,
+      terminalSettings?: {
+        shell?: string
+        useLoginShell?: boolean
+        additionalSourceFiles?: string[]
+        environmentVariables?: Record<string, string>
+        inheritGlobalSettings?: boolean
+      }
     ) =>
       startProcess(
         appId,
@@ -53,7 +60,8 @@ export function useAppProcess(appId: string) {
         browserDelay,
         portToCheck,
         portCheckTimeout,
-        terminalType
+        terminalType,
+        terminalSettings
       ),
     [appId, startProcess]
   )
