@@ -34,6 +34,7 @@ export function Terminal({
   const [isAutoScrollEnabled, setIsAutoScrollEnabled] = useState(autoScroll)
   const [searchQuery, setSearchQuery] = useState('')
   const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; show: boolean }>({ x: 0, y: 0, show: false })
   const terminalContentRef = useRef<HTMLDivElement>(null)
   const terminalEndRef = useRef<HTMLDivElement>(null)
 
@@ -107,6 +108,38 @@ export function Terminal({
     }
   }, [displayLines, isAutoScrollEnabled])
 
+  // Keyboard shortcuts for terminal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Only handle shortcuts when terminal is focused or has text selected
+      const isTerminalFocused = terminalContentRef.current?.contains(document.activeElement)
+      const hasSelection = window.getSelection()?.toString().trim()
+
+      if (!isTerminalFocused && !hasSelection) return
+
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key === 'c' && hasSelection) {
+          // Copy selected text (let browser handle this naturally)
+          return
+        }
+        if (e.key === 'a') {
+          // Select all terminal content
+          e.preventDefault()
+          const range = document.createRange()
+          if (terminalContentRef.current) {
+            range.selectNodeContents(terminalContentRef.current)
+            const selection = window.getSelection()
+            selection?.removeAllRanges()
+            selection?.addRange(range)
+          }
+        }
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [])
+
   // Limit lines to maxLines (FIFO buffer)
   const limitedLines = displayLines.slice(-maxLines)
 
@@ -123,16 +156,46 @@ export function Terminal({
     }
   }
 
-  const handleCopyClick = () => {
-    if (onCopy) {
-      onCopy()
-    } else {
-      // Default copy implementation - copy all terminal content
-      const content = filteredLines.map(line => `[${line.timestamp}] ${line.content}`).join('\n')
-      navigator.clipboard.writeText(content).then(() => {
-        // Visual feedback could be added here
+  const handleCopyClick = async () => {
+    try {
+      const selection = window.getSelection()
+      let textToCopy = ''
+
+      if (selection && selection.toString().trim()) {
+        // Copy selected text
+        textToCopy = selection.toString()
+      } else if (onCopy) {
+        // Use provided copy handler
+        onCopy()
+        return
+      } else {
+        // Copy all terminal content if nothing is selected
+        textToCopy = filteredLines.map(line => `[${line.timestamp}] ${line.content}`).join('\n')
+      }
+
+      if (textToCopy) {
+        await navigator.clipboard.writeText(textToCopy)
         console.log('Terminal content copied to clipboard')
-      }).catch(console.error)
+        
+        // Optional: Show a brief feedback (you could add a toast notification here)
+        // For now, just log it
+      }
+    } catch (err) {
+      console.error('Failed to copy to clipboard:', err)
+      
+      // Fallback for older browsers
+      try {
+        const textArea = document.createElement('textarea')
+        const fallbackText = filteredLines.map(line => `[${line.timestamp}] ${line.content}`).join('\n')
+        textArea.value = fallbackText
+        document.body.appendChild(textArea)
+        textArea.select()
+        document.execCommand('copy')
+        document.body.removeChild(textArea)
+        console.log('Terminal content copied to clipboard (fallback)')
+      } catch (fallbackErr) {
+        console.error('Fallback copy failed:', fallbackErr)
+      }
     }
   }
 
@@ -149,6 +212,39 @@ export function Terminal({
       onSearch(searchQuery)
     }
   }
+
+  // Context menu handlers
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault()
+    setContextMenu({
+      x: e.clientX,
+      y: e.clientY,
+      show: true
+    })
+  }
+
+  const handleContextMenuCopy = () => {
+    handleCopyClick()
+    setContextMenu(prev => ({ ...prev, show: false }))
+  }
+
+  const handleContextMenuSelectAll = () => {
+    const range = document.createRange()
+    if (terminalContentRef.current) {
+      range.selectNodeContents(terminalContentRef.current)
+      const selection = window.getSelection()
+      selection?.removeAllRanges()
+      selection?.addRange(range)
+    }
+    setContextMenu(prev => ({ ...prev, show: false }))
+  }
+
+  // Close context menu when clicking elsewhere
+  useEffect(() => {
+    const handleClick = () => setContextMenu(prev => ({ ...prev, show: false }))
+    document.addEventListener('click', handleClick)
+    return () => document.removeEventListener('click', handleClick)
+  }, [])
 
   const handleAutoScrollToggle = () => {
     setIsAutoScrollEnabled(!isAutoScrollEnabled)
@@ -256,7 +352,7 @@ export function Terminal({
         </div>
       )}
 
-      <div className="terminal-content" ref={terminalContentRef}>
+      <div className="terminal-content" ref={terminalContentRef} onContextMenu={handleContextMenu}>
         {filteredLines.length === 0 ? (
           <div className="terminal-empty-state">
             <p>No output yet...</p>
@@ -280,6 +376,22 @@ export function Terminal({
           </>
         )}
       </div>
+
+      {/* Context Menu */}
+      {contextMenu.show && (
+        <div 
+          className="terminal-context-menu"
+          style={{ left: contextMenu.x, top: contextMenu.y }}
+        >
+          <button onClick={handleContextMenuCopy} className="terminal-context-menu-item">
+            <Copy size={14} />
+            Copy {window.getSelection()?.toString().trim() ? 'Selected' : 'All'}
+          </button>
+          <button onClick={handleContextMenuSelectAll} className="terminal-context-menu-item">
+            Select All
+          </button>
+        </div>
+      )}
     </div>
   )
 }

@@ -319,7 +319,7 @@ fn build_sourced_command(
 ---
 
 ### Task TE-4: Add Per-Launcher Terminal Environment Overrides
-**Priority:** MEDIUM 🔶 | **Status:** TODO 📝 | **Depends On:** TE-2, TE-3
+**Priority:** MEDIUM 🔶 | **Status:** COMPLETED ✅ | **Issue:** TBD | **Commit:** 8b351b2
 
 **Problem Statement:**
 While global terminal settings solve most issues, some launchers need project-specific environment setup (like .env files, project setup scripts, or specific environment variables).
@@ -332,7 +332,7 @@ While global terminal settings solve most issues, some launchers need project-sp
 
 **Technical Implementation:**
 
-**Phase 1: Extend AppConfig Type**
+**Phase 1: Extend AppConfig Type ✅ DONE**
 ```typescript
 interface AppConfig {
   // ... existing fields

@@ -164,6 +164,19 @@
 .terminal-output {
   flex: 1;
   white-space: pre-wrap;
+  user-select: text;  /* Explicitly enable text selection */
+  cursor: text;       /* Show text cursor on hover */
+}
+
+/* Selection styling */
+.terminal-output::selection {
+  background-color: #264f78;  /* VS Code like selection color */
+  color: #ffffff;
+}
+
+.terminal-output::-moz-selection {
+  background-color: #264f78;  /* Firefox support */
+  color: #ffffff;
 }
 
 /* Terminal Line Types */
@@ -189,19 +202,51 @@
   color: #58a6ff;
 }
 
-/* Terminal Cursor */
+/* Terminal cursor */
 .terminal-cursor {
-  display: inline-block;
-  background-color: #f0f6fc;
-  width: 8px;
-  height: 1.2em;
-  animation: terminalBlink 1s infinite;
-  margin-top: 0.5rem;
+  color: var(--text-primary);
+  animation: blink 1s infinite;
+  margin-left: 2px;
 }
 
-@keyframes terminalBlink {
+@keyframes blink {
   0%, 50% { opacity: 1; }
   51%, 100% { opacity: 0; }
+}
+
+/* Context Menu */
+.terminal-context-menu {
+  position: fixed;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  min-width: 150px;
+  padding: 4px 0;
+}
+
+.terminal-context-menu-item {
+  width: 100%;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+}
+
+.terminal-context-menu-item:hover {
+  background: var(--bg-tertiary);
+}
+
+.terminal-context-menu-item:focus {
+  outline: none;
+  background: var(--bg-tertiary);
 }
 
 /* Empty State */
